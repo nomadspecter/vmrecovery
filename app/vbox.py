@@ -36,8 +36,15 @@ class VBoxController:
         except subprocess.TimeoutExpired:
             raise VBoxError(f"VBoxManage timed out: {' '.join(args[:3])}")
         if check and proc.returncode != 0:
-            msg = (proc.stderr or proc.stdout).strip().splitlines()
-            raise VBoxError(msg[-1] if msg else f"VBoxManage exit code {proc.returncode}")
+            lines = [line.strip() for line in (proc.stderr or proc.stdout).splitlines() if line.strip()]
+            err_line = None
+            for l in lines:
+                if "error:" in l and "Context:" not in l and "Details:" not in l:
+                    err_line = l
+                    break
+            if not err_line and lines:
+                err_line = lines[-1] if not any("error:" in l for l in lines) else lines[0]
+            raise VBoxError(err_line or f"VBoxManage exit code {proc.returncode}")
         return proc.stdout
 
     # ---- queries ---------------------------------------------------------
@@ -60,9 +67,10 @@ class VBoxController:
         return re.findall(r'^SnapshotName(?:-[\d-]+)?="(.*)"$', out, re.M)
 
     def get_guest_property(self, vm: str, prop: str) -> str | None:
-        out = self._run("guestproperty", "get", vm, prop, check=False).strip()
-        if out.startswith("Value:"):
-            return out[len("Value:"):].strip()
+        out = self._run("guestproperty", "get", vm, prop, check=False)
+        m = re.search(r'^Value:\s*(.*)$', out, re.M)
+        if m:
+            return m.group(1).strip()
         return None
 
     # ---- actions ---------------------------------------------------------
