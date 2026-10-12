@@ -1,0 +1,30 @@
+[Unit]
+Description=Automated Virtual Machine Recovery System (VMRecovery)
+After=network.target virtualbox.service
+Wants=virtualbox.service
+
+[Service]
+Type=simple
+User=nomad
+Group=nomad
+WorkingDirectory=/home/nomad/vmrecovery
+Environment="PATH=/home/nomad/vmrecovery/.venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONUNBUFFERED=1"
+EnvironmentFile=-/home/nomad/vmrecovery/instance/vmrecovery.env
+ExecStart=/home/nomad/vmrecovery/.venv/bin/python run.py
+Restart=always
+RestartSec=5
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-write
+PrivateTmp=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vmrecovery
+
+[Install]
+WantedBy=multi-user.target

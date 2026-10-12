@@ -40,5 +40,8 @@ input[type=text],input[type=password],input[type=number],input[type=date],select
 .login{width:100%;max-width:430px;margin:8vh auto;padding:34px 36px;border:1px solid #d9e2ec;border-radius:8px;background:#fff}
 .login h2{text-align:center;font-size:19px;margin-bottom:4px}.login p.sub{text-align:center;color:#52606d;font-size:12px;margin-bottom:22px}
 .login .row{margin-bottom:14px}.login .btn{width:100%;padding:10px;font-size:14px}
-.muted{color:#52606d;font-size:12px}
+.banner.red{background:#fdecea;border-color:#f1a9a0;color:#c0392b}
+.btn.g{background:#1e8449;border-color:#1e8449}
+.badge{display:inline-block;padding:2px 7px;font-size:11px;border-radius:3px;background:#e4ecf4;color:#24537f}
+.badge.tmpl{background:#fef3c7;color:#92400e;font-weight:600}
 @media(max-width:760px){.layout{flex-direction:column}.side{width:100%}.form,.form.three{grid-template-columns:1fr}}

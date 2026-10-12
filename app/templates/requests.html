@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block heading %}VM Requests & Provisioning{% endblock %}
+{% block body %}
+{% if user.role in ('admin', 'trainer') %}
+<div class="panel"><h4>Request a new virtual machine from a template</h4>
+  {% if not templates %}
+    <p class="muted">No golden templates configured yet. An administrator can mark any registered VM as a template in <a href="{{ url_for('main.vms') }}">Virtual Machines</a>.</p>
+  {% else %}
+  <form method="post" action="{{ url_for('main.request_new') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form">
+      <div><label for="template_choice">Choose approved template</label>
+        <select id="template_choice" name="template_choice" required>
+          {% for t in templates %}
+            <option value="{{ t.vbox_uuid }}|{{ t.vm_name }}">{{ t.vm_name }} ({{ t.class_group }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div><label for="requested_name">New VM name</label><input type="text" id="requested_name" name="requested_name" placeholder="e.g. LAB-NET-01" required pattern="[A-Za-z0-9_-]+"></div>
+      <div><label for="class_group">Class group</label><input type="text" id="class_group" name="class_group" value="General" required></div>
+      <div><label for="clone_type">Clone mode</label>
+        <select id="clone_type" name="clone_type">
+          <option value="linked">Linked clone (Fast, minimal disk usage)</option>
+          <option value="full">Full clone (Complete independent copy)</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:14px"><button class="btn" type="submit">Submit Request</button></div>
+  </form>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="table-wrap"><table>
+  <tr><th>ID</th><th>Requested name</th><th>Template</th><th>Requested by</th><th>Group</th><th>Mode</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+  {% for r in requests %}
+  <tr>
+    <td>#{{ r.request_id }}</td>
+    <td><b>{{ r.requested_name }}</b></td>
+    <td>{{ r.template_name }}</td>
+    <td>{{ r.username }}</td>
+    <td>{{ r.class_group }}</td>
+    <td>{{ r.clone_type|capitalize }}</td>
+    <td>
+      <span class="pill {{ 'run' if r.status == 'ready' else ('crash' if r.status in ('rejected','failed') else 'frz') }}">
+        {{ r.status|capitalize }}
+      </span>
+      {% if r.rejection_reason %}<div class="muted" style="font-size:11px">{{ r.rejection_reason }}</div>{% endif %}
+    </td>
+    <td>{{ r.created_at }}</td>
+    <td>
+      {% if user.role == 'admin' and r.status == 'pending' %}
+        <form class="inline" method="post" action="{{ url_for('main.request_approve', request_id=r.request_id) }}" style="margin-right:4px">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn g" type="submit">Approve & Clone</button>
+        </form>
+        <form class="inline" method="post" action="{{ url_for('main.request_reject', request_id=r.request_id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="text" name="reason" placeholder="Reason (optional)" style="width:110px;display:inline-block;padding:3px 5px;font-size:11px">
+          <button class="btn r" type="submit">Reject</button>
+        </form>
+      {% elif r.status == 'ready' and r.created_vm_id %}
+        <a class="btn o" href="{{ url_for('main.snapshots', vm_id=r.created_vm_id) }}">Manage VM</a>
+      {% else %}
+        <span class="muted">-</span>
+      {% endif %}
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="9" class="muted">No VM requests found.</td></tr>
+  {% endfor %}
+</table></div>
+{% endblock %}

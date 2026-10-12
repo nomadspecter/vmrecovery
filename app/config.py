@@ -38,9 +38,15 @@ class Settings:
     host: str = "127.0.0.1"
     port: int = 5000
     secret_key: str = ""
+    backup_dir: str = str(INSTANCE_DIR / "backups")
+    backup_retention_count: int = 3
+    disk_min_free_gb: float = 5.0
+    disk_min_free_pct: float = 10.0
 
     @classmethod
     def from_env(cls) -> "Settings":
+        b_dir = os.environ.get("VMR_BACKUP_DIR", str(INSTANCE_DIR / "backups"))
+        Path(b_dir).mkdir(parents=True, exist_ok=True)
         return cls(
             db_path=os.environ.get("VMR_DB", str(INSTANCE_DIR / "vmrecovery.db")),
             simulate=_bool("VMR_SIMULATE", False),
@@ -53,4 +59,8 @@ class Settings:
             host=os.environ.get("VMR_HOST", "127.0.0.1"),
             port=int(os.environ.get("VMR_PORT", 5000)),
             secret_key=_secret_key(),
+            backup_dir=b_dir,
+            backup_retention_count=int(os.environ.get("VMR_BACKUP_RETENTION", 3)),
+            disk_min_free_gb=float(os.environ.get("VMR_DISK_MIN_FREE_GB", 5.0)),
+            disk_min_free_pct=float(os.environ.get("VMR_DISK_MIN_FREE_PCT", 10.0)),
         )

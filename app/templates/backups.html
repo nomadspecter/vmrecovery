@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block heading %}Independent Backups: {{ vm.vm_name }}{% endblock %}
+{% block body %}
+<div class="panel">
+  <h4>Export VM Appliance (.OVA)</h4>
+  <p class="muted" style="margin-bottom:12px">
+    Independent backups export the virtual machine as an Open Virtualization Appliance (.ova) to host storage.
+    Unlike snapshots (which share the same disk), backups are completely independent copies that protect against disk or VM corruption.
+  </p>
+  <form method="post" action="{{ url_for('main.backup_create', vm_id=vm.vm_id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn" type="submit">Create Independent Backup Now</button>
+    <a class="btn o" href="{{ url_for('main.dashboard') }}" style="margin-left:8px">Back to Dashboard</a>
+  </form>
+</div>
+
+<div class="table-wrap"><table>
+  <tr><th>Backup Name</th><th>File Size</th><th>Created At</th><th>Actions</th></tr>
+  {% for b in backups %}
+  <tr>
+    <td><b>{{ b.backup_name }}</b></td>
+    <td>{{ (b.size_bytes / (1024 * 1024))|round(1) }} MB</td>
+    <td>{{ b.created_at }}</td>
+    <td>
+      {% if user.role == 'admin' %}
+      <form class="inline" method="post" action="{{ url_for('main.backup_restore', vm_id=vm.vm_id, backup_id=b.backup_id) }}" onsubmit="return confirm('Restore VM {{ vm.vm_name }} from {{ b.backup_name }}? Current disk state will be replaced.')" style="margin-right:6px">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn o" type="submit">Restore from Backup</button>
+      </form>
+      <form class="inline" method="post" action="{{ url_for('main.backup_delete', vm_id=vm.vm_id, backup_id=b.backup_id) }}" onsubmit="return confirm('Delete backup {{ b.backup_name }} from disk?')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn r" type="submit">Delete</button>
+      </form>
+      {% else %}
+        <span class="muted">Contact admin to restore</span>
+      {% endif %}
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="4" class="muted">No independent backups created for this virtual machine yet.</td></tr>
+  {% endfor %}
+</table></div>
+{% endblock %}

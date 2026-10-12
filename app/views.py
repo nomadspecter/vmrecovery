@@ -5,6 +5,7 @@ import time
 from collections import defaultdict, deque
 from datetime import date, timedelta
 from functools import wraps
+from pathlib import Path
 
 from flask import (Blueprint, abort, current_app, flash, g, redirect, render_template,
                    request, session, url_for)
@@ -106,7 +107,7 @@ def vm_or_404(vm_id):
     return vm
 
 
-# ------------------------------------------------------------------ login
+# ------------------------------------------------------------------ login & auth
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -142,7 +143,10 @@ def logout():
 @login_required
 def dashboard():
     conn = get_db()
-    data = services.dashboard_data(conn)
+    if g.user["role"] == "student":
+        student_vms = services.get_student_vms(conn, g.user["user_id"])
+        return render_template("dashboard.html", student_vms=student_vms)
+    data = services.dashboard_data(conn, settings=settings())
     pending = services.pending_requests(conn) if g.user["role"] == "admin" else []
     return render_template("dashboard.html", pending=pending, **data)
 
@@ -157,19 +161,21 @@ def start_session():
     return redirect(url_for("main.dashboard"))
 
 
-# ------------------------------------------------------------------ VM registry (admin)
+# ------------------------------------------------------------------ VM registry & templates (admin)
 @bp.route("/vms")
 @role_required("admin")
 def vms():
     conn = get_db()
     registered = services.list_vms(conn)
+    templates = services.list_templates(conn)
     known = {v["vbox_uuid"] for v in registered}
     available, vbox_error = [], None
     try:
         available = [(n, u) for n, u in vbox().list_vms() if u not in known]
     except VBoxError as exc:
         vbox_error = str(exc)
-    return render_template("vms.html", vms=registered, available=available, vbox_error=vbox_error)
+    return render_template("vms.html", vms=registered, available=available,
+                           templates=templates, vbox_error=vbox_error)
 
 
 @bp.route("/vms/add", methods=["POST"])
@@ -180,13 +186,40 @@ def vms_add():
     if not uuid:
         name, uuid = request.form.get("vm_name", ""), request.form.get("vbox_uuid", "")
     try:
+        is_template = request.form.get("is_template") == "on"
         services.register_vm(get_db(), name, uuid, request.form.get("class_group", "General"),
                              to_int("interval_minutes", 30), to_int("retention_count", 5),
                              request.form.get("pre_session") == "on", g.user["user_id"],
-                             request.form.get("heartbeat_property"))
+                             request.form.get("heartbeat_property"), is_template=is_template)
         flash(f"{name} registered.", "ok")
     except ValueError as exc:
         flash(str(exc), "error")
+    return redirect(url_for("main.vms"))
+
+
+@bp.route("/vms/direct-create", methods=["POST"])
+@role_required("admin")
+def vms_direct_create():
+    name = request.form.get("name", "").strip()
+    tpl_uuid = request.form.get("template_uuid", "").strip()
+    group = request.form.get("class_group", "General").strip()
+    clone_type = request.form.get("clone_type", "linked")
+    try:
+        with vbox_lock():
+            vm_id = services.direct_create_vm(get_db(), vbox(), name, group, tpl_uuid,
+                                               clone_type=clone_type, user_id=g.user["user_id"])
+        flash(f"VM '{name}' cloned from template and registered.", "ok")
+    except (ValueError, VBoxError) as exc:
+        flash(str(exc), "error")
+    return redirect(url_for("main.vms"))
+
+
+@bp.route("/vms/<int:vm_id>/toggle-template", methods=["POST"])
+@role_required("admin")
+def vm_toggle_template(vm_id):
+    vm = vm_or_404(vm_id)
+    services.set_vm_template(get_db(), vm_id, not vm["is_template"], g.user["user_id"])
+    flash(f"Updated template status for {vm['vm_name']}.", "ok")
     return redirect(url_for("main.vms"))
 
 
@@ -194,18 +227,25 @@ def vms_add():
 @role_required("admin")
 def vm_edit(vm_id):
     vm = vm_or_404(vm_id)
+    conn = get_db()
     if request.method == "POST":
         try:
-            services.update_vm(get_db(), vm_id, request.form.get("class_group", "General"),
+            student_id = request.form.get("assigned_student_id")
+            student_id = int(student_id) if student_id else None
+            services.update_vm(conn, vm_id, request.form.get("class_group", "General"),
                                to_int("interval_minutes", vm["interval_minutes"]),
                                to_int("retention_count", vm["retention_count"]),
                                request.form.get("pre_session") == "on",
-                               request.form.get("heartbeat_property"), g.user["user_id"])
+                               request.form.get("heartbeat_property"),
+                               is_template=request.form.get("is_template") == "on",
+                               assigned_student_id=student_id,
+                               user_id=g.user["user_id"])
             flash("Policy updated.", "ok")
             return redirect(url_for("main.vms"))
         except ValueError as exc:
             flash(str(exc), "error")
-    return render_template("vm_edit.html", vm=vm)
+    students = [u for u in services.list_users(conn) if u["role"] == "student"]
+    return render_template("vm_edit.html", vm=vm, students=students)
 
 
 @bp.route("/vms/<int:vm_id>/delete", methods=["POST"])
@@ -251,12 +291,166 @@ def restore(vm_id):
 
 
 @bp.route("/vms/<int:vm_id>/request-restore", methods=["POST"])
-@role_required("trainer", "admin")
+@role_required("trainer", "admin", "student")
 def request_restore(vm_id):
-    vm_or_404(vm_id)
+    vm = vm_or_404(vm_id)
     services.request_restore(get_db(), vm_id, g.user["user_id"])
     flash("Restore requested. The administrator has been notified on the dashboard.", "ok")
     return redirect(url_for("main.dashboard"))
+
+
+# ------------------------------------------------------------------ independent backups (.ova)
+@bp.route("/vms/<int:vm_id>/backups")
+@role_required("admin", "trainer")
+def backups(vm_id):
+    vm = vm_or_404(vm_id)
+    b_list = services.list_backups(get_db(), vm_id)
+    return render_template("backups.html", vm=vm, backups=b_list, backup_dir=settings().backup_dir)
+
+
+@bp.route("/vms/<int:vm_id>/backups/create", methods=["POST"])
+@role_required("admin", "trainer")
+def backup_create(vm_id):
+    vm = vm_or_404(vm_id)
+    try:
+        with vbox_lock():
+            services.create_backup(get_db(), vbox(), vm, settings().backup_dir,
+                                   user_id=g.user["user_id"],
+                                   retention_count=settings().backup_retention_count)
+        flash("Independent OVA backup created successfully.", "ok")
+    except Exception as exc:
+        flash(f"Backup failed: {exc}", "error")
+    return redirect(url_for("main.backups", vm_id=vm_id))
+
+
+@bp.route("/vms/<int:vm_id>/backups/<int:backup_id>/restore", methods=["POST"])
+@role_required("admin")
+def backup_restore(vm_id, backup_id):
+    vm = vm_or_404(vm_id)
+    try:
+        with vbox_lock():
+            ok = services.restore_backup(get_db(), vbox(), vm, backup_id, user_id=g.user["user_id"])
+        if ok:
+            flash(f"{vm['vm_name']} successfully restored from appliance backup.", "ok")
+        else:
+            flash("Restore from backup failed. See event log.", "error")
+    except Exception as exc:
+        flash(str(exc), "error")
+    return redirect(url_for("main.backups", vm_id=vm_id))
+
+
+@bp.route("/vms/<int:vm_id>/backups/<int:backup_id>/delete", methods=["POST"])
+@role_required("admin")
+def backup_delete(vm_id, backup_id):
+    vm_or_404(vm_id)
+    conn = get_db()
+    b = conn.execute("SELECT * FROM backups WHERE backup_id=? AND vm_id=?", (backup_id, vm_id)).fetchone()
+    if b:
+        try:
+            Path(b["file_path"]).unlink(missing_ok=True)
+        except OSError:
+            pass
+        conn.execute("DELETE FROM backups WHERE backup_id=?", (backup_id,))
+        conn.commit()
+        services.log_event(conn, "backup_deleted", vm_id, g.user["user_id"],
+                           f"Deleted backup {b['backup_name']}", "Success")
+        flash("Backup deleted.", "ok")
+    return redirect(url_for("main.backups", vm_id=vm_id))
+
+
+# ------------------------------------------------------------------ VM requests & approval
+@bp.route("/requests")
+@role_required("admin", "trainer")
+def requests_list():
+    conn = get_db()
+    uid = None if g.user["role"] == "admin" else g.user["user_id"]
+    reqs = services.list_vm_requests(conn, user_id=uid)
+    templates = services.list_templates(conn)
+    return render_template("requests.html", requests=reqs, templates=templates)
+
+
+@bp.route("/requests/new", methods=["POST"])
+@role_required("admin", "trainer")
+def request_new():
+    choice = request.form.get("template_choice", "")
+    uuid, _, name = choice.partition("|")
+    req_name = request.form.get("requested_name", "")
+    group = request.form.get("class_group", "General")
+    mode = request.form.get("clone_type", "linked")
+    try:
+        services.request_vm(get_db(), g.user["user_id"], uuid, name, req_name, group, mode)
+        flash("VM request submitted for administrator review.", "ok")
+    except ValueError as exc:
+        flash(str(exc), "error")
+    return redirect(url_for("main.requests_list"))
+
+
+@bp.route("/requests/<int:request_id>/approve", methods=["POST"])
+@role_required("admin")
+def request_approve(request_id):
+    try:
+        with vbox_lock():
+            services.approve_vm_request(get_db(), vbox(), request_id, g.user["user_id"])
+        flash("Request approved. Virtual machine created and registered.", "ok")
+    except Exception as exc:
+        flash(f"Approval failed: {exc}", "error")
+    return redirect(url_for("main.requests_list"))
+
+
+@bp.route("/requests/<int:request_id>/reject", methods=["POST"])
+@role_required("admin")
+def request_reject(request_id):
+    reason = request.form.get("reason", "").strip()
+    try:
+        services.reject_vm_request(get_db(), request_id, g.user["user_id"], reason)
+        flash("Request rejected.", "ok")
+    except ValueError as exc:
+        flash(str(exc), "error")
+    return redirect(url_for("main.requests_list"))
+
+
+# ------------------------------------------------------------------ user management (admin)
+@bp.route("/users")
+@role_required("admin")
+def users_page():
+    return render_template("users.html", users=services.list_users(get_db()))
+
+
+@bp.route("/users/create", methods=["POST"])
+@role_required("admin")
+def user_create():
+    u = request.form.get("username", "")
+    p = request.form.get("password", "")
+    r = request.form.get("role", "trainer")
+    try:
+        services.create_user(get_db(), u, p, r)
+        flash(f"User '{u}' created.", "ok")
+    except (ValueError, Exception) as exc:
+        flash(str(exc), "error")
+    return redirect(url_for("main.users_page"))
+
+
+@bp.route("/users/<int:user_id>/reset-password", methods=["POST"])
+@role_required("admin")
+def user_reset_password(user_id):
+    p = request.form.get("new_password", "")
+    try:
+        services.reset_user_password(get_db(), user_id, p)
+        flash("Password updated.", "ok")
+    except ValueError as exc:
+        flash(str(exc), "error")
+    return redirect(url_for("main.users_page"))
+
+
+@bp.route("/users/<int:user_id>/delete", methods=["POST"])
+@role_required("admin")
+def user_delete(user_id):
+    try:
+        services.delete_user(get_db(), user_id)
+        flash("User deleted.", "ok")
+    except ValueError as exc:
+        flash(str(exc), "error")
+    return redirect(url_for("main.users_page"))
 
 
 # ------------------------------------------------------------------ demo helpers (simulation only)

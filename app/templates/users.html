@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block heading %}User Management{% endblock %}
+{% block body %}
+<div class="panel"><h4>Create a new user account</h4>
+  <form method="post" action="{{ url_for('main.user_create') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form three">
+      <div><label for="username">Username</label><input type="text" id="username" name="username" required></div>
+      <div><label for="password">Password (8+ chars)</label><input type="password" id="password" name="password" minlength="8" required></div>
+      <div><label for="role">Role</label>
+        <select id="role" name="role" required>
+          <option value="trainer">Trainer</option>
+          <option value="student">Student</option>
+          <option value="admin">Administrator</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:14px"><button class="btn" type="submit">Create User</button></div>
+  </form>
+</div>
+
+<div class="table-wrap"><table>
+  <tr><th>Username</th><th>Role</th><th>Assigned VMs</th><th>Actions</th></tr>
+  {% for u in users %}
+  <tr>
+    <td><b>{{ u.username }}</b></td>
+    <td><span class="badge">{{ u.role|capitalize }}</span></td>
+    <td>{{ u.assigned_vm_count }}</td>
+    <td>
+      <form class="inline" method="post" action="{{ url_for('main.user_reset_password', user_id=u.user_id) }}" style="margin-right:6px">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="password" name="new_password" placeholder="New pass (8+ chars)" minlength="8" required style="width:140px;display:inline-block;padding:4px 6px;font-size:12px">
+        <button class="btn o" type="submit">Reset</button>
+      </form>
+      {% if u.user_id != user.user_id %}
+      <form class="inline" method="post" action="{{ url_for('main.user_delete', user_id=u.user_id) }}" onsubmit="return confirm('Delete user {{ u.username }}?')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn r" type="submit">Delete</button>
+      </form>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% endblock %}

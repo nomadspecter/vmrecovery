@@ -73,6 +73,13 @@ class VBoxController:
             return m.group(1).strip()
         return None
 
+    def get_uuid(self, vm: str) -> str:
+        out = self._run("showvminfo", vm, "--machinereadable")
+        m = re.search(r'^UUID="([^"]+)"', out, re.M)
+        if not m:
+            raise VBoxError("could not read VM UUID")
+        return m.group(1)
+
     # ---- actions ---------------------------------------------------------
     def take_snapshot(self, vm: str, name: str, live: bool = False, description: str = "") -> None:
         args = ["snapshot", vm, "take", name]
@@ -94,6 +101,29 @@ class VBoxController:
     def start_vm(self, vm: str) -> None:
         self._run("startvm", vm, "--type", "headless")
 
+    def clone_vm(self, source_vm: str, new_name: str, linked: bool = True) -> tuple[str, str]:
+        args = ["clonevm", source_vm, "--name", new_name, "--register"]
+        if linked:
+            args += ["--options", "link"]
+        else:
+            args += ["--mode", "all"]
+        self._run(*args)
+        return new_name, self.get_uuid(new_name)
+
+    def export_vm(self, vm: str, output_path: str) -> None:
+        self._run("export", vm, "-o", output_path)
+
+    def import_vm(self, appliance_path: str, new_name: str = "") -> tuple[str, str]:
+        args = ["import", appliance_path]
+        if new_name:
+            args += ["--vsys", "0", "--vmname", new_name]
+        self._run(*args)
+        target = new_name or "Imported-VM"
+        return target, self.get_uuid(target)
+
+    def unregister_and_delete(self, vm: str) -> None:
+        self._run("unregistervm", vm, "--delete", check=False)
+
 
 class SimulatedVBox:
     """In-memory stand-in for VirtualBox. Thread-safe enough for the demo."""
@@ -105,8 +135,8 @@ class SimulatedVBox:
         self.fail_next: set[str] = set()      # operations that should fail, for tests
         if demo_vms:
             for i, (name, state) in enumerate([("DEV-LAB-01", "running"), ("DEV-LAB-02", "running"),
-                                               ("NET-LAB-03", "running"), ("NET-LAB-04", "running"),
-                                               ("SEC-LAB-05", "poweroff")], start=1):
+                                                ("NET-LAB-03", "running"), ("NET-LAB-04", "running"),
+                                                ("SEC-LAB-05", "poweroff")], start=1):
                 self.add_vm(name, f"00000000-0000-4000-8000-00000000000{i}", state)
 
     def add_vm(self, name: str, uuid: str, state: str = "running") -> None:
@@ -139,6 +169,13 @@ class SimulatedVBox:
 
     def get_state(self, vm):
         return self._find(vm)["state"]
+
+    def get_uuid(self, vm):
+        with self._lock:
+            for u, d in self.vms.items():
+                if vm in (u, d["name"]):
+                    return u
+        raise VBoxError(f"Could not find a registered machine named '{vm}'")
 
     def list_snapshots(self, vm):
         return list(self._find(vm)["snapshots"])
@@ -180,6 +217,41 @@ class SimulatedVBox:
     def start_vm(self, vm):
         self._maybe_fail("start_vm")
         self._find(vm)["state"] = "running"
+
+    def clone_vm(self, source_vm, new_name, linked=True):
+        self._maybe_fail("clone_vm")
+        with self._lock:
+            self._find(source_vm)
+            new_uuid = f"00000000-0000-4000-8000-{len(self.vms) + 1:012d}"
+            self.add_vm(new_name, new_uuid, state="poweroff")
+            return new_name, new_uuid
+
+    def export_vm(self, vm, output_path):
+        self._maybe_fail("export_vm")
+        self._find(vm)
+        from pathlib import Path
+        p = Path(output_path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text("SIMULATED_OVA_BACKUP")
+
+    def import_vm(self, appliance_path, new_name=""):
+        self._maybe_fail("import_vm")
+        with self._lock:
+            name = new_name or f"Imported-VM-{len(self.vms) + 1}"
+            new_uuid = f"00000000-0000-4000-8000-{len(self.vms) + 1:012d}"
+            self.add_vm(name, new_uuid, state="poweroff")
+            return name, new_uuid
+
+    def unregister_and_delete(self, vm):
+        self._maybe_fail("unregister_and_delete")
+        with self._lock:
+            found_u = None
+            for u, d in self.vms.items():
+                if vm in (u, d["name"]):
+                    found_u = u
+                    break
+            if found_u:
+                del self.vms[found_u]
 
 
 def make_vbox(settings):

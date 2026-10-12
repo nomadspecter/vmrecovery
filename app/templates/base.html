@@ -9,6 +9,8 @@
     <h3>VM Recovery</h3>
     <a href="{{ url_for('main.dashboard') }}" class="{{ 'on' if request.endpoint == 'main.dashboard' }}">Dashboard</a>
     {% if user.role == 'admin' %}<a href="{{ url_for('main.vms') }}" class="{{ 'on' if request.endpoint in ('main.vms','main.vm_edit') }}">Virtual Machines</a>{% endif %}
+    {% if user.role in ('admin', 'trainer') %}<a href="{{ url_for('main.requests_list') }}" class="{{ 'on' if request.endpoint == 'main.requests_list' }}">VM Requests</a>{% endif %}
+    {% if user.role == 'admin' %}<a href="{{ url_for('main.users_page') }}" class="{{ 'on' if request.endpoint == 'main.users_page' }}">Users</a>{% endif %}
     <a href="{{ url_for('main.events') }}" class="{{ 'on' if request.endpoint == 'main.events' }}">Event Log</a>
     {% if user.role == 'admin' %}<a href="{{ url_for('main.reports') }}" class="{{ 'on' if request.endpoint == 'main.reports' }}">Reports</a>{% endif %}
     <form method="post" action="{{ url_for('main.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Logout</button></form>

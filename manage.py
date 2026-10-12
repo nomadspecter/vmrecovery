@@ -28,7 +28,7 @@ def main() -> int:
     sub.add_parser("init-db", help="create the database tables")
     cu = sub.add_parser("create-user", help="add a user")
     cu.add_argument("username")
-    cu.add_argument("role", choices=["admin", "trainer"])
+    cu.add_argument("role", choices=["admin", "trainer", "student"])
     rp = sub.add_parser("reset-password", help="change a user's password")
     rp.add_argument("username")
     sub.add_parser("list-users", help="show all users")
