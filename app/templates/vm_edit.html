@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block heading %}Edit {{ vm.vm_name }}{% endblock %}
+{% block body %}
+<div class="panel"><form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form">
+    <div><label for="class_group">Class group</label><input type="text" id="class_group" name="class_group" value="{{ vm.class_group }}" required></div>
+    <div><label for="heartbeat_property">Heartbeat guest property (optional)</label><input type="text" id="heartbeat_property" name="heartbeat_property" value="{{ vm.heartbeat_property or '' }}"></div>
+    <div><label for="interval_minutes">Snapshot interval (minutes)</label><input type="number" id="interval_minutes" name="interval_minutes" value="{{ vm.interval_minutes }}" min="1" max="1440"></div>
+    <div><label for="retention_count">Snapshots to keep</label><input type="number" id="retention_count" name="retention_count" value="{{ vm.retention_count }}" min="1" max="20"></div>
+    <div><label style="color:#1f2933"><input type="checkbox" name="pre_session" {{ 'checked' if vm.pre_session_snapshot }}> Snapshot before every session</label></div>
+  </div>
+  <div style="margin-top:14px"><button class="btn" type="submit">Save</button> <a class="btn o" href="{{ url_for('main.vms') }}">Cancel</a></div>
+</form></div>
+{% endblock %}

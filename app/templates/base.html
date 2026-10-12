@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}{{ self.heading() }}{% endblock %} - VM Recovery System</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body>
+{% if user %}
+<div class="layout">
+  <nav class="side">
+    <h3>VM Recovery</h3>
+    <a href="{{ url_for('main.dashboard') }}" class="{{ 'on' if request.endpoint == 'main.dashboard' }}">Dashboard</a>
+    {% if user.role == 'admin' %}<a href="{{ url_for('main.vms') }}" class="{{ 'on' if request.endpoint in ('main.vms','main.vm_edit') }}">Virtual Machines</a>{% endif %}
+    <a href="{{ url_for('main.events') }}" class="{{ 'on' if request.endpoint == 'main.events' }}">Event Log</a>
+    {% if user.role == 'admin' %}<a href="{{ url_for('main.reports') }}" class="{{ 'on' if request.endpoint == 'main.reports' }}">Reports</a>{% endif %}
+    <form method="post" action="{{ url_for('main.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Logout</button></form>
+  </nav>
+  <main class="main">
+    <div class="top"><h2>{% block heading %}{% endblock %}</h2>
+      <span class="user">Signed in as <b>{{ user.username }}</b> ({{ user.role|capitalize }}){% if simulate %} &middot; <b>SIMULATION MODE</b>{% endif %}</span></div>
+    {% with msgs = get_flashed_messages(with_categories=true) %}{% for cat, m in msgs %}<div class="flash {{ cat }}">{{ m }}</div>{% endfor %}{% endwith %}
+    {% block body %}{% endblock %}
+  </main>
+</div>
+{% else %}
+  {% with msgs = get_flashed_messages(with_categories=true) %}{% for cat, m in msgs %}<div class="flash {{ cat }}" style="max-width:430px;margin:12px auto 0">{{ m }}</div>{% endfor %}{% endwith %}
+  {% block public %}{% endblock %}
+{% endif %}
+</body></html>

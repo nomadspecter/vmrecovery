@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block heading %}Event Log{% endblock %}
+{% block body %}
+<div class="panel"><form method="get" class="form three" style="align-items:end">
+  <div><label for="vm_id">VM</label><select id="vm_id" name="vm_id"><option value="">All VMs</option>{% for v in vms %}<option value="{{ v.vm_id }}" {{ 'selected' if f_vm == v.vm_id }}>{{ v.vm_name }}</option>{% endfor %}</select></div>
+  <div><label for="event_type">Event type</label><select id="event_type" name="event_type"><option value="">All events</option>{% for t in types %}<option value="{{ t }}" {{ 'selected' if f_type == t }}>{{ t|replace('_',' ') }}</option>{% endfor %}</select></div>
+  <div><label for="day">Date</label><input type="date" id="day" name="day" value="{{ f_day }}"></div>
+  <div><button class="btn" type="submit">Filter</button> <a class="btn o" href="{{ url_for('main.events') }}">Clear</a></div>
+</form></div>
+<div class="table-wrap"><table>
+  <tr><th>Time</th><th>VM</th><th>Event</th><th>Details</th><th>Result</th><th>By</th></tr>
+  {% for e in events %}
+  <tr><td>{{ e.created_at }}</td><td>{{ e.vm_name or '-' }}</td><td>{{ e.event_type|replace('_',' ') }}</td><td>{{ e.details }}</td><td>{{ e.result }}</td><td>{{ e.username or 'system' }}</td></tr>
+  {% else %}<tr><td colspan="6" class="muted">No events match.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

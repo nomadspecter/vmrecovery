@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block heading %}Snapshots: {{ vm.vm_name }}{% endblock %}
+{% block body %}
+<div class="panel"><h4>Current status: <span class="pill {{ pill(vm.status) }}">{{ vm.status|capitalize }}</span></h4>
+  <form class="inline" method="post" action="{{ url_for('main.snapshot_now', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn" type="submit">Take snapshot now</button></form>
+  <a class="btn o" href="{{ url_for('main.dashboard') }}">Back</a></div>
+<div class="table-wrap"><table>
+  <tr><th>Snapshot</th><th>Type</th><th>Taken</th><th>Action</th></tr>
+  {% for s in snaps %}
+  <tr><td>{{ s.snapshot_name }}</td><td>{{ s.snapshot_type }}</td><td>{{ s.created_at }}</td>
+    <td>{% if user.role == 'admin' %}
+      <form class="inline" method="post" action="{{ url_for('main.restore', vm_id=vm.vm_id) }}" onsubmit="return confirm('Power off {{ vm.vm_name }} and restore {{ s.snapshot_name }}? Work done after {{ s.created_at }} will be lost.')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="snapshot_id" value="{{ s.snapshot_id }}"><button class="btn r" type="submit">Restore this</button></form>
+      {% else %}<span class="muted">Ask the administrator to restore</span>{% endif %}</td></tr>
+  {% else %}<tr><td colspan="4" class="muted">No snapshots yet.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

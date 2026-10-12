@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block heading %}Virtual Machines{% endblock %}
+{% block body %}
+<div class="panel"><h4>Register a virtual machine</h4>
+  {% if vbox_error %}<div class="flash error">Could not list VirtualBox machines: {{ vbox_error }}. You can still enter the details by hand.</div>{% endif %}
+  <form method="post" action="{{ url_for('main.vms_add') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form">
+      <div><label for="vbox_choice">Choose from VirtualBox</label>
+        <select id="vbox_choice" name="vbox_choice"><option value="">- or enter manually below -</option>
+          {% for name, uuid in available %}<option value="{{ name }}|{{ uuid }}">{{ name }} ({{ uuid[:8] }})</option>{% endfor %}</select></div>
+      <div><label for="class_group">Class group</label><input type="text" id="class_group" name="class_group" value="General" required></div>
+      <div><label for="vm_name">VM name (manual)</label><input type="text" id="vm_name" name="vm_name"></div>
+      <div><label for="vbox_uuid">VirtualBox UUID (manual)</label><input type="text" id="vbox_uuid" name="vbox_uuid"></div>
+      <div><label for="interval_minutes">Snapshot interval (minutes)</label><input type="number" id="interval_minutes" name="interval_minutes" value="30" min="1" max="1440"></div>
+      <div><label for="retention_count">Snapshots to keep</label><input type="number" id="retention_count" name="retention_count" value="5" min="1" max="20"></div>
+      <div><label for="heartbeat_property">Heartbeat guest property (optional)</label><input type="text" id="heartbeat_property" name="heartbeat_property" placeholder="/Lab/Heartbeat"></div>
+      <div><label>&nbsp;</label><label style="color:#1f2933"><input type="checkbox" name="pre_session" checked> Snapshot before every session</label></div>
+    </div>
+    <div style="margin-top:14px"><button class="btn" type="submit">Save VM</button></div>
+  </form></div>
+
+<div class="table-wrap"><table>
+  <tr><th>VM name</th><th>Class group</th><th>Interval</th><th>Keep</th><th>Pre-session</th><th>Actions</th></tr>
+  {% for vm in vms %}
+  <tr><td>{{ vm.vm_name }}</td><td>{{ vm.class_group }}</td><td>{{ vm.interval_minutes }} min</td><td>{{ vm.retention_count }}</td>
+    <td>{{ 'Yes' if vm.pre_session_snapshot else 'No' }}</td>
+    <td><a class="btn o" href="{{ url_for('main.vm_edit', vm_id=vm.vm_id) }}">Edit</a>
+      <form class="inline" method="post" action="{{ url_for('main.vm_delete', vm_id=vm.vm_id) }}" onsubmit="return confirm('Stop managing {{ vm.vm_name }}? The VM stays in VirtualBox.')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn r" type="submit">Remove</button></form></td></tr>
+  {% else %}<tr><td colspan="6" class="muted">Nothing registered yet.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

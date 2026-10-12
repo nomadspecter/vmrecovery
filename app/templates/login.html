@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block heading %}Login{% endblock %}
+{% block public %}
+<form class="login" method="post">
+  <h2>VM Recovery System</h2><p class="sub">VirtualKenya Labs - sign in to continue</p>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="row"><label for="username">Username</label><input type="text" id="username" name="username" autocomplete="username" required autofocus></div>
+  <div class="row"><label for="password">Password</label><input type="password" id="password" name="password" autocomplete="current-password" required></div>
+  <button class="btn" type="submit">Log in</button>
+  <p class="muted" style="margin-top:14px;text-align:center">Forgot password? Contact the lab administrator.</p>
+</form>
+{% endblock %}

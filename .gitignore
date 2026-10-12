@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Instance-specific database and secret files
+instance/*.db
+instance/*.sqlite
+instance/*.sqlite3
+instance/*.key
+instance/vmrecovery.db*
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE & Editor artifacts
+.vscode/
+.idea/
+*.swp
+*~

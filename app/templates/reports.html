@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block heading %}Reports{% endblock %}
+{% block body %}
+<div class="panel"><form method="get" class="form three" style="grid-template-columns:repeat(4,1fr);align-items:end">
+  <div><label for="start">From</label><input type="date" id="start" name="start" value="{{ start }}"></div>
+  <div><label for="end">To</label><input type="date" id="end" name="end" value="{{ end }}"></div>
+  <div><label for="class_group">Class group</label><select id="class_group" name="class_group"><option>All</option>{% for g in groups %}<option {{ 'selected' if g == group }}>{{ g }}</option>{% endfor %}</select></div>
+  <div><button class="btn" type="submit">Generate</button> <button class="btn o" type="button" onclick="window.print()">Print / PDF</button></div>
+</form></div>
+<div class="cards">
+  <div class="card">Snapshots taken<b>{{ r.totals.snapshots }}</b></div>
+  <div class="card red">Crashes detected<b>{{ r.totals.crashes }}</b></div>
+  <div class="card green">Auto-recovered<b>{{ r.totals.auto_recovered }}</b></div>
+  <div class="card">Restored by admin<b>{{ r.totals.manual_recovered }}</b></div>
+  <div class="card amber">Alerts (manual action)<b>{{ r.totals.manual_action }}</b></div>
+</div>
+<div class="panel"><h4>Crashes and recoveries per week</h4>
+  {% if r.weekly %}
+  <div class="bars">{% for w in r.weekly %}
+    <div><div class="bargroup">
+      <div class="bar c" style="height:{{ ((w.crashes or 0) / peak * 140)|round|int + 2 }}px">{{ w.crashes or 0 }}</div>
+      <div class="bar s" style="height:{{ ((w.recoveries or 0) / peak * 140)|round|int + 2 }}px">{{ w.recoveries or 0 }}</div></div>
+      <div class="lab">{{ w.week }}</div></div>{% endfor %}</div>
+  <p class="muted" style="margin-top:8px">Red = crashes and freezes detected, green = successful restores.</p>
+  {% else %}<p class="muted">No crash or recovery events in this period.</p>{% endif %}
+</div>
+{% endblock %}
