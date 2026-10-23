@@ -3,7 +3,7 @@
 {% block body %}
 {% if templates %}
 <div class="panel"><h4>Create New VM from Template (Clone)</h4>
-  <p class="muted" style="margin-bottom:12px">Instantly provision and register a new VirtualBox machine by cloning an approved golden template.</p>
+  <p class="muted" style="margin-bottom:12px">Instantly provision and register a new VirtualBox machine by cloning an approved golden template. <b>Linked</b> clones share the template's base disk and are fast/space-efficient; <b>full</b> clones are complete independent copies.</p>
   <form method="post" action="{{ url_for('main.vms_direct_create') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="form">
@@ -69,10 +69,14 @@
       </form>
     </td>
     <td>
+      <a class="btn o" href="{{ url_for('main.vm_detail', vm_id=vm.vm_id) }}">Manage</a>
       <a class="btn o" href="{{ url_for('main.vm_edit', vm_id=vm.vm_id) }}">Edit</a>
       <a class="btn o" href="{{ url_for('main.backups', vm_id=vm.vm_id) }}">Backups</a>
-      <form class="inline" method="post" action="{{ url_for('main.vm_delete', vm_id=vm.vm_id) }}" onsubmit="return confirm('Stop managing {{ vm.vm_name }}? The VM stays in VirtualBox.')">
+      <form class="inline" method="post" action="{{ url_for('main.vm_delete', vm_id=vm.vm_id) }}" onsubmit="return confirm('Stop managing {{ vm.vm_name }}? The VM stays in VirtualBox unless you tick the box below.')">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label class="muted" style="font-size:11px;display:inline-block;margin-right:6px">
+          <input type="checkbox" name="delete_from_vbox" value="on"> delete from VirtualBox
+        </label>
         <button class="btn r" type="submit">Remove</button>
       </form>
     </td>

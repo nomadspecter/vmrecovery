@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Error{% endblock %}
+{% block heading %}Something went wrong{% endblock %}
+{% block body %}
+<div class="card">
+  <p>{{ message }}</p>
+  <p><a href="{{ url_for('main.dashboard') }}">Back to the dashboard</a></p>
+</div>
+{% endblock %}
+{% block public %}
+<div class="card" style="max-width:430px;margin:12px auto">
+  <p>{{ message }}</p>
+</div>
+{% endblock %}

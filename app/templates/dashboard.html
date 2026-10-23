@@ -7,6 +7,20 @@
 </div>
 {% endif %}
 
+{% if health and not health.ok %}
+<div class="banner red">
+  <b>VirtualBox is not reachable:</b> {{ health.error }}
+  {% if user.role == 'admin' %}<a href="{{ url_for('main.system_page') }}">Open System Health</a>{% endif %}
+</div>
+{% endif %}
+
+{% if stale %}
+<div class="banner amber">
+  <b>Monitoring may be behind:</b> {{ stale|length }} VM(s) have not been checked recently
+  ({{ stale[0].vm_name }} last checked {{ stale[0].last_checked or 'never' }}). Make sure the background service is running.
+</div>
+{% endif %}
+
 {% if user.role == 'student' %}
   <div class="panel">
     <h4>Student Workstation</h4>
@@ -41,6 +55,12 @@
     <div class="card red">Crashed<b>{{ counts.crashed }}</b></div>
     <div class="card">Snapshots today<b>{{ counts.snapshots_today }}</b></div>
     <div class="card">Backups<b>{{ counts.backups_total }}</b></div>
+    {% if counts.mean_recovery_seconds is not none %}
+    <div class="card green">Mean recovery (30d)<b>{{ counts.mean_recovery_seconds }}s</b></div>
+    {% endif %}
+    {% if counts.failed_recoveries_24h %}
+    <div class="card red">Failed recoveries (24h)<b>{{ counts.failed_recoveries_24h }}</b></div>
+    {% endif %}
     {% if counts.pending_vm_requests %}
     <div class="card amber">Pending Requests<b><a href="{{ url_for('main.requests_list') }}" style="color:inherit;text-decoration:none">{{ counts.pending_vm_requests }}</a></b></div>
     {% endif %}
@@ -55,40 +75,76 @@
     </div>
   {% endfor %}
 
+  {% if active_sessions %}
+  <div class="panel"><h4>Active training sessions</h4>
+    {% for s in active_sessions %}
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid #e4e7eb">
+      <div><b>{{ s.class_group }}</b> &middot; started {{ s.started_at }} by {{ s.started_by_name or 'user' }}</div>
+      <form class="inline" method="post" action="{{ url_for('main.end_session') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="class_group" value="{{ s.class_group }}">
+        <label class="muted" style="margin-right:8px"><input type="checkbox" name="power_off" checked> Power off VMs</label>
+        <button class="btn r" type="submit">End session</button>
+      </form>
+    </div>
+    {% endfor %}
+    <p class="muted" style="margin-top:8px">Ending a session takes a final post-session snapshot (for VMs with session snapshots enabled), optionally powers the VMs off, and closes the session so the next Start begins a fresh one.</p>
+  </div>
+  {% endif %}
+
   {% if groups %}
   <div class="panel"><h4>Start a training session</h4>
     <form method="post" action="{{ url_for('main.start_session') }}" class="form three" style="align-items:end">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div><label for="class_group">Class group</label><select id="class_group" name="class_group">{% for g in groups %}<option>{{ g }}</option>{% endfor %}</select></div>
-      <div class="muted">Takes a pre-session snapshot of every running VM in the group.</div>
+      <div class="muted">Starts every VM in the group and takes one pre-session snapshot per VM. Pressing Start again while the session is active only restarts stopped VMs and protects VMs that missed their snapshot; it never duplicates one.</div>
       <div><button class="btn" type="submit">Start session</button></div>
     </form></div>
   {% endif %}
 
-  <div class="table-wrap"><table>
-    <tr><th>VM name</th><th>Class group</th><th>Status</th><th>Student</th><th>Last snapshot</th><th>Actions</th></tr>
-    {% for vm in vms %}
-    <tr>
-      <td>
-        <b>{{ vm.vm_name }}</b>
-        {% if vm.is_template %}<span class="badge tmpl">Template</span>{% endif %}
-      </td>
-      <td>{{ vm.class_group }}</td>
-      <td><span class="pill {{ pill(vm.status) }}">{{ vm.status|capitalize }}</span></td>
-      <td>{{ vm.student_username or '-' }}</td>
-      <td>{{ vm.last_snapshot or 'None yet' }}</td>
-      <td>
-        <form class="inline" method="post" action="{{ url_for('main.snapshot_now', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn" type="submit">Snapshot</button></form>
-        <a class="btn o" href="{{ url_for('main.snapshots', vm_id=vm.vm_id) }}">{{ 'Restore' if user.role == 'admin' else 'Snapshots' }}</a>
-        <a class="btn o" href="{{ url_for('main.backups', vm_id=vm.vm_id) }}">Backups ({{ vm.backup_count or 0 }})</a>
-        {% if user.role == 'trainer' %}<form class="inline" method="post" action="{{ url_for('main.request_restore', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn o" type="submit">Request restore</button></form>{% endif %}
-        {% if simulate and user.role == 'admin' %}
-          <form class="inline" method="post" action="{{ url_for('main.demo', action='crash', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn r" type="submit">Sim. crash</button></form>
-          <form class="inline" method="post" action="{{ url_for('main.demo', action='freeze', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn r" type="submit">Sim. freeze</button></form>
-        {% endif %}
-      </td></tr>
-    {% else %}<tr><td colspan="6" class="muted">No virtual machines registered yet.{% if user.role == 'admin' %} <a href="{{ url_for('main.vms') }}">Register or create one</a>.{% endif %}</td></tr>{% endfor %}
-  </table></div>
+  <form method="post" action="{{ url_for('main.vms_bulk') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="panel bulkbar">
+      <span class="muted">Bulk action for the selected machines:</span>
+      <select name="action" style="width:auto;display:inline-block">
+        <option value="start">Start</option>
+        <option value="stop">Stop</option>
+        <option value="restart">Restart</option>
+        <option value="reset">Reset</option>
+        <option value="pause">Pause</option>
+        <option value="resume">Resume</option>
+      </select>
+      <button class="btn" type="submit">Apply</button>
+      <span class="muted">A paused machine stays paused; the monitor leaves it alone until it is resumed.</span>
+    </div>
+    <div class="table-wrap"><table>
+      <tr><th style="width:28px"><input type="checkbox" onclick="document.querySelectorAll('input[name=vm_ids]').forEach(c=>c.checked=this.checked)"></th>
+          <th>VM name</th><th>Class group</th><th>Status</th><th>Student</th><th>Last snapshot</th><th>Actions</th></tr>
+      {% for vm in vms %}
+      <tr>
+        <td><input type="checkbox" name="vm_ids" value="{{ vm.vm_id }}"></td>
+        <td>
+          <b>{{ vm.vm_name }}</b>
+          {% if vm.is_template %}<span class="badge tmpl">Template</span>{% endif %}
+        </td>
+        <td>{{ vm.class_group }}</td>
+        <td><span class="pill {{ pill(vm.status) }}">{{ vm.status|capitalize }}</span></td>
+        <td>{{ vm.student_username or '-' }}</td>
+        <td>{{ vm.last_snapshot or 'None yet' }}</td>
+        <td>
+          <a class="btn o" href="{{ url_for('main.vm_detail', vm_id=vm.vm_id) }}">Manage</a>
+          <form class="inline" method="post" action="{{ url_for('main.snapshot_now', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn" type="submit">Snapshot</button></form>
+          <a class="btn o" href="{{ url_for('main.snapshots', vm_id=vm.vm_id) }}">{{ 'Restore' if user.role == 'admin' else 'Snapshots' }}</a>
+          <a class="btn o" href="{{ url_for('main.backups', vm_id=vm.vm_id) }}">Backups ({{ vm.backup_count or 0 }})</a>
+          {% if user.role == 'trainer' %}<form class="inline" method="post" action="{{ url_for('main.request_restore', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn o" type="submit">Request restore</button></form>{% endif %}
+          {% if simulate and user.role == 'admin' %}
+            <form class="inline" method="post" action="{{ url_for('main.demo', action='crash', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn r" type="submit">Sim. crash</button></form>
+            <form class="inline" method="post" action="{{ url_for('main.demo', action='freeze', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn r" type="submit">Sim. freeze</button></form>
+          {% endif %}
+        </td></tr>
+      {% else %}<tr><td colspan="7" class="muted">No virtual machines registered yet.{% if user.role == 'admin' %} <a href="{{ url_for('main.vms') }}">Register or create one</a>.{% endif %}</td></tr>{% endfor %}
+    </table></div>
+  </form>
   <p class="muted">Status updates every few seconds as the background service checks each VM. Host free disk: {{ disk.free_gb }} GB.</p>
 {% endif %}
 {% endblock %}

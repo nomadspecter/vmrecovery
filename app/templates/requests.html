@@ -45,20 +45,22 @@
       <span class="pill {{ 'run' if r.status == 'ready' else ('crash' if r.status in ('rejected','failed') else 'frz') }}">
         {{ r.status|capitalize }}
       </span>
-      {% if r.rejection_reason %}<div class="muted" style="font-size:11px">{{ r.rejection_reason }}</div>{% endif %}
+      {% if r.rejection_reason and r.status in ('failed', 'rejected') %}<div class="muted" style="font-size:11px">{{ r.rejection_reason }}</div>{% endif %}
     </td>
     <td>{{ r.created_at }}</td>
     <td>
-      {% if user.role == 'admin' and r.status == 'pending' %}
+      {% if user.role == 'admin' and r.status in ('pending', 'failed') %}
         <form class="inline" method="post" action="{{ url_for('main.request_approve', request_id=r.request_id) }}" style="margin-right:4px">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button class="btn g" type="submit">Approve & Clone</button>
+          <button class="btn g" type="submit">{{ 'Retry Clone' if r.status == 'failed' else 'Approve & Clone' }}</button>
         </form>
+        {% if r.status == 'pending' %}
         <form class="inline" method="post" action="{{ url_for('main.request_reject', request_id=r.request_id) }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="text" name="reason" placeholder="Reason (optional)" style="width:110px;display:inline-block;padding:3px 5px;font-size:11px">
           <button class="btn r" type="submit">Reject</button>
         </form>
+        {% endif %}
       {% elif r.status == 'ready' and r.created_vm_id %}
         <a class="btn o" href="{{ url_for('main.snapshots', vm_id=r.created_vm_id) }}">Manage VM</a>
       {% else %}

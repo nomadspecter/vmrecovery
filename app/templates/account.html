@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block heading %}My Account{% endblock %}
+{% block body %}
+<div class="panel" style="max-width:520px">
+  <h4>Change my password</h4>
+  <p class="muted" style="margin-bottom:14px">Signed in as <b>{{ user.username }}</b>
+    ({{ user.role|capitalize }}).</p>
+  <form method="post" action="{{ url_for('main.account') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form" style="grid-template-columns:1fr">
+      <div><label for="current_password">Current password</label>
+        <input type="password" id="current_password" name="current_password" required autocomplete="current-password"></div>
+      <div><label for="new_password">New password (8+ characters)</label>
+        <input type="password" id="new_password" name="new_password" minlength="8" required autocomplete="new-password"></div>
+    </div>
+    <div style="margin-top:14px"><button class="btn" type="submit">Change password</button></div>
+  </form>
+</div>
+{% endblock %}

@@ -45,3 +45,8 @@ input[type=text],input[type=password],input[type=number],input[type=date],select
 .badge{display:inline-block;padding:2px 7px;font-size:11px;border-radius:3px;background:#e4ecf4;color:#24537f}
 .badge.tmpl{background:#fef3c7;color:#92400e;font-weight:600}
 @media(max-width:760px){.layout{flex-direction:column}.side{width:100%}.form,.form.three{grid-template-columns:1fr}}
+.bulkbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bulkbar select{width:auto}
+.pager{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+table td .inline{margin-right:4px}
+table input[type=checkbox]{width:auto}

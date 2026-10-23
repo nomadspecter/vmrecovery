@@ -108,3 +108,90 @@ def test_reports_and_events_pages_render(client):
     login(client)
     assert client.get("/reports").status_code == 200
     assert client.get("/events").status_code == 200
+
+
+def test_health_endpoint_is_public_and_reports_database(client):
+    r = client.get("/healthz")
+    assert r.status_code == 200
+    body = r.get_json()
+    assert body["status"] == "ok"
+    assert body["checks"]["database"] == "ok"
+
+
+def test_security_headers_are_set(client):
+    r = client.get("/login")
+    assert r.headers["X-Frame-Options"] == "DENY"
+    assert r.headers["X-Content-Type-Options"] == "nosniff"
+    assert "default-src 'self'" in r.headers["Content-Security-Policy"]
+    assert r.headers["Cache-Control"] == "no-store"
+
+
+def test_admin_can_open_system_health_page(client):
+    login(client)
+    r = client.get("/system")
+    assert r.status_code == 200
+    assert b"System Health" in r.data
+    assert b"Background recovery service" in r.data
+
+
+def test_trainer_cannot_open_system_health_page(client):
+    login(client, "trainer")
+    assert client.get("/system").status_code == 403
+
+
+def test_start_session_button_starts_powered_off_vms(client, settings, vbox):
+    conn = db.connect(settings.db_path)
+    services.register_vm(conn, "DEV-LAB-01", "uuid-1", "Class A", 30, 3, now=T0)
+    conn.close()
+    vbox.vms["uuid-1"]["state"] = "poweroff"
+
+    login(client)
+    t = csrf(client)
+    r = client.post("/sessions/start", data={"csrf_token": t, "class_group": "Class A"})
+
+    assert r.status_code == 302
+    assert vbox.get_state("uuid-1") == "running"
+    assert b"1 VM(s) started" in client.get("/").data
+
+
+def test_second_start_session_click_does_not_take_another_snapshot(client, settings, vbox):
+    conn = db.connect(settings.db_path)
+    vm_id = services.register_vm(conn, "DEV-LAB-01", "uuid-1", "Class A", 30, 3, now=T0)
+    conn.close()
+
+    login(client)
+    t = csrf(client)
+    client.post("/sessions/start", data={"csrf_token": t, "class_group": "Class A"})
+    vbox.vms["uuid-1"]["state"] = "poweroff"
+    client.post("/sessions/start", data={"csrf_token": t, "class_group": "Class A"})
+
+    page = client.get("/").data
+    assert b"already active" in page
+    assert b"Active training sessions" in page
+    assert vbox.get_state("uuid-1") == "running"
+
+    conn = db.connect(settings.db_path)
+    assert conn.execute("SELECT COUNT(*) FROM snapshots WHERE vm_id=?", (vm_id,)).fetchone()[0] == 1
+    conn.close()
+
+
+def test_end_session_button_powers_off_and_closes_the_session(client, settings, vbox):
+    conn = db.connect(settings.db_path)
+    services.register_vm(conn, "DEV-LAB-01", "uuid-1", "Class A", 30, 3, now=T0)
+    conn.close()
+
+    login(client)
+    t = csrf(client)
+    client.post("/sessions/start", data={"csrf_token": t, "class_group": "Class A"})
+    r = client.post("/sessions/end", data={"csrf_token": t, "class_group": "Class A",
+                                           "power_off": "on"})
+
+    assert r.status_code == 302
+    assert vbox.get_state("uuid-1") == "poweroff"
+    page = client.get("/").data
+    assert b"Session ended for Class A" in page
+    assert b"Active training sessions" not in page
+
+    conn = db.connect(settings.db_path)
+    assert services.active_session(conn, "Class A") is None
+    conn.close()

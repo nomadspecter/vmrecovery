@@ -10,11 +10,24 @@ ENV/
 env/
 
 # Instance-specific database and secret files
-instance/*.db
-instance/*.sqlite
-instance/*.sqlite3
+# The trailing * also covers the SQLite sidecar files (-wal, -shm).
+instance/*.db*
+instance/*.sqlite*
 instance/*.key
 instance/vmrecovery.db*
+instance/*.env
+instance/backups/
+instance/db-backups/
+instance/*.log
+
+# Local configuration. Copy .env.example and .env.local.example to these.
+.env
+.env.local
+.env.*.local
+
+# Local export files
+*.csv
+!docs/*.csv
 
 # Testing & coverage
 .pytest_cache/
@@ -26,3 +39,6 @@ htmlcov/
 .idea/
 *.swp
 *~
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/

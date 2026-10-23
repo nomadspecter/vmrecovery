@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block heading %}Settings{% endblock %}
+{% block body %}
+<p class="muted" style="margin-bottom:14px">
+  These values override the environment files and the <code>.env</code> configuration.
+  A change takes effect on the next monitoring cycle (within {{ effective.check_seconds }} seconds)
+  and survives a restart, because it is stored in the database.
+  Use <b>Reset</b> to fall back to the value from the environment again.
+</p>
+
+{% for title, entries in sections %}
+<div class="panel">
+  <h4>{{ title }}</h4>
+  <div class="table-wrap"><table>
+    <tr><th style="width:34%">Setting</th><th style="width:46%">Value</th><th>Action</th></tr>
+    {% for key, label, help in entries %}
+    <tr>
+      <td><b>{{ label }}</b><div class="muted" style="font-size:11px">{{ help }}</div>
+        <code style="font-size:11px">{{ key }}</code></td>
+      <td>
+        <form method="post" action="{{ url_for('main.settings_page') }}" class="form" style="grid-template-columns:1fr auto;gap:8px;align-items:center">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="key" value="{{ key }}">
+          {% if 'password' in key or 'secret' in key or key == 'api_token' %}
+            <input type="password" name="value" value="{{ values.get(key, '') }}"
+                   placeholder="{% if values.get(key) %}unchanged{% else %}not set{% endif %}">
+          {% elif key.endswith('_enabled') or key == 'smtp_use_tls' %}
+            <select name="value">
+              <option value="1" {{ 'selected' if values.get(key) in ('1','true','yes','on') }}>Enabled</option>
+              <option value="0" {{ 'selected' if values.get(key) not in ('1','true','yes','on') }}>Disabled</option>
+            </select>
+          {% else %}
+            <input type="text" name="value" value="{{ values.get(key, '') }}">
+          {% endif %}
+          <button class="btn" type="submit">Save</button>
+        </form>
+      </td>
+      <td>
+        {% if key in overrides %}
+          <span class="badge tmpl">Overridden</span>
+          <form class="inline" method="post" action="{{ url_for('main.settings_reset') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="key" value="{{ key }}">
+            <button class="btn o" type="submit">Reset</button>
+          </form>
+        {% else %}
+          <span class="muted">From environment</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table></div>
+</div>
+{% endfor %}
+
+<div class="panel">
+  <h4>Read-only JSON API</h4>
+  {% if api_token_set %}
+    <p><span class="pill run">Enabled</span> A token is configured. Every endpoint except
+      <code>/api/health</code> needs it in the <code>Authorization: Bearer</code> header
+      or in <code>X-API-Token</code>.</p>
+  {% else %}
+    <p><span class="pill off">Disabled</span> No token is set, so the API answers
+      <code>503</code> until you generate one.</p>
+  {% endif %}
+  <p class="muted" style="font-size:12px">
+    <code>curl -H "Authorization: Bearer &lt;token&gt;" http://{{ effective.host }}:{{ effective.port }}/api/vms</code>
+  </p>
+  <form class="inline" method="post" action="{{ url_for('main.settings_api_token') }}"
+        onsubmit="return confirm('Generate a new API token? The current token stops working immediately.')">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn" type="submit">Generate a new API token</button>
+  </form>
+</div>
+
+<div class="panel">
+  <h4>Test the notification channels</h4>
+  <p class="muted" style="margin-bottom:10px">Sends one message over every enabled channel so you can
+    confirm the address, the credentials, and the webhook endpoint are right.</p>
+  <form class="inline" method="post" action="{{ url_for('main.settings_test_notification') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn" type="submit">Send a test notification</button>
+  </form>
+</div>
+
+<div class="panel">
+  <h4>Read-only settings</h4>
+  <div class="table-wrap"><table>
+    <tr><th>Setting</th><td>Value</td></tr>
+    <tr><th>Database</th><td><code>{{ effective.db_path }}</code></td></tr>
+    <tr><th>Bind address</th><td>{{ effective.host }}:{{ effective.port }}</td></tr>
+    <tr><th>Background worker</th><td>{{ 'Enabled' if effective.run_worker else 'Disabled' }}</td></tr>
+    <tr><th>Simulation mode</th><td>{{ 'On' if effective.simulate else 'Off' }}</td></tr>
+    <tr><th>VirtualBox command</th><td><code>{{ effective.vboxmanage }}</code></td></tr>
+    <tr><th>Log level</th><td>{{ effective.log_level }}</td></tr>
+  </table></div>
+  <p class="muted" style="margin-top:8px">These are read from the environment and the
+    <code>.env</code> files, and can only be changed by editing those files and
+    restarting the service.</p>
+</div>
+{% endblock %}

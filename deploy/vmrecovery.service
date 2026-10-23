@@ -2,24 +2,35 @@
 Description=Automated Virtual Machine Recovery System (VMRecovery)
 After=network.target virtualbox.service
 Wants=virtualbox.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
 Type=simple
 User=nomad
 Group=nomad
+SupplementaryGroups=vboxusers
 WorkingDirectory=/home/nomad/vmrecovery
 Environment="PATH=/home/nomad/vmrecovery/.venv/bin:/usr/local/bin:/usr/bin:/bin"
 Environment="PYTHONUNBUFFERED=1"
+Environment="VMR_ENV=production"
+Environment="VMR_VBOX_TIMEOUT=1800"
+# The shared defaults first, then the machine-specific overrides. systemd
+# applies the last file that sets a variable, so instance/vmrecovery.env wins.
+EnvironmentFile=-/home/nomad/vmrecovery/.env
 EnvironmentFile=-/home/nomad/vmrecovery/instance/vmrecovery.env
 ExecStart=/home/nomad/vmrecovery/.venv/bin/python run.py
 Restart=always
 RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGTERM
 
-# Security hardening
+# Security hardening. PrivateTmp is deliberately not enabled: VirtualBox uses
+# /tmp/.vbox-$USER-ipc to talk to VBoxSVC, and a private /tmp breaks it.
+# ProtectHome is left at systemd's default because the VMs live under /home.
 NoNewPrivileges=true
 ProtectSystem=full
-ProtectHome=read-write
-PrivateTmp=true
+UMask=0077
 
 # Logging
 StandardOutput=journal

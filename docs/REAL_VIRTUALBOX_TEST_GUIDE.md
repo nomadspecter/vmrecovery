@@ -35,6 +35,9 @@ Register two test VMs with an interval of 1 minute and keep 3 snapshots. **Scree
 | 8 | Restore failure | delete the VM's snapshots in VirtualBox, then crash it | *no usable snapshot* alert on the dashboard | dashboard |
 | 9 | Trainer role | log in as trainer, request a restore | admin dashboard shows the request | both dashboards |
 | 10 | Reports | open **Reports** | counts match the event log | reports page |
+| 11 | Start session is idempotent | click **Start session** twice, powering one VM off between clicks | second click says *already active*, restarts the off VM, and takes no new pre-session snapshot | dashboard + snapshots |
+| 12 | End session | click **End session** with *Power off VMs* checked | a `post-session-...` snapshot appears, the VM is powered off, and the active-session banner disappears | dashboard + snapshots |
+| 13 | Template clone | mark a VM as **Template (Yes)**, then clone it from **Create New VM from Template** (try linked and full) | new VM appears in VirtualBox and in the registry with a `baseline-...` snapshot | VMs page + `VBoxManage list vms` |
 
 **Simulating a crash (test 5):**
 ```bash
@@ -57,3 +60,10 @@ updating for 90 seconds (`VMR_HEARTBEAT_TIMEOUT`) the VM counts as frozen. The h
 Copy the terminal output from `python run.py` (it logs every cycle) and the matching rows from the **Event Log** page.
 The most likely differences are the `VBoxManage` output format on your VirtualBox version and VM-specific
 settings (snapshot of a running VM with a lot of RAM is slow, so allow time).
+
+## 5. Screenshots for cloning
+
+See [`CLONING_GUIDE.md`](CLONING_GUIDE.md) for the full walkthrough, terminal commands that prove the clone
+exists, and suggested figure captions. The short version: screenshot the template row and clone form, clone
+a VM in linked mode, screenshot the new registry row, then run `VBoxManage list hdds` to show the
+differencing disk's parent UUID.

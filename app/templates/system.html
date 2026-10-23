@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block heading %}System Health{% endblock %}
+{% block body %}
+<div class="panel">
+  <h4>VirtualBox connection</h4>
+  {% if health.ok %}
+    <p><span class="pill run">Connected</span> Version {{ health.version }} &middot; {{ health.vm_count }} machine(s) registered in VirtualBox.</p>
+  {% else %}
+    <div class="banner red"><b>VirtualBox is not reachable:</b> {{ health.error }}</div>
+    <p class="muted">Check that VirtualBox is installed, that <code>VMR_VBOXMANAGE</code> points at the right binary,
+      and that the service user is in the <code>vboxusers</code> group.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h4>Background recovery service</h4>
+  {% if worker %}
+    {% if worker.running and not worker_stale %}
+      <p><span class="pill run">Running</span> {{ worker.cycles }} cycle(s) completed since {{ worker.started_at }}.</p>
+    {% elif worker.running %}
+      <div class="banner amber"><b>Worker may be behind:</b> the last cycle started at
+        {{ worker.last_cycle or worker.started_at }}. A long snapshot or export can delay it.</div>
+    {% else %}
+      <div class="banner red"><b>Worker is not running.</b> Recovery and scheduled snapshots are paused.</div>
+    {% endif %}
+    <div class="table-wrap"><table>
+      <tr><th>Last cycle</th><td>{{ worker.last_cycle or 'none yet' }}</td></tr>
+      <tr><th>Cycles completed</th><td>{{ worker.cycles }}</td></tr>
+      <tr><th>Last cycle summary</th><td>
+        {% if worker.last_summary %}
+          {{ worker.last_summary.checked }} checked,
+          {{ worker.last_summary.snapshots }} snapshot(s),
+          {{ worker.last_summary.recoveries }} recovered,
+          {{ worker.last_summary.failed_recoveries }} failed
+        {% else %}-{% endif %}
+      </td></tr>
+      {% if worker.last_error %}<tr><th>Last error</th><td class="muted">{{ worker.last_error }}</td></tr>{% endif %}
+    </table></div>
+  {% else %}
+    <p class="muted">This process was started without the background worker
+      (<code>VMR_WORKER=0</code> or a simulation/test run). Monitoring is not active.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h4>Notifications</h4>
+  {% if channels %}
+    <p>Enabled channels: {% for c in channels %}<span class="badge">{{ c }}</span> {% endfor %}</p>
+  {% else %}
+    <div class="banner amber"><b>No notification channel is enabled.</b> Crashes and failed
+      restores are only recorded in the event log. Configure email or a webhook on the
+      <a href="{{ url_for('main.settings_page') }}">Settings</a> page.</div>
+  {% endif %}
+  <div class="table-wrap"><table>
+    <tr><th>Time</th><th>Channel</th><th>Subject</th><th>Severity</th><th>Status</th><th>Detail</th></tr>
+    {% for n in notifications %}
+    <tr>
+      <td>{{ n.created_at }}</td>
+      <td>{{ n.channel }}{% if n.recipient %}<div class="muted" style="font-size:11px">{{ n.recipient }}</div>{% endif %}</td>
+      <td>{{ n.subject }}</td>
+      <td>{{ n.severity }}</td>
+      <td><span class="pill {{ 'run' if n.status == 'sent' else ('crash' if n.status == 'failed' else 'off') }}">{{ n.status }}</span></td>
+      <td class="muted">{{ n.error or '' }}</td>
+    </tr>
+    {% else %}<tr><td colspan="6" class="muted">No notifications have been sent yet.</td></tr>{% endfor %}
+  </table></div>
+</div>
+
+<div class="panel">
+  <h4>Host storage</h4>
+  <p>
+    Backup directory <code>{{ settings.backup_dir }}</code><br>
+    Free space <b>{{ disk.free_gb }} GB</b> ({{ disk.free_pct }}%) of {{ disk.total_gb }} GB
+    {% if disk.is_low %}<span class="pill crash">Low</span>{% else %}<span class="pill run">OK</span>{% endif %}
+  </p>
+</div>
+
+<div class="panel">
+  <h4>Settings in use</h4>
+  <div class="table-wrap"><table>
+    <tr><th>Check interval</th><td>{{ settings.check_seconds }} s</td></tr>
+    <tr><th>Failure threshold</th><td>{{ settings.fail_threshold }} bad checks in a row</td></tr>
+    <tr><th>Max automatic restores per hour</th><td>{{ settings.max_restores_per_hour }}</td></tr>
+    <tr><th>Heartbeat timeout</th><td>{{ settings.heartbeat_timeout }} s</td></tr>
+    <tr><th>VBoxManage timeout</th><td>{{ settings.vbox_timeout }} s</td></tr>
+    <tr><th>Backup retention</th><td>{{ settings.backup_retention_count }} per VM</td></tr>
+    <tr><th>Background worker</th><td>{{ 'Enabled' if settings.run_worker else 'Disabled' }}</td></tr>
+    <tr><th>Simulation mode</th><td>{{ 'On' if settings.simulate else 'Off' }}</td></tr>
+  </table></div>
+</div>
+{% endblock %}

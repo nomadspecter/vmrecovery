@@ -13,6 +13,10 @@
   <div class="card green">Auto-recovered<b>{{ r.totals.auto_recovered }}</b></div>
   <div class="card">Restored by admin<b>{{ r.totals.manual_recovered }}</b></div>
   <div class="card amber">Alerts (manual action)<b>{{ r.totals.manual_action }}</b></div>
+  <div class="card">Appliance backups<b>{{ r.totals.backups }}</b></div>
+  {% if r.totals.mean_recovery_seconds is not none %}
+  <div class="card green">Mean recovery time<b>{{ r.totals.mean_recovery_seconds }}s</b></div>
+  {% endif %}
 </div>
 <div class="panel"><h4>Crashes and recoveries per week</h4>
   {% if r.weekly %}
@@ -23,5 +27,20 @@
       <div class="lab">{{ w.week }}</div></div>{% endfor %}</div>
   <p class="muted" style="margin-top:8px">Red = crashes and freezes detected, green = successful restores.</p>
   {% else %}<p class="muted">No crash or recovery events in this period.</p>{% endif %}
+</div>
+<div class="panel"><h4>Per machine</h4>
+  <div class="table-wrap"><table>
+    <tr><th>Virtual machine</th><th>Class group</th><th>Crashes</th><th>Recoveries</th><th>Snapshots</th><th>Mean recovery</th></tr>
+    {% for row in r.per_vm %}
+    <tr>
+      <td><b>{{ row.vm_name }}</b></td>
+      <td>{{ row.class_group }}</td>
+      <td>{{ row.crashes or 0 }}</td>
+      <td>{{ row.recoveries or 0 }}</td>
+      <td>{{ row.snapshots or 0 }}</td>
+      <td>{{ (row.mean_seconds|round(1)) if row.mean_seconds is not none else '-' }}s</td>
+    </tr>
+    {% else %}<tr><td colspan="6" class="muted">No per-machine activity in this period.</td></tr>{% endfor %}
+  </table></div>
 </div>
 {% endblock %}
