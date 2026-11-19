@@ -13,4 +13,4 @@ services:
       - key: PYTHON_VERSION
         value: "3.11.9"
       - key: DATABASE_URL
-        sync: false
+        value: "postgresql://postgres.bggtmgrdjdrwwucgyqig:FoHwFabmlrELWe91@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
