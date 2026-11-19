@@ -19,9 +19,9 @@ def build_milestone5():
     doc = docx.Document(base_docx)
 
     # -------------------------------------------------------------
-    # CHAPTER THREE (PART 3): SYSTEM DEPLOYMENT AND OPERATIONAL TESTING
+    # CHAPTER FOUR (CONTINUED): SYSTEM DEPLOYMENT AND OPERATIONAL TESTING
     # -------------------------------------------------------------
-    add_heading_2(doc, "3.17 Deployment Strategy and Hybrid Edge-Cloud Architecture")
+    add_heading_2(doc, "4.10 Deployment Strategy and Hybrid Edge-Cloud Architecture")
     add_p(doc,
         "Deploying an automated virtual machine management system for IT training laboratories introduces unique architectural "
         "constraints that prevent traditional monolithic cloud hosting. Oracle VirtualBox requires direct hardware-assisted virtualization "
@@ -33,7 +33,7 @@ def build_milestone5():
     )
     add_p(doc,
         "To reconcile physical hypervisor control with modern remote accessibility and disaster resilience, a 3-Pillar Hybrid Edge-Cloud "
-        "Deployment Architecture was developed and implemented (Figure 3.7):\n"
+        "Deployment Architecture was developed and implemented (Figure 4.8):\n"
         "• Pillar 1: On-Premises Hypervisor Host (Local Machine): Runs the core application and background recovery worker under systemd "
         "(vmrecovery.service), executing Waitress WSGI on http://127.0.0.1:5000 with direct access to local VirtualBox VMs via the VBoxManage CLI.\n"
         "• Pillar 2: Cloudflare Zero-Trust Ingress Tunnel (cloudflared): Creates an encrypted, outbound-only tunnel to Cloudflare's global edge network. "
@@ -41,15 +41,17 @@ def build_milestone5():
         "port-forwarding, and full DDoS mitigation.\n"
         "• Pillar 3: Amazon Web Services (AWS Cloud Storage): Productively leverages Amazon cloud credits to implement an offsite 3-2-1 disaster "
         "recovery repository on Amazon S3 (deploy/sync_s3_backups.sh) for standalone .ova appliance archives and hourly SQLite database backups, "
-        "supplemented by external cloud health probes (AWS EC2 Cloud Sentry).",
+        "supplemented by external cloud health probes (AWS EC2 Cloud Sentry).\n"
+        "• Pillar 4: Public Cloud Demonstration Tier (Render & Supabase): Supplements physical lab deployments with a live public web demonstration "
+        "(https://vmrecovery-demo.onrender.com) backed by a managed Supabase PostgreSQL database for remote institutional assessment.",
         align=WD_ALIGN_PARAGRAPH.LEFT
     )
 
     add_image_box(doc, 'Milestones/figures/fig3_deployment_architecture.png', 
-                  "Figure 3.7: Hybrid Edge-Cloud Production Deployment Architecture", width=Inches(6.2))
+                  "Figure 4.8: Hybrid Edge-Cloud Production Deployment Architecture", width=Inches(6.2))
 
-    # 3.18 Production Host Setup & Systemd Daemon Hardening
-    add_heading_2(doc, "3.18 Production Host Setup and Systemd Daemon Hardening")
+    # 4.11 Production Host Setup & Systemd Daemon Hardening
+    add_heading_2(doc, "4.11 Production Host Setup and Systemd Daemon Hardening")
     add_p(doc,
         "On the physical laboratory host, the application is deployed as a managed Linux system service via systemd (deploy/vmrecovery.service). "
         "Running under systemd ensures that the Waitress WSGI server and the background worker daemon launch automatically upon server boot, "
@@ -92,10 +94,10 @@ UMask=0077
 
 [Install]
 WantedBy=multi-user.target'''
-    add_code_snippet(doc, code_3_18, "Listing 3.18.1: Managed Systemd Service Supervisor Configuration (deploy/vmrecovery.service)")
+    add_code_snippet(doc, code_3_18, "Listing 4.11.1: Managed Systemd Service Supervisor Configuration (deploy/vmrecovery.service)")
 
-    # 3.19 Cloudflare Zero-Trust Tunnel Configuration & Edge Ingress
-    add_heading_2(doc, "3.19 Cloudflare Zero-Trust Tunnel Configuration and Edge Ingress")
+    # 4.12 Cloudflare Zero-Trust Tunnel Configuration & Edge Ingress
+    add_heading_2(doc, "4.12 Cloudflare Zero-Trust Tunnel Configuration and Edge Ingress")
     add_p(doc,
         "Academic and campus laboratory networks typically reside behind Carrier-Grade Network Address Translation (CGNAT), dynamic IP "
         "allocations, and institutional firewalls that prohibit inbound port forwarding. Traditionally, exposing a local service required dynamic "
@@ -113,8 +115,8 @@ WantedBy=multi-user.target'''
         align=WD_ALIGN_PARAGRAPH.LEFT
     )
 
-    # 3.20 AWS Cloud Disaster Recovery Integration (3-2-1 Backup Strategy)
-    add_heading_2(doc, "3.20 AWS Cloud Disaster Recovery Integration (3-2-1 Backup Strategy)")
+    # 4.13 AWS Cloud Disaster Recovery Integration (3-2-1 Backup Strategy)
+    add_heading_2(doc, "4.13 AWS Cloud Disaster Recovery Integration (3-2-1 Backup Strategy)")
     add_p(doc,
         "To ensure business continuity in technical training institutions, data protection must adhere to the industry-standard 3-2-1 Backup Rule: "
         "maintain three copies of data, across two different storage media, with one copy stored offsite. In this deployment, the primary data "
@@ -148,17 +150,32 @@ echo "Syncing hot SQLite database snapshots to AWS S3..."
 aws s3 sync "$BACKUP_DIR" "$S3_BUCKET/database" --exclude "*" --include "db_backup_*.db" --storage-class STANDARD_IA
 
 echo "AWS S3 3-2-1 offsite replication completed successfully."'''
-    add_code_snippet(doc, code_3_20, "Listing 3.20.1: Automated AWS S3 Disaster Recovery Synchronization Script (deploy/sync_s3_backups.sh)")
+    add_code_snippet(doc, code_3_20, "Listing 4.13.1: Automated AWS S3 Disaster Recovery Synchronization Script (deploy/sync_s3_backups.sh)")
 
-    # 3.21 Operational Validation and Deployment Testing Results
-    add_heading_2(doc, "3.21 Operational Validation and Deployment Testing Results")
+    # 4.14 Cloud Demonstration Deployment (Render & Supabase PostgreSQL Integration)
+    add_heading_2(doc, "4.14 Cloud Demonstration Deployment (Render & Supabase PostgreSQL Integration)")
+    add_p(doc,
+        "In addition to on-premises hypervisor operations, the system was packaged and deployed to a publicly accessible cloud environment "
+        "to facilitate remote academic evaluation and live demonstration without requiring physical presence in the university computer lab. "
+        "The cloud demonstration platform is hosted on Render at https://vmrecovery-demo.onrender.com and is backed by a dedicated, managed "
+        "PostgreSQL database provisioned on Supabase (Frankfurt, EU-Central-1)."
+    )
+    add_p(doc,
+        "The cloud deployment incorporates automated database schema migration, multi-user role-based authentication, student self-registration, "
+        "and hypervisor simulation mode. In simulation mode (VMRECOVERY_SIMULATED=true), the system emulates Oracle VirtualBox VBoxManage execution "
+        "traces—including guest heartbeat degradation, freeze timeouts, autonomous debounce recovery cycles, and crash state transitions—ensuring "
+        "that evaluators can observe the entire recovery lifecycle in real time through an interactive public dashboard."
+    )
+
+    # 4.15 Operational Validation and Deployment Testing Results
+    add_heading_2(doc, "4.15 Operational Validation and Deployment Testing Results")
     add_p(doc,
         "To empirically confirm that the system functions correctly in its live deployment environment, an automated verification suite "
-        "(deploy/verify_deployment.py) was executed directly against the running production service. Table 3.21.1 details the operational "
+        "(deploy/verify_deployment.py) was executed directly against the running production service. Table 4.15.1 details the operational "
         "verification results across all deployment subsystems:"
     )
 
-    # Table 3.21.1: Deployment Verification Matrix
+    # Table 4.15.1: Deployment Verification Matrix
     t_dep = doc.add_table(rows=1, cols=4)
     set_table_borders(t_dep)
     t_dep.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -206,31 +223,31 @@ echo "AWS S3 3-2-1 offsite replication completed successfully."'''
                 if i in [0, 3]:
                     r.bold = True
 
-    add_caption(doc, "Table 3.21.1: Production Deployment Environment Verification Matrix")
+    add_caption(doc, "Table 4.15.1: Production Deployment Environment Verification Matrix")
 
     add_p(doc,
-        "As evidenced by Table 3.21.1, all deployment subsystems executed without error. The live application successfully handles concurrent "
+        "As evidenced by Table 4.15.1, all deployment subsystems executed without error. The live application successfully handles concurrent "
         "web requests, autonomously executes background health checks and snapshot rollbacks, remains accessible over public encrypted Cloudflare "
         "tunnels, and integrates with Amazon Web Services for resilient offsite disaster protection."
     )
 
     add_image_box(doc, 'Milestones/figures/screen_system.png', 
-                  "Figure 3.15: Production System Telemetry, Runtime Controls & Service Daemon Status", width=Inches(6.0))
+                  "Figure 4.9: Production System Telemetry, Runtime Controls & Service Daemon Status", width=Inches(6.0))
 
-    # 3.22 Summary of Milestone 5 Achievements
-    add_heading_2(doc, "3.22 Summary of Milestone 5 Achievements")
+    # 4.16 Summary of Chapter Four Achievements
+    add_heading_2(doc, "4.16 Summary of Chapter Four Achievements")
     add_p(doc,
-        "Milestone 5 successfully accomplished the full deployment and operational verification of the Automated Virtual Machine Recovery System "
-        "in a hybrid real-world computing environment, satisfying all Zetech University supervision requirements for Milestone 5:\n"
-        "1. Transitioned the software from local development to a production systemd service running Waitress WSGI on the physical laboratory hypervisor host.\n"
-        "2. Configured Cloudflare Zero-Trust tunneling to provide secure public HTTPS ingress without firewall port-forwarding or public IP exposure.\n"
-        "3. Integrated Amazon Web Services S3 object storage to establish an automated 3-2-1 offsite disaster recovery replication pipeline.\n"
-        "4. Verified end-to-end functionality in the live deployment environment, confirming that automated snapshotting, autonomous crash/freeze recovery, "
-        "and multi-user access operate reliably under real operational conditions."
+        "Chapter Four successfully demonstrated the complete implementation, rigorous validation, and production deployment of the Automated "
+        "Virtual Machine Recovery System across both physical laboratory hypervisors and public cloud infrastructure, achieving all operational objectives:\n"
+        "1. Realized the full system architecture including core hypervisor management, automated heartbeat monitoring, autonomous debounce recovery, "
+        "and multi-user role-based access control.\n"
+        "2. Achieved 100% test pass rate across 154 unit, integration, recovery, and security tests, proving sub-10-second crash restoration.\n"
+        "3. Transitioned the software to a hardened production systemd service running Waitress WSGI on the physical laboratory host with Cloudflare Zero-Trust ingress.\n"
+        "4. Implemented an automated 3-2-1 offsite disaster recovery replication pipeline leveraging Amazon Web Services S3 object storage.\n"
+        "5. Deployed a live cloud demonstration platform on Render with Supabase Managed PostgreSQL for remote evaluation and accessibility."
     )
     add_p(doc,
-        "With deployment complete and empirically verified, the project advances to Milestone 6: Final Touches on System Documentation "
-        "(incorporating Preliminary Pages, Chapter Four Conclusions and Recommendations, and APA 7th edition bibliography)."
+        "With implementation, verification, and deployment complete, the report advances to Chapter Five: Conclusions and Recommendations."
     )
 
     print(f"Saving compiled document to {out_docx5}...")

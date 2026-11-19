@@ -19,9 +19,21 @@ def build_milestone4():
     doc = docx.Document(base_docx)
 
     # -------------------------------------------------------------
-    # CHAPTER THREE (PART 2): ADVANCED DEVELOPMENT & SYSTEM TESTING
+    # CHAPTER FOUR: SYSTEM IMPLEMENTATION, TESTING AND DEPLOYMENT
     # -------------------------------------------------------------
-    add_heading_2(doc, "3.8 Automated Snapshot Engine and Retention Policy Enforcement")
+    doc.add_page_break()
+    add_heading_1(doc, "CHAPTER FOUR: SYSTEM IMPLEMENTATION, TESTING AND DEPLOYMENT")
+
+    add_p(doc,
+        "This chapter details the concrete implementation, verification, and deployment of the Automated Virtual Machine "
+        "Recovery System (VMRecovery). Building directly upon the design models of Chapter Two and the architectural "
+        "framework established in Chapter Three, this chapter presents the practical realization of the automated snapshot "
+        "and retention engine, autonomous self-healing recovery algorithms, independent appliance disaster recovery, "
+        "student self-service provisioning workflows, multi-channel alerting infrastructure, empirical testing results, "
+        "and production deployment configurations."
+    )
+
+    add_heading_2(doc, "4.1 Automated Snapshot Engine and Retention Policy Enforcement")
     add_p(doc,
         "The automated snapshot engine (app/services.py) guarantees state preservation for laboratory virtual machines "
         "without requiring manual intervention from lab technicians. The engine operates dynamically based on the policy "
@@ -65,13 +77,13 @@ def apply_retention(conn, vbox, vm, now):
         vbox.delete_snapshot(vm["vbox_uuid"], rows[i]["snapshot_name"])
         conn.execute("DELETE FROM snapshots WHERE snapshot_id = ?", (rows[i]["snapshot_id"],))
     conn.commit()'''
-    add_code_snippet(doc, code_3_8, "Listing 3.8.1: Snapshot Due Verification and Retention Pruning Algorithm (app/services.py)")
+    add_code_snippet(doc, code_3_8, "Listing 4.1.1: Snapshot Due Verification and Retention Pruning Algorithm (app/services.py)")
 
     add_image_box(doc, 'Milestones/figures/screen_snapshots.png', 
-                  "Figure 3.8: Snapshot Management Interface with Point-in-Time Baselines and Granular Deletion Controls", width=Inches(6.0))
+                  "Figure 4.1: Snapshot Management Interface with Point-in-Time Baselines and Granular Deletion Controls", width=Inches(6.0))
 
-    # 3.9 Autonomous Recovery Engine & Failure Modes Handling
-    add_heading_2(doc, "3.9 Autonomous Recovery Engine and Failure Modes Handling")
+    # 4.2 Autonomous Recovery Engine & Failure Modes Handling
+    add_heading_2(doc, "4.2 Autonomous Recovery Engine and Failure Modes Handling")
     add_p(doc,
         "The autonomous recovery engine is the core innovation of the system, engineered to achieve zero-touch self-healing for crashed "
         "or frozen virtual machines during active lab sessions. The engine executes three distinct phases: state observation, failure debouncing, "
@@ -123,10 +135,10 @@ def recover(conn, vbox, vm, now):
     conn.execute("UPDATE vms SET fail_count = 0, status = 'running' WHERE vm_id = ?", (vm["vm_id"],))
     conn.commit()
     return True'''
-    add_code_snippet(doc, code_3_9, "Listing 3.9.1: Autonomous Crash Observation, Heartbeat Polling & Debounced Recovery (app/services.py)")
+    add_code_snippet(doc, code_3_9, "Listing 4.2.1: Autonomous Crash Observation, Heartbeat Polling & Debounced Recovery (app/services.py)")
 
-    # 3.10 Disaster Recovery: Independent Appliance (.ova) Engine & Hot Online Database Backups
-    add_heading_2(doc, "3.10 Disaster Recovery: Independent Appliance (.ova) Engine and Online Database Backups")
+    # 4.3 Disaster Recovery: Independent Appliance (.ova) Engine & Hot Online Database Backups
+    add_heading_2(doc, "4.3 Disaster Recovery: Independent Appliance (.ova) Engine and Online Database Backups")
     add_p(doc,
         "While hypervisor snapshots provide fast, point-in-time differencing disk recovery, they remain dependent on the base virtual disk image. "
         "If a base disk experiences block corruption or physical disk failure, all dependent snapshots are lost. To achieve true disaster recovery, "
@@ -163,10 +175,10 @@ def create_backup(conn, vbox, vm, backup_dir):
         (vm["vm_id"], os.path.basename(ova_path), ova_path, size, datetime.utcnow().isoformat())
     )
     conn.commit()'''
-    add_code_snippet(doc, code_3_10, "Listing 3.10.1: Standalone Open Virtualization Appliance (.ova) Export Engine (app/services.py)")
+    add_code_snippet(doc, code_3_10, "Listing 4.3.1: Standalone Open Virtualization Appliance (.ova) Export Engine (app/services.py)")
 
-    # 3.11 Golden Master Template Provisioning & Student Request Workflow
-    add_heading_2(doc, "3.11 Golden Master Template Provisioning and Student Request Workflow")
+    # 4.4 Golden Master Template Provisioning & Student Request Workflow
+    add_heading_2(doc, "4.4 Golden Master Template Provisioning and Student Request Workflow")
     add_p(doc,
         "To streamline lab preparation for technical courses, the system implements a self-service provisioning workflow based on Golden Master "
         "templates. Lab administrators can designate any pristine baseline virtual machine as a template by toggling the is_template flag in the vms table."
@@ -205,16 +217,16 @@ def approve_vm_request(conn, vbox, request_id, approved_by_user_id):
     conn.execute("UPDATE vm_requests SET status = 'ready', created_vm_id = ? WHERE request_id = ?",
                  (cur.lastrowid, request_id))
     conn.commit()'''
-    add_code_snippet(doc, code_3_11, "Listing 3.11.1: Golden Master Linked/Full Clone Provisioning Routine (app/services.py)")
+    add_code_snippet(doc, code_3_11, "Listing 4.4.1: Golden Master Linked/Full Clone Provisioning Routine (app/services.py)")
 
     add_image_box(doc, 'Milestones/figures/screen_requests.png', 
-                  "Figure 3.9: Administrative Virtual Machine Request Approval Dashboard", width=Inches(6.0))
+                  "Figure 4.2: Administrative Virtual Machine Request Approval Dashboard", width=Inches(6.0))
 
     add_image_box(doc, 'Milestones/figures/screen_student_requests.png', 
-                  "Figure 3.10: Student Self-Service VM Provisioning Portal (Template Selection & Clone Provisioning)", width=Inches(6.0))
+                  "Figure 4.3: Student Self-Service VM Provisioning Portal (Template Selection & Clone Provisioning)", width=Inches(6.0))
 
-    # 3.12 Multi-Channel Alert & Notification Engine
-    add_heading_2(doc, "3.12 Multi-Channel Alert and Notification Engine")
+    # 4.5 Multi-Channel Alert & Notification Engine
+    add_heading_2(doc, "4.5 Multi-Channel Alert and Notification Engine")
     add_p(doc,
         "To guarantee that lab technicians and administrators are notified immediately upon critical system incidents (such as recurring machine crashes, "
         "restore failures, low disk space warnings, or hung hypervisor processes), a decoupled notification subsystem was implemented in app/notifier.py."
@@ -242,13 +254,13 @@ def _send_webhook(url, secret, payload):
     res = requests.post(url, data=body, headers=headers, timeout=(3.0, 5.0))
     if not res.ok:
         raise RuntimeError(f"Webhook HTTP {res.status_code}: {res.text[:100]}")'''
-    add_code_snippet(doc, code_3_12, "Listing 3.12.1: Multi-Channel Alert Dispatcher with HMAC-SHA256 Webhook Signing (app/notifier.py)")
+    add_code_snippet(doc, code_3_12, "Listing 4.5.1: Multi-Channel Alert Dispatcher with HMAC-SHA256 Webhook Signing (app/notifier.py)")
 
     add_image_box(doc, 'Milestones/figures/screen_system.png', 
-                  "Figure 3.11: Real-Time System Health Telemetry and Outbound Notification Audit Log", width=Inches(6.0))
+                  "Figure 4.4: Real-Time System Health Telemetry and Outbound Notification Audit Log", width=Inches(6.0))
 
-    # 3.13 RESTful API & Administrative Command-Line Interface (CLI)
-    add_heading_2(doc, "3.13 RESTful API and Administrative Command-Line Interface (CLI)")
+    # 4.6 RESTful API & Administrative Command-Line Interface (CLI)
+    add_heading_2(doc, "4.6 RESTful API and Administrative Command-Line Interface (CLI)")
     add_p(doc,
         "To enable programmatic integration with campus monitoring dashboards and provide headless management during network outages, "
         "two administrative interfaces were developed:"
@@ -277,13 +289,13 @@ def require_token(f):
             return jsonify({"error": "Unauthorized", "message": "Invalid or missing API token"}), 401
         return f(*args, **kwargs)
     return decorated'''
-    add_code_snippet(doc, code_3_13, "Listing 3.13.1: Token-Authenticated REST API Endpoint Guard with Constant-Time Verification (app/api.py)")
+    add_code_snippet(doc, code_3_13, "Listing 4.6.1: Token-Authenticated REST API Endpoint Guard with Constant-Time Verification (app/api.py)")
 
     add_image_box(doc, 'Milestones/figures/screen_events.png', 
-                  "Figure 3.12: System Event Audit Trail with Fast Multi-Column Search Filtering", width=Inches(6.0))
+                  "Figure 4.5: System Event Audit Trail with Fast Multi-Column Search Filtering", width=Inches(6.0))
 
-    # 3.14 Advanced Feature Debugging & Problem-Solving Log (Part 2)
-    add_heading_2(doc, "3.14 Advanced Feature Debugging and Problem-Solving Log (Part 2)")
+    # 4.7 Advanced Feature Debugging & Problem-Solving Log
+    add_heading_2(doc, "4.7 Advanced Feature Debugging and Problem-Solving Log")
     add_p(doc,
         "During the development and integration of the advanced automation, disaster recovery, and API modules, five additional complex engineering "
         "challenges were diagnosed and resolved:"
@@ -319,15 +331,15 @@ def require_token(f):
     for title, desc in adv_bugs:
         add_p(doc, desc, bold_prefix=title + "\n")
 
-    # 3.15 Comprehensive System Testing Matrix (Full Test Suite Verification)
-    add_heading_2(doc, "3.15 Comprehensive System Testing Matrix (Full Test Suite Verification)")
+    # 4.8 Comprehensive System Testing Matrix (Full Test Suite Verification)
+    add_heading_2(doc, "4.8 Comprehensive System Testing Matrix (Full Test Suite Verification)")
     add_p(doc,
         "To rigorously validate that every functional requirement, edge case, and failure mode is properly handled across the entire codebase, "
-        "a comprehensive automated test suite consisting of 150 test cases was executed using Pytest 9.x. Table 3.15.1 provides the complete test "
+        "a comprehensive automated test suite consisting of 154 test cases was executed using Pytest 9.x. Table 4.8.1 provides the complete test "
         "execution matrix categorized by functional module:"
     )
 
-    # Table 3.15.1: Full Test Suite Matrix
+    # Table 4.8.1: Full Test Suite Matrix
     t_full = doc.add_table(rows=1, cols=5)
     set_table_borders(t_full)
     t_full.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -350,8 +362,8 @@ def require_token(f):
     matrix_rows = [
         ("tests/test_enterprise.py", "Configuration, API, Security & Operations", "37", 
          "Layered dotenv hierarchy, production env isolation, database runtime overrides, signed webhook HMAC delivery, SMTP stubs, bulk power controls, admin_paused safety, token-authenticated REST API, CSV event export, online database hot backup and restore, and schema migrations.", "37 / 37 PASSED"),
-        ("tests/test_new_features.py", "Advanced Features & Disaster Recovery", "10", 
-         "Disk space thresholds, independent .ova appliance export and retention, student template provisioning workflow, direct VM creation, student machine assignment, user CRUD, recovery duration tracking, snapshot manual deletion, and student self-service workflow.", "10 / 10 PASSED"),
+        ("tests/test_new_features.py", "Advanced Features & Disaster Recovery", "12", 
+         "Disk space thresholds, independent .ova appliance export and retention, student template provisioning workflow, direct VM creation, student machine assignment, user CRUD, recovery duration tracking, snapshot manual deletion, student self-registration (/register), and direct admin VM assignment.", "12 / 12 PASSED"),
         ("tests/test_recovery_failure_modes.py", "Failure Modes & Edge Cases", "24", 
          "Template suspension and settling before cloning, failed clone cleanup and retry, duplicate machine name handling, hypervisor timeout handling, and partial failure isolation.", "24 / 24 PASSED"),
         ("tests/test_services.py", "Core Business Rules & Automation", "32", 
@@ -383,35 +395,36 @@ def require_token(f):
                 if i in [0, 2, 4]:
                     r.bold = True
 
-    add_caption(doc, "Table 3.15.1: Comprehensive System Testing Execution Matrix (152 Total Tests)")
+    add_caption(doc, "Table 4.8.1: Comprehensive System Testing Execution Matrix (154 Total Tests)")
 
     add_p(doc,
-        "As reflected in Table 3.15.1, all 152 automated test cases executed across the seven test suites passed with a 100% success rate "
-        "in 16.82 seconds. This empirical testing proves that the software reliably handles both normal operations and severe fault conditions "
+        "As reflected in Table 4.8.1, all 154 automated test cases executed across the seven test suites passed with a 100% success rate "
+        "in 16.79 seconds. This empirical testing proves that the software reliably handles both normal operations and severe fault conditions "
         "without crashing, data loss, or hypervisor corruption."
     )
 
     add_image_box(doc, 'Milestones/figures/screen_reports.png', 
-                  "Figure 3.13: MTTR Analytics and Weekly Virtual Machine Reliability Report", width=Inches(6.0))
+                  "Figure 4.6: MTTR Analytics and Weekly Virtual Machine Reliability Report", width=Inches(6.0))
 
     add_image_box(doc, 'Milestones/figures/screen_student_dashboard.png', 
-                  "Figure 3.14: Student Dedicated Laboratory Dashboard (VM State & Active Session Monitoring)", width=Inches(6.0))
+                  "Figure 4.7: Student Dedicated Laboratory Dashboard (VM State & Active Session Monitoring)", width=Inches(6.0))
 
-    # 3.16 Summary of Milestone 4 Achievements
-    add_heading_2(doc, "3.16 Summary of Milestone 4 Achievements")
+    # 4.9 Summary of Core Implementation and Testing
+    add_heading_2(doc, "4.9 Summary of Core Implementation and Testing")
     add_p(doc,
-        "Milestone 4 successfully completed the development, debugging, and comprehensive testing of all advanced modules for the "
-        "Automated Virtual Machine Recovery System, concluding the practical implementation phase (Milestones 3 and 4) with the following achievements:\n"
+        "Sections 4.1 through 4.8 successfully realized the practical implementation, debugging, and comprehensive testing of all core and advanced "
+        "modules for the Automated Virtual Machine Recovery System, achieving the following key milestones:\n"
         "1. Realization of autonomous snapshot scheduling, session baselines, and automatic retention pruning.\n"
         "2. Implementation of zero-touch automated recovery for both crashed VM processes and silent guest OS hangs via debounced heartbeats.\n"
-        "3. Development of independent .ova appliance disaster recovery and non-blocking SQLite hot database backups.\n"
+        "3. Development of independent .ova appliance disaster recovery and non-blocking database backups.\n"
         "4. Deployment of the student self-service provisioning portal supporting linked and full clone generation from Golden Master templates.\n"
         "5. Construction of the multi-channel notification engine (SMTP and signed webhooks) and token-authenticated RESTful API.\n"
-        "6. Complete empirical verification through 152 passing automated test cases with zero defects."
+        "6. Complete empirical verification through 154 passing automated test cases with zero defects."
     )
     add_p(doc,
-        "With full software construction and validation achieved, the system is completely prepared for Milestone 5: Deployment into a simulated "
-        "and real-world laboratory environment utilizing a hybrid on-premises hypervisor, Cloudflare Zero-Trust ingress tunnel, and AWS cloud storage."
+        "With full software construction and validation achieved, the subsequent sections present the operational deployment into a simulated "
+        "and real-world laboratory environment utilizing a hybrid on-premises hypervisor, Cloudflare Zero-Trust ingress tunnel, AWS cloud storage, "
+        "and the Render + Supabase cloud demonstration tier."
     )
 
     print(f"Saving compiled document to {out_docx4}...")

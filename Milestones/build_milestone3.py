@@ -28,19 +28,16 @@ def build_milestone3():
     doc.add_page_break()
     
     # -------------------------------------------------------------
-    # CHAPTER THREE: SYSTEM IMPLEMENTATION AND TESTING (PART 1)
+    # CHAPTER THREE: SYSTEM METHODOLOGY AND ARCHITECTURE
     # -------------------------------------------------------------
-    add_heading_1(doc, "CHAPTER THREE: SYSTEM IMPLEMENTATION AND TESTING (PART 1)")
+    add_heading_1(doc, "CHAPTER THREE: SYSTEM METHODOLOGY AND ARCHITECTURE")
     
     add_p(doc, 
-        "This chapter presents the implementation and testing of the core modules of the Automated Virtual Machine "
-        "Recovery System (VMRecovery). Building directly upon the design models, class diagrams, flowcharts and entity "
-        "relationship diagrams established in Chapter Two, the software was practically constructed to automate virtual "
-        "machine instability management for IT training laboratories. This first phase of implementation focuses on the core "
-        "architectural foundation: the high-concurrency database engine, dynamic schema migrations, robust user authentication "
-        "and role-based authorization, the hardware-level hypervisor integration engine, the background monitoring daemon, and "
-        "comprehensive unit and integration test verification. Every feature was systematically developed, integrated, and debugged "
-        "to ensure stability before advancing to higher-level automation policies."
+        "This chapter establishes the system methodology, architectural design, data persistence models, and execution "
+        "frameworks of the Automated Virtual Machine Recovery System (VMRecovery). Building directly upon the conceptual "
+        "models, class diagrams, flowcharts, and entity-relationship diagrams developed in Chapter Two, this chapter details "
+        "the software engineering methodology, concurrency management mechanisms, database schema design, hypervisor abstraction "
+        "layer, and autonomous daemon architecture required to deliver high-availability virtual machine management for IT technical laboratories."
     )
 
     # 3.1 Introduction to Implementation & System Architecture
@@ -543,21 +540,22 @@ def run_worker(app, stop_event=None, poll_interval=10):
         "and test_vbox_controller.py) passed with zero errors, achieving comprehensive code coverage across all core features."
     )
 
-    # 3.7 Summary of Milestone 3 Achievements
-    add_heading_2(doc, "3.7 Summary of Milestone 3 Achievements")
+    # 3.7 Summary of Chapter Three
+    add_heading_2(doc, "3.7 Summary of Chapter Three")
     add_p(doc,
-        "Milestone 3 successfully realized the practical development, database integration, and feature-by-feature verification of the "
-        "Automated Virtual Machine Recovery System. The following key objectives were achieved in full:\n"
-        "1. Complete construction of the Model-Service-Controller codebase and Waitress multi-threaded WSGI application server.\n"
+        "Chapter Three established the architectural foundation, concurrency models, and hardware integration boundaries "
+        "of the Automated Virtual Machine Recovery System. The following key architectural objectives were achieved in full:\n"
+        "1. Formulation of the Model-Service-Controller codebase and Waitress multi-threaded WSGI application server.\n"
         "2. Implementation of high-concurrency SQLite WAL database architecture and an 8-stage zero-downtime schema migration engine.\n"
         "3. Role-Based Access Control enforcing secure privilege boundaries for Administrators, Trainers, and Students.\n"
         "4. VirtualBox hardware integration wrapper with automatic discovery, power state management, and template isolation.\n"
         "5. Background monitoring daemon with guest property heartbeat interrogation and debounced failure detection.\n"
-        "6. Systematic debugging and resolution of concurrency, IPC, and state tracking issues, verified by 150 passing automated tests."
+        "6. Systematic debugging and resolution of concurrency, IPC, and state tracking issues, verified by passing automated unit tests."
     )
     add_p(doc,
-        "These achievements establish a battle-tested core foundation, preparing the system for Milestone 4 (advanced automated snapshot policies, "
-        "disaster recovery appliances, multi-channel alerting, and RESTful APIs) and Milestone 5 (production deployment)."
+        "With the architectural methodology and core execution engines firmly established, Chapter Four presents the practical "
+        "feature implementation, disaster recovery algorithms, student provisioning workflows, comprehensive system verification, "
+        "and production deployment."
     )
 
     print(f"Saving compiled document to {out_docx3}...")

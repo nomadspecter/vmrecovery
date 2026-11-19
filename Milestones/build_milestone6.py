@@ -130,8 +130,8 @@ def build_milestone6():
           "provides student self-service provisioning from Golden Master templates (linked and full clones), independent .ova appliance disaster recovery, "
           "multi-channel alerting via SMTP and HMAC-SHA256 signed webhooks, and a token-authenticated RESTful API.")
     ins_p("The system was deployed and validated within a hybrid edge-cloud architecture utilizing Linux systemd service hardening on the physical lab "
-          "hypervisor host, Cloudflare Zero-Trust ingress tunneling for firewall-free remote HTTPS access, and Amazon Web Services (AWS S3) for offsite 3-2-1 "
-          "disaster recovery. Empirical validation across an automated suite of 152 test cases achieved a 100% pass rate with zero defects. The resulting system "
+          "hypervisor host, Cloudflare Zero-Trust ingress tunneling for firewall-free remote HTTPS access, an offsite 3-2-1 disaster recovery pipeline "
+          "on Amazon Web Services (AWS S3), and a live public demonstration platform on Render with Supabase Managed PostgreSQL. Empirical validation across an automated suite of 154 test cases achieved a 100% pass rate with zero defects. The resulting system "
           "guarantees instructional continuity, protects learning progress, and automates laboratory administration.")
 
     ins_page_break()
@@ -174,35 +174,37 @@ def build_milestone6():
         ("    2.3.4 Entity Relationship Diagram (ERD)", "22"),
         ("    2.3.5 Use Case Diagram", "24"),
         ("    2.3.6 Class Diagram", "26"),
-        ("CHAPTER THREE: SYSTEM IMPLEMENTATION AND TESTING", "28"),
+        ("CHAPTER THREE: SYSTEM METHODOLOGY AND ARCHITECTURE", "28"),
         ("  3.1 System Architecture and Modular Organization", "28"),
         ("  3.2 Implementation Environment and Technology Stack", "29"),
-        ("  3.3 Database Development and Schema Migrations (DB Development & Integration)", "30"),
+        ("  3.3 Database Development and Schema Migrations", "30"),
         ("  3.4 Feature-by-Feature Implementation and Debugging (Part 1 - Core Modules)", "35"),
         ("  3.5 Feature Debugging and Problem-Solving Log (Part 1)", "38"),
         ("  3.6 Unit and Integration Testing (Part 1)", "40"),
-        ("  3.7 Summary of Milestone 3 Achievements", "42"),
-        ("  3.8 Automated Snapshot Engine and Retention Policy Enforcement", "43"),
-        ("  3.9 Autonomous Recovery Engine and Failure Modes Handling", "44"),
-        ("  3.10 Disaster Recovery: Independent Appliance (.ova) Engine and Online Backups", "46"),
-        ("  3.11 Golden Master Template Provisioning and Student Request Workflow", "47"),
-        ("  3.12 Multi-Channel Alert and Notification Engine", "48"),
-        ("  3.13 RESTful API and Administrative Command-Line Interface (CLI)", "49"),
-        ("  3.14 Advanced Feature Debugging and Problem-Solving Log (Part 2)", "50"),
-        ("  3.15 Comprehensive System Testing Matrix (Full 152-Test Verification)", "52"),
-        ("  3.16 Summary of Milestone 4 Achievements", "54"),
-        ("  3.17 Deployment Strategy and Hybrid Edge-Cloud Architecture", "55"),
-        ("  3.18 Production Host Setup and Systemd Daemon Hardening", "56"),
-        ("  3.19 Cloudflare Zero-Trust Tunnel Configuration and Edge Ingress", "57"),
-        ("  3.20 AWS Cloud Disaster Recovery Integration (3-2-1 Backup Strategy)", "58"),
-        ("  3.21 Operational Validation and Deployment Testing Results", "59"),
-        ("  3.22 Summary of Milestone 5 Achievements", "61"),
-        ("CHAPTER FOUR: CONCLUSIONS AND RECOMMENDATIONS", "62"),
-        ("  4.1 Summary of Project Achievements", "62"),
-        ("  4.2 Challenges Encountered and Technical Mitigations", "63"),
-        ("  4.3 Recommendations for Future Work", "64"),
-        ("  4.4 Concluding Remarks", "65"),
-        ("REFERENCES (APA 7th Edition)", "66")
+        ("  3.7 Summary of Chapter Three Achievements", "42"),
+        ("CHAPTER FOUR: SYSTEM IMPLEMENTATION, TESTING AND DEPLOYMENT", "43"),
+        ("  4.1 Automated Snapshot Engine and Retention Policy Enforcement", "43"),
+        ("  4.2 Autonomous Recovery Engine and Failure Modes Handling", "44"),
+        ("  4.3 Disaster Recovery: Independent Appliance (.ova) Engine and Online Backups", "46"),
+        ("  4.4 Golden Master Template Provisioning and Student Request Workflow", "47"),
+        ("  4.5 Multi-Channel Alert and Notification Engine", "48"),
+        ("  4.6 RESTful API and Administrative Command-Line Interface (CLI)", "49"),
+        ("  4.7 Advanced Feature Debugging and Problem-Solving Log (Part 2)", "50"),
+        ("  4.8 Comprehensive System Testing Matrix (Full 154-Test Verification)", "52"),
+        ("  4.9 Summary of System Implementation and Verification", "54"),
+        ("  4.10 Deployment Strategy and Hybrid Edge-Cloud Architecture", "55"),
+        ("  4.11 Production Host Setup and Systemd Daemon Hardening", "56"),
+        ("  4.12 Cloudflare Zero-Trust Tunnel Configuration and Edge Ingress", "57"),
+        ("  4.13 AWS Cloud Disaster Recovery Integration (3-2-1 Backup Strategy)", "58"),
+        ("  4.14 Cloud Demonstration Deployment (Render & Supabase PostgreSQL Integration)", "59"),
+        ("  4.15 Operational Validation and Deployment Testing Results", "60"),
+        ("  4.16 Summary of Chapter Four Achievements", "62"),
+        ("CHAPTER FIVE: CONCLUSIONS AND RECOMMENDATIONS", "63"),
+        ("  5.1 Summary of Project Achievements", "63"),
+        ("  5.2 Challenges Encountered and Technical Mitigations", "64"),
+        ("  5.3 Recommendations for Future Work", "65"),
+        ("  5.4 Concluding Remarks", "66"),
+        ("REFERENCES (APA 7th Edition)", "67")
     ]
     for item, pg in toc_items:
         dots = ". " * int((60 - len(item)) / 2)
@@ -235,7 +237,15 @@ def build_milestone6():
         ("Figure 3.4: Virtual Machine Registry Management Interface", "37"),
         ("Figure 3.5: Real-Time Laboratory VM Health Monitoring Dashboard", "38"),
         ("Figure 3.6: Background Worker Cycle & Fault Detection Flowchart", "39"),
-        ("Figure 3.7: Hybrid Edge-Cloud Production Deployment Architecture", "56")
+        ("Figure 4.1: Automated Snapshot Engine Architecture & Retention Pruning Flow", "44"),
+        ("Figure 4.2: Autonomous Zero-Touch Rollback Sequence Diagram", "45"),
+        ("Figure 4.3: Independent Appliance (.ova) Disaster Recovery Pipeline", "46"),
+        ("Figure 4.4: Golden Master Template Provisioning & Approval State Machine", "47"),
+        ("Figure 4.5: Multi-Channel Alert Dispatcher & HMAC-SHA256 Webhook Pipeline", "48"),
+        ("Figure 4.6: Token-Authenticated RESTful API & CLI Subsystem Architecture", "49"),
+        ("Figure 4.7: Comprehensive 154-Test Automated Validation Execution Console", "53"),
+        ("Figure 4.8: Hybrid Edge-Cloud Production Deployment Architecture", "56"),
+        ("Figure 4.9: Production System Telemetry, Runtime Controls & Service Daemon Status", "61")
     ]
     for ftitle, fpg in figs:
         dots = ". " * int((58 - len(ftitle)) / 2)
@@ -252,8 +262,8 @@ def build_milestone6():
         ("Table 3.3.1: Complete Relational Database Data Dictionary", "33"),
         ("Table 3.3.2: Numbered Database Migrations Record (Schema Version 8)", "34"),
         ("Table 3.6.1: Core Module Unit and Integration Testing Execution Matrix", "41"),
-        ("Table 3.15.1: Comprehensive System Testing Execution Matrix (152 Total Tests)", "53"),
-        ("Table 3.21.1: Production Deployment Environment Verification Matrix", "60")
+        ("Table 4.8.1: Comprehensive System Testing Execution Matrix (154 Total Tests)", "53"),
+        ("Table 4.15.1: Production Deployment Environment Verification Matrix", "60")
     ]
     for ttitle, tpg in tbls:
         dots = ". " * int((58 - len(ttitle)) / 2)
@@ -313,14 +323,14 @@ def build_milestone6():
     print("Preliminary pages inserted successfully.")
 
     # -------------------------------------------------------------
-    # 2. CHAPTER FOUR: CONCLUSIONS AND RECOMMENDATIONS
+    # 2. CHAPTER FIVE: CONCLUSIONS AND RECOMMENDATIONS
     # -------------------------------------------------------------
-    print("Appending Chapter Four and References at document end...")
+    print("Appending Chapter Five and References at document end...")
     doc.add_page_break()
 
-    add_heading_1(doc, "CHAPTER FOUR: CONCLUSIONS AND RECOMMENDATIONS")
+    add_heading_1(doc, "CHAPTER FIVE: CONCLUSIONS AND RECOMMENDATIONS")
 
-    add_heading_2(doc, "4.1 Summary of Project Achievements")
+    add_heading_2(doc, "5.1 Summary of Project Achievements")
     add_p(doc,
         "The primary purpose of this project was to resolve the severe operational and educational disruption caused by virtual machine "
         "instabilities in IT training laboratories. By designing, developing, and deploying the Automated Virtual Machine Recovery System "
@@ -338,11 +348,13 @@ def build_milestone6():
         "bulk machine power controls, and an immutable audit log tracking state transitions and recovery elapsed durations.\n"
         "5. Provisioning and Enterprise Cloud Disaster Recovery: Developed a self-service student VM request portal based on Golden Master "
         "templates, integrated multi-channel alerting (SMTP/Webhooks), and deployed an offsite 3-2-1 backup pipeline replicating .ova appliance archives "
-        "and SQLite database hot backups to Amazon Web Services (AWS S3).",
+        "and SQLite database hot backups to Amazon Web Services (AWS S3).\n"
+        "6. Public Cloud Demonstration Platform: Deployed a live cloud demonstration tier on Render with Supabase Managed PostgreSQL for "
+        "remote assessment, complete with role-based authentication and hypervisor execution simulation.",
         align=WD_ALIGN_PARAGRAPH.LEFT
     )
 
-    add_heading_2(doc, "4.2 Challenges Encountered and Technical Mitigations")
+    add_heading_2(doc, "5.2 Challenges Encountered and Technical Mitigations")
     add_p(doc,
         "Throughout the practical implementation and deployment of this system, several significant technical and architectural hurdles were "
         "encountered. The engineering mitigations devised during this project provide valuable insights for systems engineering:"
@@ -351,7 +363,7 @@ def build_milestone6():
         "• Public Cloud Virtualization Limitations: Standard cloud virtual machines (e.g., AWS EC2 t3 instances) do not support nested hardware "
         "virtualization (VT-x/AMD-V), while bare-metal cloud servers carry prohibitive rental fees. This was mitigated by developing a 3-Pillar "
         "Hybrid Edge-Cloud Architecture that retains the physical hypervisor on-premises while using Cloudflare Zero-Trust tunnels for global HTTPS "
-        "access and AWS S3 for offsite disaster storage.\n"
+        "access, AWS S3 for offsite disaster storage, and Render/Supabase for simulated evaluation.\n"
         "• SQLite Concurrency Lock Contention: Default SQLite rollback journals locked the entire database during worker write cycles, causing "
         "concurrent web requests to throw 'database is locked' errors. This was resolved by enabling Write-Ahead Logging (WAL) mode and setting a "
         "15-second busy timeout (PRAGMA busy_timeout = 15000), allowing non-blocking concurrent reads and writes.\n"
@@ -365,7 +377,7 @@ def build_milestone6():
         align=WD_ALIGN_PARAGRAPH.LEFT
     )
 
-    add_heading_2(doc, "4.3 Recommendations for Future Work")
+    add_heading_2(doc, "5.3 Recommendations for Future Work")
     add_p(doc,
         "While the VMRecovery system successfully fulfills all operational requirements for single-server laboratory environments, "
         "the following architectural enhancements are recommended for future academic research and commercial expansion:"
@@ -384,7 +396,7 @@ def build_milestone6():
         align=WD_ALIGN_PARAGRAPH.LEFT
     )
 
-    add_heading_2(doc, "4.4 Concluding Remarks")
+    add_heading_2(doc, "5.4 Concluding Remarks")
     add_p(doc,
         "The Automated Virtual Machine Recovery System establishes a resilient, scalable, and autonomous platform for managing virtualized technical "
         "training environments. By eliminating reliance on manual hypervisor interventions, the software guarantees that student technical progress "
