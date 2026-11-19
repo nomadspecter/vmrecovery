@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block heading %}VM Requests & Provisioning{% endblock %}
 {% block body %}
-{% if user.role in ('admin', 'trainer') %}
+{% if user.role in ('admin', 'trainer', 'student') %}
 <div class="panel"><h4>Request a new virtual machine from a template</h4>
   {% if not templates %}
     <p class="muted">No golden templates configured yet. An administrator can mark any registered VM as a template in <a href="{{ url_for('main.vms') }}">Virtual Machines</a>.</p>

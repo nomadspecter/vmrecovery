@@ -3,7 +3,8 @@ body{font-family:'Montserrat','Segoe UI','DejaVu Sans',Arial,sans-serif;backgrou
 .layout{display:flex;min-height:100vh}
 .side{width:210px;background:#17324d;color:#dbe7f3;padding:18px 0;flex-shrink:0}
 .side h3{font-size:14px;padding:0 18px 14px;color:#fff;border-bottom:1px solid #2c4a68;margin-bottom:8px}
-.side a,.side button{display:block;width:100%;text-align:left;padding:10px 18px;font-size:13px;color:#dbe7f3;text-decoration:none;background:none;border:0;cursor:pointer;font-family:inherit}
+.side-section{font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:#7e9bb8;padding:12px 18px 4px;font-weight:700}
+.side a,.side button{display:block;width:100%;text-align:left;padding:9px 18px;font-size:13px;color:#dbe7f3;text-decoration:none;background:none;border:0;cursor:pointer;font-family:inherit}
 .side a:hover,.side button:hover{background:#1f4466}
 .side a.on{background:#24537f;color:#fff;border-left:4px solid #5fb0ff;padding-left:14px}
 .main{flex:1;padding:22px 28px;min-width:0}

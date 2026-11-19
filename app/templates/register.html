@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block heading %}Student Registration{% endblock %}
+{% block public %}
+<form class="login" method="post" action="{{ url_for('main.register') }}">
+  <h2>VM Recovery System</h2>
+  <p class="sub">VirtualKenya Labs - Create Student Account</p>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  
+  <div class="row">
+    <label for="username">Username (min. 3 characters)</label>
+    <input type="text" id="username" name="username" autocomplete="username" required autofocus minlength="3" placeholder="e.g. john_doe">
+  </div>
+  
+  <div class="row">
+    <label for="password">Password (min. 8 characters)</label>
+    <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8" placeholder="••••••••">
+  </div>
+
+  <div class="row">
+    <label for="confirm_password">Confirm Password</label>
+    <input type="password" id="confirm_password" name="confirm_password" autocomplete="new-password" required minlength="8" placeholder="••••••••">
+  </div>
+  
+  <button class="btn" type="submit">Register as Student</button>
+  
+  <p class="muted" style="margin-top:14px;text-align:center">
+    Already have an account? <a href="{{ url_for('main.login') }}" style="color:#2563eb;font-weight:600">Sign in here</a>
+  </p>
+</form>
+{% endblock %}

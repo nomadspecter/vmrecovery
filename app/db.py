@@ -9,6 +9,8 @@ import logging
 import sqlite3
 from pathlib import Path
 
+from .pg_db import connect_pg, init_pg_db, is_postgres_url
+
 SCHEMA = Path(__file__).with_name("schema.sql")
 
 # The schema file is split in two: the tables first, then the indexes. The
@@ -22,14 +24,11 @@ SCHEMA_VERSION = 8
 log = logging.getLogger("vmrecovery")
 
 
-def connect(path: str) -> sqlite3.Connection:
-    """Open a connection to the application database.
+def connect(path: str):
+    """Open a connection to the application database (SQLite or PostgreSQL)."""
+    if is_postgres_url(path):
+        return connect_pg(path)
 
-    WAL is used so the web tier and the worker can read and write at the same
-    time, and foreign keys are enforced so the references in the schema mean
-    something. The busy timeout makes a concurrent writer wait for the lock
-    instead of failing with "database is locked".
-    """
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     # timeout= sets the busy handler, so the pragmas below wait for a lock
     # held by another connection instead of failing straight away.
@@ -225,6 +224,10 @@ def _current_version(conn: sqlite3.Connection) -> int:
 
 def init_db(path: str) -> int:
     """Create or upgrade the database. Returns the schema version in use."""
+    if is_postgres_url(path):
+        init_pg_db(path)
+        return SCHEMA_VERSION
+
     conn = connect(path)
     try:
         conn.execute("PRAGMA legacy_alter_table = OFF")

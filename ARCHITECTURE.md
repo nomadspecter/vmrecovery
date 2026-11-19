@@ -3,9 +3,12 @@
 ## The shape of the system
 
 ```
+   browser / LAN (HTTPS:443)  ──► [ Nginx Reverse Proxy & SSL Termination ]
+                                       │ HTTP (127.0.0.1:5000)
+                                       ▼
                        ┌──────────────────────────────────────────┐
-   browser  ──HTTP──►  │  run.py (waitress, threaded WSGI)        │
-   monitoring ──API─►  │    ├── app/views.py   the web pages      │
+                       │  run.py (waitress, threaded WSGI)        │
+                       │    ├── app/views.py   the web pages      │
                        │    ├── app/api.py     the JSON API        │
                        │    └── app/worker.py  the monitoring loop │
                        └───────────────┬──────────────────────────┘

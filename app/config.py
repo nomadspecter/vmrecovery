@@ -231,8 +231,10 @@ class Settings:
         Path(b_dir).mkdir(parents=True, exist_ok=True)
         d_dir = os.environ.get("VMR_DB_BACKUP_DIR", str(INSTANCE_DIR / "db-backups"))
         Path(d_dir).mkdir(parents=True, exist_ok=True)
+        db_url = os.environ.get("DATABASE_URL", os.environ.get("SUPABASE_DB_URL", os.environ.get("VMR_DB_URL", ""))).strip()
+        db_target = db_url if db_url else os.environ.get("VMR_DB", str(INSTANCE_DIR / "vmrecovery.db"))
         return cls(
-            db_path=os.environ.get("VMR_DB", str(INSTANCE_DIR / "vmrecovery.db")),
+            db_path=db_target,
             simulate=_bool("VMR_SIMULATE", False),
             vboxmanage=os.environ.get("VMR_VBOXMANAGE", "VBoxManage"),
             check_seconds=_int("VMR_CHECK_SECONDS", 30),
@@ -248,8 +250,8 @@ class Settings:
             busy_timeout=_int("VMR_BUSY_TIMEOUT", 300),
             run_worker=_bool("VMR_WORKER", True),
             dev_server=_bool("VMR_DEV_SERVER", False),
-            host=os.environ.get("VMR_HOST", "127.0.0.1"),
-            port=_int("VMR_PORT", 5000),
+            host=os.environ.get("HOST", os.environ.get("VMR_HOST", "0.0.0.0" if ("PORT" in os.environ or "RENDER" in os.environ) else "127.0.0.1")),
+            port=_int("PORT", _int("VMR_PORT", 5000)),
             cookie_secure=_bool("VMR_COOKIE_SECURE", False),
             session_hours=_int("VMR_SESSION_HOURS", 12),
             log_level=os.environ.get("VMR_LOG_LEVEL", "INFO").upper(),

@@ -507,6 +507,24 @@ def apply_retention(conn, vbox, vm, now):
         conn.commit()
 
 
+def delete_snapshot_by_id(conn, vbox, vm_id, snapshot_id, user_id=None, now=None):
+    """Manually delete an individual snapshot by ID, removing from VirtualBox and database."""
+    now = now or now_local()
+    snap = conn.execute("SELECT * FROM snapshots WHERE snapshot_id=? AND vm_id=?", (snapshot_id, vm_id)).fetchone()
+    if not snap:
+        raise ValueError("Snapshot not found.")
+    vm = get_vm(conn, vm_id)
+    if not vm:
+        raise ValueError("Unknown virtual machine.")
+    vbox.wait_until_ready(vm["vbox_uuid"])
+    vbox.delete_snapshot(vm["vbox_uuid"], snap["snapshot_name"])
+    conn.execute("DELETE FROM snapshots WHERE snapshot_id=?", (snapshot_id,))
+    conn.commit()
+    log_event(conn, "snapshot_deleted", vm_id, user_id,
+              f"Deleted snapshot '{snap['snapshot_name']}'", "Success", now)
+    return True
+
+
 # ---------------------------------------------------------------- training sessions
 def active_session(conn, class_group):
     """The session currently open for a class group, if any."""
@@ -1600,8 +1618,8 @@ def report(conn, start: str, end: str, class_group: str | None = None) -> dict:
     totals["mean_recovery_seconds"] = round(avg["avg"], 1) if avg and avg["avg"] is not None else None
     weekly = conn.execute(
         f"SELECT strftime('%Y-W%W', e.created_at) AS week, "
-        f"SUM(e.event_type IN ('crash_detected','freeze_detected')) AS crashes, "
-        f"SUM(e.event_type = 'restore_success') AS recoveries "
+        f"SUM(CASE WHEN e.event_type IN ('crash_detected','freeze_detected') THEN 1 ELSE 0 END) AS crashes, "
+        f"SUM(CASE WHEN e.event_type = 'restore_success' THEN 1 ELSE 0 END) AS recoveries "
         f"FROM events e {join} WHERE {where} GROUP BY week ORDER BY week", args).fetchall()
 
     group_where = where
@@ -1611,9 +1629,9 @@ def report(conn, start: str, end: str, class_group: str | None = None) -> dict:
         group_args.append(class_group)
     per_vm = conn.execute(
         f"SELECT v.vm_id, v.vm_name, v.class_group, "
-        f"SUM(e.event_type IN ('crash_detected','freeze_detected')) AS crashes, "
-        f"SUM(e.event_type = 'restore_success') AS recoveries, "
-        f"SUM(e.event_type = 'snapshot_taken') AS snapshots, "
+        f"SUM(CASE WHEN e.event_type IN ('crash_detected','freeze_detected') THEN 1 ELSE 0 END) AS crashes, "
+        f"SUM(CASE WHEN e.event_type = 'restore_success' THEN 1 ELSE 0 END) AS recoveries, "
+        f"SUM(CASE WHEN e.event_type = 'snapshot_taken' THEN 1 ELSE 0 END) AS snapshots, "
         f"AVG(CASE WHEN e.event_type='restore_success' THEN e.duration_seconds END) AS mean_seconds "
         f"FROM events e {join} WHERE {group_where} AND e.vm_id IS NOT NULL "
         f"GROUP BY v.vm_id ORDER BY crashes DESC, v.vm_name", group_args).fetchall()

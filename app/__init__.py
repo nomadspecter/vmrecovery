@@ -27,7 +27,11 @@ def create_app(settings: Settings | None = None, vbox=None) -> Flask:
     app.extensions["lock"] = threading.Lock()   # one VirtualBox operation at a time
     init_db(settings.db_path)
 
+    from werkzeug.middleware.proxy_fix import ProxyFix
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
     _load_runtime_settings(app)
+    _seed_initial_data(app)
 
     @app.after_request
     def security_headers(response):
@@ -96,3 +100,53 @@ def _load_runtime_settings(app: Flask) -> None:
     finally:
         conn.close()
     notifier.configure(settings)
+
+
+def _seed_initial_data(app: Flask) -> None:
+    """Seed default accounts and demo VMs if database is newly initialized."""
+    import os
+    if os.environ.get("PYTEST_CURRENT_TEST"):
+        return
+    from . import db, services
+    settings = app.extensions["settings"]
+    conn = db.connect(settings.db_path)
+    try:
+        user_count = conn.execute("SELECT COUNT(*) AS c FROM users").fetchone()["c"]
+        if user_count == 0:
+            admin_id = services.create_user(conn, "admin", "Admin1234!", role="admin")
+            services.create_user(conn, "trainer", "Trainer1234!", role="trainer")
+            student_id = services.create_user(conn, "student", "Student1234!", role="student")
+            log.info("Initialized default users: admin, trainer, student")
+
+            if settings.simulate:
+                vbox = app.extensions["vbox"]
+                demo_vms = [
+                    ("DEV-LAB-01", "00000000-0000-4000-8000-000000000001", "Software Dev", student_id, False),
+                    ("DEV-LAB-02", "00000000-0000-4000-8000-000000000002", "Software Dev", None, False),
+                    ("NET-LAB-03", "00000000-0000-4000-8000-000000000003", "Networking", None, False),
+                    ("NET-LAB-04", "00000000-0000-4000-8000-000000000004", "Networking", None, False),
+                    ("SEC-LAB-05", "00000000-0000-4000-8000-000000000005", "Cybersecurity", None, True),
+                ]
+                for name, uuid, group, assigned_to, is_tpl in demo_vms:
+                    try:
+                        vm_id = services.register_vm(
+                            conn, name, uuid, group,
+                            interval=30, keep=5, pre_session=True,
+                            user_id=admin_id,
+                            is_template=is_tpl,
+                            assigned_student_id=assigned_to
+                        )
+                        vbox.take_snapshot(uuid, "baseline-clean")
+                        conn.execute(
+                            "INSERT INTO snapshots (vm_id, snapshot_name, snapshot_type, created_at) "
+                            "VALUES (?, ?, 'scheduled', ?)",
+                            (vm_id, "baseline-clean", services.ts(services.now_local()))
+                        )
+                    except Exception as e:
+                        log.debug("Demo VM setup note: %s", e)
+                conn.commit()
+                log.info("Initialized demo lab VMs for simulation mode.")
+    except Exception as exc:
+        log.warning("Could not check/seed initial database records: %s", exc)
+    finally:
+        conn.close()

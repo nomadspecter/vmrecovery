@@ -7,6 +7,9 @@
   <div class="row"><label for="username">Username</label><input type="text" id="username" name="username" autocomplete="username" required autofocus></div>
   <div class="row"><label for="password">Password</label><input type="password" id="password" name="password" autocomplete="current-password" required></div>
   <button class="btn" type="submit">Log in</button>
-  <p class="muted" style="margin-top:14px;text-align:center">Forgot password? Contact the lab administrator.</p>
+  <p class="muted" style="margin-top:14px;text-align:center">
+    New student? <a href="{{ url_for('main.register') }}" style="color:#2563eb;font-weight:600">Register here</a>
+  </p>
+  <p class="muted" style="margin-top:6px;text-align:center;font-size:12px">Forgot password? Contact the lab administrator.</p>
 </form>
 {% endblock %}

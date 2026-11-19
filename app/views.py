@@ -182,6 +182,42 @@ def login():
     return render_template("login.html")
 
 
+@bp.route("/register", methods=["GET", "POST"])
+def register():
+    if g.user:
+        return redirect(url_for("main.dashboard"))
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+        confirm = request.form.get("confirm_password", "")
+        if not username:
+            flash_error("Username is required.")
+            return render_template("register.html")
+        if len(username) < 3:
+            flash_error("Username must be at least 3 characters.")
+            return render_template("register.html")
+        if len(password) < 8:
+            flash_error("Password must be at least 8 characters.")
+            return render_template("register.html")
+        if password != confirm:
+            flash_error("Passwords do not match.")
+            return render_template("register.html")
+        conn = get_db()
+        existing = conn.execute("SELECT user_id FROM users WHERE LOWER(username) = LOWER(?)", (username,)).fetchone()
+        if existing:
+            flash_error("That username is already taken. Please choose another.")
+            return render_template("register.html")
+        try:
+            user_id = services.create_user(conn, username, password, role="student")
+            services.log_event(conn, "user_registered", None, user_id,
+                               f"Student account '{username}' registered", "Success")
+            flash("Registration successful! You can now log in.", "ok")
+            return redirect(url_for("main.login"))
+        except Exception as exc:
+            flash_error(f"Registration failed: {exc}")
+    return render_template("register.html")
+
+
 @bp.route("/logout", methods=["POST"])
 @login_required
 def logout():
@@ -283,6 +319,7 @@ def vms():
     conn = get_db()
     registered = services.list_vms(conn)
     templates = services.list_templates(conn)
+    students = [u for u in services.list_users(conn) if u["role"] == "student"]
     known = {v["vbox_uuid"] for v in registered}
     available, vbox_error = [], None
     try:
@@ -290,7 +327,7 @@ def vms():
     except VBoxError as exc:
         vbox_error = str(exc)
     return render_template("vms.html", vms=registered, available=available,
-                           templates=templates, vbox_error=vbox_error)
+                           templates=templates, students=students, vbox_error=vbox_error)
 
 
 @bp.route("/vms/add", methods=["POST"])
@@ -300,12 +337,15 @@ def vms_add():
     name, _, uuid = choice.partition("|")
     if not uuid:
         name, uuid = request.form.get("vm_name", ""), request.form.get("vbox_uuid", "")
+    student_id = request.form.get("assigned_student_id")
+    student_id = int(student_id) if student_id else None
     try:
         is_template = request.form.get("is_template") == "on"
         services.register_vm(get_db(), name, uuid, request.form.get("class_group", "General"),
                              to_int("interval_minutes", 30), to_int("retention_count", 5),
                              request.form.get("pre_session") == "on", g.user["user_id"],
-                             request.form.get("heartbeat_property"), is_template=is_template)
+                             request.form.get("heartbeat_property"), is_template=is_template,
+                             assigned_student_id=student_id)
         flash(f"{name} registered.", "ok")
     except ValueError as exc:
         flash_error(str(exc))
@@ -319,14 +359,38 @@ def vms_direct_create():
     tpl_uuid = request.form.get("template_uuid", "").strip()
     group = request.form.get("class_group", "General").strip()
     clone_type = request.form.get("clone_type", "linked")
+    student_id = request.form.get("assigned_student_id")
+    student_id = int(student_id) if student_id else None
     try:
         with vbox_lock():
             vm_id = services.direct_create_vm(get_db(), vbox(), name, group, tpl_uuid,
                                                clone_type=clone_type, user_id=g.user["user_id"])
+            if student_id:
+                services.assign_student(get_db(), vm_id, student_id, admin_user_id=g.user["user_id"])
         flash(f"VM '{name}' cloned from template and registered.", "ok")
     except (ValueError, VBoxError) as exc:
         flash_error(str(exc))
     return redirect(url_for("main.vms"))
+
+
+@bp.route("/vms/<int:vm_id>/assign", methods=["POST"])
+@role_required("admin")
+def vm_assign(vm_id):
+    vm = vm_or_404(vm_id)
+    student_id = request.form.get("assigned_student_id")
+    student_id = int(student_id) if student_id else None
+    conn = get_db()
+    try:
+        services.assign_student(conn, vm_id, student_id, admin_user_id=g.user["user_id"])
+        if student_id:
+            student = conn.execute("SELECT username FROM users WHERE user_id = ?", (student_id,)).fetchone()
+            sname = student["username"] if student else str(student_id)
+            flash(f"VM '{vm['vm_name']}' assigned to student '{sname}'.", "ok")
+        else:
+            flash(f"VM '{vm['vm_name']}' is now unassigned.", "ok")
+    except ValueError as exc:
+        flash_error(str(exc))
+    return redirect(request.referrer or url_for("main.vms"))
 
 
 @bp.route("/vms/<int:vm_id>/toggle-template", methods=["POST"])
@@ -619,7 +683,8 @@ def request_reject(request_id):
 @bp.route("/users")
 @role_required("admin")
 def users_page():
-    return render_template("users.html", users=services.list_users(get_db()))
+    conn = get_db()
+    return render_template("users.html", users=services.list_users(conn), vms=services.list_vms(conn))
 
 
 @bp.route("/users/create", methods=["POST"])
@@ -656,6 +721,22 @@ def user_delete(user_id):
         flash("User deleted.", "ok")
     except ValueError as exc:
         flash_error(str(exc))
+    return redirect(url_for("main.users_page"))
+
+
+@bp.route("/users/<int:user_id>/assign-vm", methods=["POST"])
+@role_required("admin")
+def user_assign_vm(user_id):
+    vm_id = request.form.get("vm_id")
+    vm_id = int(vm_id) if vm_id else None
+    conn = get_db()
+    if vm_id:
+        try:
+            services.assign_student(conn, vm_id, user_id, admin_user_id=g.user["user_id"])
+            vm = services.get_vm(conn, vm_id)
+            flash(f"VM '{vm['vm_name']}' assigned successfully.", "ok")
+        except ValueError as exc:
+            flash_error(str(exc))
     return redirect(url_for("main.users_page"))
 
 

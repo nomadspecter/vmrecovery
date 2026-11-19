@@ -163,3 +163,98 @@ def test_worker_status_before_it_starts(settings, vbox):
     assert status["cycles"] == 0
     assert status["last_cycle"] is None
     assert status["last_error"] is None
+
+
+def test_delete_snapshot_by_id(conn, vbox, vm, users):
+    admin_id, _ = users
+    services.take_snapshot(conn, vbox, vm, "manual", user_id=admin_id)
+    snaps = services.list_snapshots(conn, vm["vm_id"])
+    assert len(snaps) == 1
+    snap_id = snaps[0]["snapshot_id"]
+
+    services.delete_snapshot_by_id(conn, vbox, vm["vm_id"], snap_id, user_id=admin_id)
+    snaps_after = services.list_snapshots(conn, vm["vm_id"])
+    assert len(snaps_after) == 0
+
+
+def test_student_vm_request_workflow(conn, vbox, vm):
+    stu_id = services.create_user(conn, "alice_student", "studentpass123", "student")
+    services.set_vm_template(conn, vm["vm_id"], True, vbox=vbox)
+
+    req_id = services.request_vm(
+        conn, stu_id, vm["vbox_uuid"], vm["vm_name"], "ALICE-VM-01",
+        class_group="CyberSec", clone_type="linked"
+    )
+    assert req_id is not None
+    reqs = services.list_vm_requests(conn, user_id=stu_id)
+    assert len(reqs) == 1
+    assert reqs[0]["requested_name"] == "ALICE-VM-01"
+    assert reqs[0]["username"] == "alice_student"
+
+
+def test_student_registration_and_login(client, settings):
+    import re
+    res = client.get("/register")
+    assert res.status_code == 200
+    assert b"Student Registration" in res.data
+    reg_csrf = re.search(r'name="csrf_token" value="([^"]+)"', res.get_data(as_text=True)).group(1)
+
+    # POST password mismatch
+    res = client.post("/register", data={
+        "csrf_token": reg_csrf,
+        "username": "newstudent",
+        "password": "Password123!",
+        "confirm_password": "WrongPassword!"
+    })
+    assert b"Passwords do not match" in res.data
+
+    # POST valid registration
+    res = client.post("/register", data={
+        "csrf_token": reg_csrf,
+        "username": "newstudent",
+        "password": "Password123!",
+        "confirm_password": "Password123!"
+    }, follow_redirects=True)
+    assert b"Registration successful" in res.data
+
+    from app import db
+    conn = db.connect(settings.db_path)
+    u = conn.execute("SELECT * FROM users WHERE username='newstudent'").fetchone()
+    assert u is not None
+    assert u["role"] == "student"
+    conn.close()
+
+    # Login with newly registered student
+    login_page = client.get("/login").get_data(as_text=True)
+    login_csrf = re.search(r'name="csrf_token" value="([^"]+)"', login_page).group(1)
+    res = client.post("/login", data={"username": "newstudent", "password": "Password123!", "csrf_token": login_csrf}, follow_redirects=True)
+    assert res.status_code == 200
+    assert b"Student" in res.data
+
+
+def test_admin_direct_vm_assignment(client, conn, vm):
+    import re
+    stu_id = services.create_user(conn, "bob_student", "studentpass123", "student")
+
+    # Log in as admin
+    login_page = client.get("/login").get_data(as_text=True)
+    login_csrf = re.search(r'name="csrf_token" value="([^"]+)"', login_page).group(1)
+    client.post("/login", data={"username": "admin", "password": "password123", "csrf_token": login_csrf})
+
+    dash_page = client.get("/").get_data(as_text=True)
+    dash_csrf = re.search(r'name="csrf_token" value="([^"]+)"', dash_page).group(1)
+
+    # Assign VM to bob_student
+    res = client.post(f"/vms/{vm['vm_id']}/assign", data={"csrf_token": dash_csrf, "assigned_student_id": str(stu_id)}, follow_redirects=True)
+    assert res.status_code == 200
+
+    fresh = services.get_vm(conn, vm["vm_id"])
+    assert fresh["assigned_student_id"] == stu_id
+
+    # Unassign VM
+    res = client.post(f"/vms/{vm['vm_id']}/assign", data={"csrf_token": dash_csrf, "assigned_student_id": ""}, follow_redirects=True)
+    assert res.status_code == 200
+
+    fresh2 = services.get_vm(conn, vm["vm_id"])
+    assert fresh2["assigned_student_id"] is None
+

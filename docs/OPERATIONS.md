@@ -106,7 +106,32 @@ the worker cleanly and exits.
 
 ---
 
-## 3. Health checks
+## 3. Nginx Reverse Proxy with SSL
+
+For production access across the local lab network, run Nginx as a reverse proxy in front of Waitress:
+
+```bash
+# Run the automated Nginx & SSL setup script:
+sudo ./deploy/setup_nginx_ssl.sh
+```
+
+This script:
+1. Generates an SSL certificate with Subject Alternative Names (SAN) for `localhost`, the hostname, and your LAN IP.
+2. Places the configuration in `/etc/nginx/conf.d/vmrecovery.conf`.
+3. Redirects port 80 (HTTP) to port 443 (HTTPS) automatically.
+4. Proxies requests to Waitress on `http://127.0.0.1:5000` with full client IP preservation (`ProxyFix`).
+5. Sets `VMR_COOKIE_SECURE=1` to enforce secure cookies over TLS.
+
+Access the dashboard via:
+- Local browser: `https://localhost`
+- Network/Lab browser: `https://<server-ip>` (e.g. `https://192.168.100.3`)
+
+See [`docs/DEPLOYMENT_AND_SSL.md`](DEPLOYMENT_AND_SSL.md) for the full deployment architecture,
+SSL management, firewall rules, and troubleshooting guide.
+
+---
+
+## 4. Health checks
 
 ```bash
 curl -fsS http://127.0.0.1:5000/healthz | python -m json.tool

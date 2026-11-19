@@ -10,15 +10,8 @@ ENV/
 env/
 
 # Instance-specific database and secret files
-# The trailing * also covers the SQLite sidecar files (-wal, -shm).
-instance/*.db*
-instance/*.sqlite*
-instance/*.key
-instance/vmrecovery.db*
-instance/*.env
-instance/backups/
-instance/db-backups/
-instance/*.log
+instance/*
+!instance/.gitkeep
 
 # Local configuration. Copy .env.example and .env.local.example to these.
 .env

@@ -28,7 +28,11 @@ KillSignal=SIGTERM
 # Security hardening. PrivateTmp is deliberately not enabled: VirtualBox uses
 # /tmp/.vbox-$USER-ipc to talk to VBoxSVC, and a private /tmp breaks it.
 # ProtectHome is left at systemd's default because the VMs live under /home.
-NoNewPrivileges=true
+# NOTE: NoNewPrivileges must NOT be true. VirtualBox's headless runner
+# (/usr/lib/virtualbox/VBoxHeadless) is a setuid-root binary required to
+# access /dev/vboxdrv. Setting NoNewPrivileges=true prevents setuid execution,
+# causing VMs to crash on startup with exit code 1 (0x1).
+NoNewPrivileges=false
 ProtectSystem=full
 UMask=0077
 

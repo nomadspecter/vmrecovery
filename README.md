@@ -451,8 +451,15 @@ sudo journalctl -u vmrecovery -f     # live logs
 The service restarts automatically, waits for VirtualBox, runs as the VM-owning user (with the
 `vboxusers` group when it exists), and stops cleanly on `systemctl stop`.
 
-**Behind a proxy.** Keep `VMR_HOST=127.0.0.1` and terminate TLS in Caddy or nginx. Set
-`VMR_COOKIE_SECURE=1` so the session cookie is only sent over HTTPS.
+**Behind a proxy with SSL.** Run Nginx as a reverse proxy in front of Waitress to enforce HTTPS, terminate TLS, and preserve client IP addresses across the lab network:
+
+```bash
+sudo ./deploy/setup_nginx_ssl.sh       # generates SSL cert with SAN, installs Nginx site config
+sudo systemctl enable --now nginx
+```
+
+Full deployment architecture, SSL certificate setup, and network options are detailed in
+[`docs/DEPLOYMENT_AND_SSL.md`](docs/DEPLOYMENT_AND_SSL.md).
 
 A day in the life:
 

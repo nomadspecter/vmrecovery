@@ -267,7 +267,7 @@ def test_restore_failure_triggers_alert_after_max_attempts(conn, vbox, vm, setti
         services.run_cycle(conn, vbox, settings, minutes(i))
     failed = services.list_events(conn, event_type="restore_failed")
     assert len(failed) == settings.max_restores_per_hour
-    alerts = services.list_events(conn, event_type="alert")
+    alerts = services.list_events(conn, vm_id=vm["vm_id"], event_type="alert")
     assert len(alerts) == 1                                    # raised once, not every cycle
 
 
