@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="100%" height="100%">
+  <defs>
+    <filter id="depShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrDep" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1E293B"/>
+    </marker>
+    <marker id="arrDepBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#2563EB"/>
+    </marker>
+    <marker id="arrDepOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#EA580C"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="800" fill="#FFFFFF"/>
+  <text x="600" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#0F172A" text-anchor="middle">Figure 3.16: Production Deployment Architecture with Cloudflare Zero-Trust &amp; AWS S3</text>
+  <text x="600" y="60" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">Hybrid On-Premises Hypervisor Host with Cloud Edge Ingress and Offsite Disaster Recovery Storage</text>
+
+  <!-- ON-PREMISES HYPERVISOR BOUNDARY (Left) -->
+  <rect x="40" y="90" width="620" height="680" rx="12" fill="#F8FAFC" stroke="#1E40AF" stroke-width="2.5"/>
+  <rect x="60" y="75" width="450" height="28" rx="4" fill="#1E40AF"/>
+  <text x="285" y="94" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle">ON-PREMISES LAB HYPERVISOR HOST (Ubuntu 22.04 LTS / Debian)</text>
+
+  <!-- Systemd Supervisor -->
+  <g transform="translate(70, 120)" filter="url(#depShadow)">
+    <rect width="560" height="50" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.8"/>
+    <text x="280" y="24" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E40AF" text-anchor="middle">SYSTEMD SERVICE MANAGER (vmrecovery.service)</text>
+    <text x="280" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569" text-anchor="middle">Automatic Boot Startup, Restart-on-Failure (RestartSec=5s), StandardOutput=journal</text>
+  </g>
+
+  <!-- Waitress WSGI -->
+  <g transform="translate(70, 190)" filter="url(#depShadow)">
+    <rect width="560" height="75" rx="6" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="560" height="24" rx="6" fill="#2563EB"/>
+    <text x="280" y="17" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">WAITRESS MULTI-THREADED WSGI SERVER</text>
+    <text x="20" y="46" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#1E40AF">Binding: http://127.0.0.1:5000 (Production threads=8)</text>
+    <text x="20" y="64" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">Handles simultaneous trainer sessions, student self-service provisioning, and REST API calls</text>
+  </g>
+
+  <!-- Middle Row: Worker & SQLite -->
+  <g transform="translate(70, 285)" filter="url(#depShadow)">
+    <rect width="265" height="135" rx="6" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.8"/>
+    <rect width="265" height="24" rx="6" fill="#EA580C"/>
+    <text x="132" y="17" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">BACKGROUND WORKER</text>
+    <text x="12" y="48" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#9A3412">app/worker.py</text>
+    <text x="12" y="68" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• 10s Continuous Polling</text>
+    <text x="12" y="86" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• Zero-Touch Auto-Healing</text>
+    <text x="12" y="104" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• Hourly Online Database Backup</text>
+    <text x="12" y="122" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• Automatic Retention Pruning</text>
+  </g>
+
+  <g transform="translate(365, 285)" filter="url(#depShadow)">
+    <rect width="265" height="135" rx="6" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.8"/>
+    <rect width="265" height="24" rx="6" fill="#CA8A04"/>
+    <text x="132" y="17" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">SQLITE 3 DATABASE (WAL)</text>
+    <text x="12" y="48" font-family="'Courier New', monospace" font-size="10.5" font-weight="700" fill="#854D0E">instance/vmrecovery.db</text>
+    <text x="12" y="68" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• WAL Concurrency Journal</text>
+    <text x="12" y="86" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• 8 Sequential Migrations</text>
+    <text x="12" y="104" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• Atomic Transaction Logs</text>
+    <text x="12" y="122" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• Hot Backup Storage (backups/)</text>
+  </g>
+
+  <!-- Bottom: VirtualBox & Physical Machines -->
+  <g transform="translate(70, 440)" filter="url(#depShadow)">
+    <rect width="560" height="205" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+    <rect width="560" height="26" rx="8" fill="#D97706"/>
+    <text x="280" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">ORACLE VIRTUALBOX 7.2 HYPERVISOR (VBoxManage)</text>
+    <text x="20" y="48" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#78350F">Hardware Virtualization &amp; Differential Storage Control</text>
+    <text x="20" y="66" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• Fast Differencing Snapshots (&lt;10s Rollback) &amp; Golden Master Linked Clones</text>
+    <text x="20" y="84" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• Guest Property Heartbeat Telemetry &amp; Headless Process Execution</text>
+    <text x="20" y="102" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• Independent Appliance Export Engine (.ova compressed standalone packages)</text>
+
+    <!-- Lab VMs Sub-boxes -->
+    <rect x="20" y="115" width="115" height="75" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="77" y="135" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#0F172A" text-anchor="middle">debian</text>
+    <text x="77" y="152" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" fill="#64748B" text-anchor="middle">Linux Server</text>
+    <text x="77" y="170" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#16A34A" text-anchor="middle">SSH Port 22</text>
+
+    <rect x="155" y="115" width="115" height="75" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="212" y="135" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#0F172A" text-anchor="middle">LAB-CS-001</text>
+    <text x="212" y="152" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" fill="#64748B" text-anchor="middle">Student Node 1</text>
+    <text x="212" y="170" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#16A34A" text-anchor="middle">SSH / VRDP</text>
+
+    <rect x="290" y="115" width="115" height="75" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="347" y="135" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#0F172A" text-anchor="middle">LAB-CS-002</text>
+    <text x="347" y="152" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" fill="#64748B" text-anchor="middle">Student Node 2</text>
+    <text x="347" y="170" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#16A34A" text-anchor="middle">SSH / VRDP</text>
+
+    <rect x="425" y="115" width="115" height="75" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="482" y="135" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#0F172A" text-anchor="middle">agnes</text>
+    <text x="482" y="152" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" fill="#64748B" text-anchor="middle">Lab Workstation</text>
+    <text x="482" y="170" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#16A34A" text-anchor="middle">VRDP Port 3389</text>
+  </g>
+
+  <!-- Local Network Footnote -->
+  <text x="350" y="665" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="600" fill="#1E40AF" text-anchor="middle">Local Area Network (LAN): Direct Student Access via SSH (22) &amp; VRDP (3389)</text>
+
+  <!-- CLOUDFLARE ZERO-TRUST EDGE (Right Top) -->
+  <g transform="translate(720, 100)" filter="url(#depShadow)">
+    <rect width="440" height="150" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="2.5"/>
+    <rect width="440" height="30" rx="10" fill="#EA580C"/>
+    <text x="220" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">CLOUDFLARE ZERO-TRUST EDGE NETWORK (cloudflared)</text>
+    <text x="20" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#C2410C">• Outbound Encrypted TLS Tunnel (No open router inbound ports)</text>
+    <text x="20" y="75" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Automated Wildcard SSL/TLS Certificate Termination</text>
+    <text x="20" y="95" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• DDoS Defense, Web Application Firewall (WAF) &amp; Global CDN</text>
+    <text x="20" y="115" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Public Endpoint: <tspan font-family="'Courier New', monospace" font-weight="700" fill="#EA580C">https://vmrecovery.lab.domain</tspan></text>
+    <text x="20" y="135" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">Enables University Examiners &amp; Remote Students to inspect dashboard safely</text>
+  </g>
+
+  <!-- UNIVERSITY STAKEHOLDERS (Right Middle) -->
+  <g transform="translate(720, 290)" filter="url(#depShadow)">
+    <rect width="440" height="140" rx="8" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/>
+    <rect width="440" height="28" rx="8" fill="#475569"/>
+    <text x="220" y="19" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">END USERS &amp; LAB CLIENTS</text>
+    <text x="20" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#1E293B">1. Web Browser Access (Dashboard Management):</text>
+    <text x="35" y="73" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">Examiners, Administrators, Trainers &amp; Students (HTTP/HTTPS)</text>
+    <text x="20" y="98" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#166534">2. Guest Operating System Access (Hands-on Labs):</text>
+    <text x="35" y="116" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">Direct LAN connection via SSH (port 22) and RDP/VRDP (port 3389)</text>
+  </g>
+
+  <!-- AWS CLOUD STORAGE (Right Bottom) -->
+  <g transform="translate(720, 470)" filter="url(#depShadow)">
+    <rect width="440" height="195" rx="10" fill="#F0FDF4" stroke="#16A34A" stroke-width="2.5"/>
+    <rect width="440" height="30" rx="10" fill="#16A34A"/>
+    <text x="220" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">AMAZON WEB SERVICES (AWS CLOUD 3-2-1 BACKUP)</text>
+    <text x="20" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#15803D">• AWS S3 Bucket: Offsite Disaster Recovery Storage</text>
+    <text x="20" y="75" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">  - Independent Open Virtualization Appliance (.ova) archives</text>
+    <text x="20" y="95" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">  - Hourly SQLite Online Hot Backups with SHA-256 Checksums</text>
+    <text x="20" y="118" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#15803D">• Automated Synchronization Script:</text>
+    <text x="35" y="136" font-family="'Courier New', monospace" font-size="10.5" fill="#1E293B">deploy/sync_s3_backups.sh (S3 Lifecycle Glacier)</text>
+    <text x="20" y="160" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#15803D">• External Health Sentinel (AWS EC2 / Cloud Sentry):</text>
+    <text x="35" y="178" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">Independent probe pinging /api/health to alert if host loses power</text>
+  </g>
+
+  <!-- Connectors -->
+  <path d="M 630 220 L 720 175" fill="none" stroke="#EA580C" stroke-width="2.2" marker-end="url(#arrDepOrange)"/>
+  <path d="M 940 250 L 940 290" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrDepBlue)"/>
+  <path d="M 495 420 L 720 540" fill="none" stroke="#16A34A" stroke-width="2.2" marker-end="url(#arrDep)"/>
+  <path d="M 350 440 L 720 370" fill="none" stroke="#166534" stroke-width="1.8" stroke-dasharray="5,4" marker-end="url(#arrDep)"/>
+</svg>

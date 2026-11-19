@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" width="100%" height="100%">
+  <defs>
+    <filter id="walShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrWal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1E293B"/>
+    </marker>
+    <marker id="arrWalBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#2563EB"/>
+    </marker>
+  </defs>
+
+  <rect width="1100" height="700" fill="#FFFFFF"/>
+  <text x="550" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#0F172A" text-anchor="middle">Figure 3.2: SQLite Concurrency Model (WAL Mode) &amp; Schema Evolution</text>
+  <text x="550" y="60" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">Non-Blocking Concurrent Operations: Multiple Simultaneous Readers and Zero-Delay Writers</text>
+
+  <!-- Top: Dual Ingress Threads -->
+  <g transform="translate(100, 100)" filter="url(#walShadow)">
+    <rect width="380" height="120" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="380" height="30" rx="8" fill="#2563EB"/>
+    <text x="190" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">WEB TIER CONCURRENCY (Waitress WSGI)</text>
+    <text x="20" y="58" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="600" fill="#1E40AF">• Dedicated Connection per HTTP Request Thread</text>
+    <text x="20" y="78" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">• Rapid Read Operations: Dashboard &amp; VM Status Queries</text>
+    <text x="20" y="98" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">• Instant Writes: Student VM Requests &amp; Password Changes</text>
+  </g>
+
+  <g transform="translate(620, 100)" filter="url(#walShadow)">
+    <rect width="380" height="120" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+    <rect width="380" height="30" rx="8" fill="#EA580C"/>
+    <text x="190" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">WORKER DAEMON CONCURRENCY (app/worker.py)</text>
+    <text x="20" y="58" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="600" fill="#C2410C">• Independent DB Connection per 10s Monitoring Cycle</text>
+    <text x="20" y="78" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">• Continuous Telemetry Writes: State &amp; Heartbeat Timestamps</text>
+    <text x="20" y="98" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">• Atomic Recovery Logging: Event Trails &amp; MTTR Durations</text>
+  </g>
+
+  <!-- Center: SQLite Engine -->
+  <g transform="translate(250, 260)" filter="url(#walShadow)">
+    <rect width="600" height="140" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="2.5"/>
+    <rect width="600" height="32" rx="10" fill="#CA8A04"/>
+    <text x="300" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">SQLITE 3 EMBEDDED DATABASE ENGINE (app/db.py)</text>
+    <text x="30" y="60" font-family="'Courier New', monospace" font-size="12" font-weight="700" fill="#854D0E">PRAGMA journal_mode = WAL;</text>
+    <text x="320" y="60" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#713F12">Writes append to log without blocking concurrent reads</text>
+    <text x="30" y="85" font-family="'Courier New', monospace" font-size="12" font-weight="700" fill="#854D0E">PRAGMA busy_timeout = 15000;</text>
+    <text x="320" y="85" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#713F12">15-second busy handler completely eliminates locked errors</text>
+    <text x="30" y="110" font-family="'Courier New', monospace" font-size="12" font-weight="700" fill="#854D0E">PRAGMA foreign_keys = ON;</text>
+    <text x="320" y="110" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#713F12">Enforces referential integrity on VM deletions &amp; cascades</text>
+  </g>
+
+  <!-- Bottom: Physical Disk Files -->
+  <g transform="translate(100, 460)" filter="url(#walShadow)">
+    <rect width="260" height="190" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="2"/>
+    <rect width="260" height="28" rx="8" fill="#16A34A"/>
+    <text x="130" y="19" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">MAIN DATABASE FILE</text>
+    <text x="20" y="55" font-family="'Courier New', monospace" font-size="12" font-weight="700" fill="#166534">instance/vmrecovery.db</text>
+    <text x="20" y="80" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• B-Tree Structured Tables</text>
+    <text x="20" y="100" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Primary relational data</text>
+    <text x="20" y="120" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Updated via Checkpoints</text>
+    <text x="20" y="150" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-style="italic" fill="#16A34A">Non-destructive checkpoints</text>
+  </g>
+
+  <g transform="translate(420, 460)" filter="url(#walShadow)">
+    <rect width="260" height="190" rx="8" fill="#FAF5FF" stroke="#9333EA" stroke-width="2"/>
+    <rect width="260" height="28" rx="8" fill="#9333EA"/>
+    <text x="130" y="19" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">WRITE-AHEAD LOG &amp; SHM</text>
+    <text x="20" y="55" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#7E22CE">vmrecovery.db-wal</text>
+    <text x="20" y="75" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Append-only transactions</text>
+    <text x="20" y="95" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Fast sequential I/O write</text>
+    <text x="20" y="125" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#7E22CE">vmrecovery.db-shm</text>
+    <text x="20" y="145" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Shared-memory index</text>
+    <text x="20" y="165" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Coordinates multi-threads</text>
+  </g>
+
+  <g transform="translate(740, 460)" filter="url(#walShadow)">
+    <rect width="260" height="190" rx="8" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+    <rect width="260" height="28" rx="8" fill="#DC2626"/>
+    <text x="130" y="19" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">DYNAMIC SCHEMA &amp; BACKUP</text>
+    <text x="20" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#991B1B">schema_meta (Migrations 1-8)</text>
+    <text x="20" y="75" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Safe programmatic upgrades</text>
+    <text x="20" y="95" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Table recreation pattern</text>
+    <text x="20" y="125" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#991B1B">Online Hot Backup API</text>
+    <text x="20" y="145" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Non-blocking backup API</text>
+    <text x="20" y="165" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Hourly automated retention</text>
+  </g>
+
+  <!-- Connectors -->
+  <path d="M 290 220 L 450 260" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrWalBlue)"/>
+  <path d="M 810 220 L 650 260" fill="none" stroke="#EA580C" stroke-width="2" marker-end="url(#arrWal)"/>
+  <path d="M 400 400 L 230 460" fill="none" stroke="#16A34A" stroke-width="2" marker-end="url(#arrWal)"/>
+  <path d="M 550 400 L 550 460" fill="none" stroke="#9333EA" stroke-width="2" marker-end="url(#arrWal)"/>
+  <path d="M 700 400 L 870 460" fill="none" stroke="#DC2626" stroke-width="2" marker-end="url(#arrWal)"/>
+</svg>

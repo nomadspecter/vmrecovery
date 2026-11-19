@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 920" width="100%" height="100%">
+  <defs>
+    <filter id="ucShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="1150" height="920" fill="#FFFFFF"/>
+
+  <!-- Title -->
+  <text x="575" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#0F172A" text-anchor="middle">Figure 2.3.5: Complete UML Use Case Diagram</text>
+  <text x="575" y="60" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">System Boundary and Interaction Model Across Roles</text>
+
+  <!-- SYSTEM BOUNDARY BOX -->
+  <rect x="260" y="85" width="630" height="805" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="2" stroke-dasharray="6,4"/>
+  <rect x="260" y="85" width="630" height="35" rx="10" fill="#E2E8F0"/>
+  <text x="575" y="108" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#334155" text-anchor="middle">SYSTEM BOUNDARY: VM INSTABILITY MANAGEMENT PLATFORM (VMRECOVERY)</text>
+
+  <!-- ACTORS: Left Side -->
+  <!-- 1. Administrator -->
+  <g transform="translate(100, 200)">
+    <circle cx="25" cy="18" r="14" fill="#E2E8F0" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="25" y1="32" x2="25" y2="70" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="0" y1="48" x2="50" y2="48" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="25" y1="70" x2="5" y2="105" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="25" y1="70" x2="45" y2="105" stroke="#0F172A" stroke-width="2.5"/>
+    <text x="25" y="125" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#0F172A" text-anchor="middle">Administrator</text>
+    <text x="25" y="140" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#64748B" text-anchor="middle">(Full System Admin)</text>
+  </g>
+
+  <!-- 2. Trainer -->
+  <g transform="translate(100, 440)">
+    <circle cx="25" cy="18" r="14" fill="#E2E8F0" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="25" y1="32" x2="25" y2="70" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="0" y1="48" x2="50" y2="48" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="25" y1="70" x2="5" y2="105" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="25" y1="70" x2="45" y2="105" stroke="#0F172A" stroke-width="2.5"/>
+    <text x="25" y="125" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#0F172A" text-anchor="middle">Trainer</text>
+    <text x="25" y="140" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#64748B" text-anchor="middle">(Instructor / Labs)</text>
+  </g>
+
+  <!-- 3. Student -->
+  <g transform="translate(100, 680)">
+    <circle cx="25" cy="18" r="14" fill="#E2E8F0" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="25" y1="32" x2="25" y2="70" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="0" y1="48" x2="50" y2="48" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="25" y1="70" x2="5" y2="105" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="25" y1="70" x2="45" y2="105" stroke="#0F172A" stroke-width="2.5"/>
+    <text x="25" y="125" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#0F172A" text-anchor="middle">Student</text>
+    <text x="25" y="140" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#64748B" text-anchor="middle">(Learner / Workstation)</text>
+  </g>
+
+  <!-- ACTOR: Right Side (VirtualBox Supporting Actor) -->
+  <g transform="translate(970, 440)">
+    <rect x="0" y="0" width="130" height="85" rx="6" fill="#FFFBEB" stroke="#D97706" stroke-width="2" filter="url(#ucShadow)"/>
+    <text x="65" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#B45309" text-anchor="middle">&lt;&lt;actor&gt;&gt;</text>
+    <text x="65" y="48" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#78350F" text-anchor="middle">VirtualBox</text>
+    <text x="65" y="66" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#92400E" text-anchor="middle">Hypervisor Host</text>
+  </g>
+
+  <!-- USE CASES (Ellipses) -->
+  <g transform="translate(350, 140)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#1E3A8A" text-anchor="middle">Authenticate &amp; Manage Account</text>
+  </g>
+
+  <g transform="translate(350, 195)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#1E3A8A" text-anchor="middle">Register Lab VM &amp; Define Policies</text>
+  </g>
+
+  <g transform="translate(350, 250)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#1E3A8A" text-anchor="middle">Start / End Class Training Session</text>
+  </g>
+
+  <g transform="translate(350, 305)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#1E3A8A" text-anchor="middle">Trigger Pre-Session Snapshot Baseline</text>
+  </g>
+
+  <g transform="translate(350, 360)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#9A3412" text-anchor="middle">Interrogate Guest OS Heartbeats</text>
+  </g>
+
+  <g transform="translate(350, 415)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#C2410C" text-anchor="middle">Execute Autonomous Zero-Touch Recovery</text>
+  </g>
+
+  <g transform="translate(350, 470)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#1E3A8A" text-anchor="middle">Request Emergency Snapshot Restore</text>
+  </g>
+
+  <g transform="translate(350, 525)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#1E3A8A" text-anchor="middle">Provision VM from Golden Master Template</text>
+  </g>
+
+  <g transform="translate(350, 580)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#1E3A8A" text-anchor="middle">Approve / Reject VM Provisioning Requests</text>
+  </g>
+
+  <g transform="translate(350, 635)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#1E3A8A" text-anchor="middle">Export / Restore Standalone .ova Appliance</text>
+  </g>
+
+  <g transform="translate(350, 690)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#1E3A8A" text-anchor="middle">Perform SQLite WAL Hot Backup &amp; Migrations</text>
+  </g>
+
+  <g transform="translate(350, 745)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#991B1B" text-anchor="middle">Dispatch Multi-Channel Alerts (SMTP / Webhook)</text>
+  </g>
+
+  <g transform="translate(350, 800)" filter="url(#ucShadow)">
+    <ellipse cx="140" cy="24" rx="135" ry="22" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.8"/>
+    <text x="140" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#1E3A8A" text-anchor="middle">View Health Dashboard &amp; Reliability Reports</text>
+  </g>
+
+  <!-- LINES: Admin Connections -->
+  <line x1="160" y1="230" x2="360" y2="164" stroke="#475569" stroke-width="1.5"/>
+  <line x1="160" y1="230" x2="355" y2="219" stroke="#475569" stroke-width="1.5"/>
+  <line x1="160" y1="230" x2="360" y2="274" stroke="#475569" stroke-width="1.5"/>
+  <line x1="160" y1="230" x2="355" y2="604" stroke="#475569" stroke-width="1.5"/>
+  <line x1="160" y1="230" x2="355" y2="659" stroke="#475569" stroke-width="1.5"/>
+  <line x1="160" y1="230" x2="355" y2="714" stroke="#475569" stroke-width="1.5"/>
+  <line x1="160" y1="230" x2="355" y2="824" stroke="#475569" stroke-width="1.5"/>
+
+  <!-- LINES: Trainer Connections -->
+  <line x1="160" y1="470" x2="355" y2="164" stroke="#475569" stroke-width="1.5"/>
+  <line x1="160" y1="470" x2="360" y2="274" stroke="#475569" stroke-width="1.5"/>
+  <line x1="160" y1="470" x2="355" y2="329" stroke="#475569" stroke-width="1.5"/>
+  <line x1="160" y1="470" x2="355" y2="494" stroke="#475569" stroke-width="1.5"/>
+  <line x1="160" y1="470" x2="355" y2="824" stroke="#475569" stroke-width="1.5"/>
+
+  <!-- LINES: Student Connections -->
+  <line x1="160" y1="710" x2="355" y2="164" stroke="#475569" stroke-width="1.5"/>
+  <line x1="160" y1="710" x2="355" y2="494" stroke="#475569" stroke-width="1.5"/>
+  <line x1="160" y1="710" x2="355" y2="549" stroke="#475569" stroke-width="1.5"/>
+
+  <!-- LINES: VirtualBox Supporting Connections -->
+  <line x1="970" y1="480" x2="625" y2="219" stroke="#D97706" stroke-width="1.5"/>
+  <line x1="970" y1="480" x2="625" y2="329" stroke="#D97706" stroke-width="1.5"/>
+  <line x1="970" y1="480" x2="625" y2="384" stroke="#D97706" stroke-width="1.5"/>
+  <line x1="970" y1="480" x2="625" y2="439" stroke="#D97706" stroke-width="1.5"/>
+  <line x1="970" y1="480" x2="625" y2="549" stroke="#D97706" stroke-width="1.5"/>
+  <line x1="970" y1="480" x2="625" y2="659" stroke="#D97706" stroke-width="1.5"/>
+</svg>

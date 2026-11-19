@@ -1,0 +1,429 @@
+import os
+import sys
+import docx
+from docx.shared import Inches, Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
+
+from docx_helpers import (
+    set_cell_margins, set_cell_shading, set_table_borders,
+    add_p, add_heading_1, add_heading_2, add_heading_3,
+    add_caption
+)
+
+def build_milestone6():
+    base_docx = 'Milestones/Milestone5_Project_SimonNdonga.docx'
+    out_docx6 = 'Milestones/Milestone6_Final_Documentation_SimonNdonga.docx'
+    
+    print(f"Loading {base_docx}...")
+    doc = docx.Document(base_docx)
+
+    # -------------------------------------------------------------
+    # 1. PRELIMINARY PAGES (Inserted before Chapter One)
+    # -------------------------------------------------------------
+    # Target insertion point: Paragraph 13 ("CHAPTER ONE: PROJECT PLANNING AND ANALYSIS")
+    target_idx = None
+    for i, p in enumerate(doc.paragraphs):
+        if "CHAPTER ONE: PROJECT PLANNING AND ANALYSIS" in p.text:
+            target_idx = i
+            break
+            
+    if target_idx is None:
+        raise ValueError("Could not find Chapter One anchor!")
+
+    p_anchor = doc.paragraphs[target_idx]
+    
+    def ins_p(text="", bold_prefix="", is_heading=False, heading_level=1, align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_before=0, space_after=10, line_spacing=1.15, italic=False):
+        new_p = p_anchor.insert_paragraph_before()
+        new_p.alignment = align
+        new_p.paragraph_format.space_before = Pt(space_before)
+        new_p.paragraph_format.space_after = Pt(space_after)
+        new_p.paragraph_format.line_spacing = line_spacing
+
+        if is_heading:
+            new_p.style = f'Heading {heading_level}'
+            r = new_p.add_run(text)
+            r.font.name = 'Montserrat Medium'
+            r.font.size = Pt(16 if heading_level == 1 else 13)
+            r.bold = True
+            return new_p
+
+        if bold_prefix:
+            rb = new_p.add_run(bold_prefix)
+            rb.font.name = 'Montserrat Medium'
+            rb.font.size = Pt(12)
+            rb.bold = True
+
+        if text:
+            r = new_p.add_run(text)
+            r.font.name = 'Montserrat Medium'
+            r.font.size = Pt(12)
+            r.italic = italic
+        return new_p
+
+    def ins_page_break():
+        p = p_anchor.insert_paragraph_before()
+        p.paragraph_format.space_before = Pt(0)
+        p.paragraph_format.space_after = Pt(0)
+        run = p.add_run()
+        run.add_break(docx.enum.text.WD_BREAK.PAGE)
+
+    print("Inserting Preliminary Pages before Chapter One...")
+
+    # --- Page Break after Cover Page ---
+    ins_page_break()
+
+    # --- DECLARATION AND APPROVAL ---
+    ins_p("DECLARATION AND APPROVAL", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
+    ins_p("Student's Declaration", bold_prefix="", is_heading=False, italic=False, align=WD_ALIGN_PARAGRAPH.LEFT, space_after=6)
+    ins_p("I, SIMON NDONGA (Admission Number: DCS-02-0200/2025), declare that this project documentation entitled "
+          "'VIRTUAL MACHINE INSTABILITY MANAGEMENT SYSTEM FOR IT TRAINING LABS' is my original work and has not been presented "
+          "for the award of a diploma, degree, or any academic certification in any other college or university.")
+    
+    ins_p("\nSignature: ____________________________________          Date: ________________________\n"
+          "SIMON NDONGA (DCS-02-0200/2025)\n", align=WD_ALIGN_PARAGRAPH.LEFT, space_after=18)
+
+    ins_p("Supervisor's Approval", is_heading=False, italic=False, align=WD_ALIGN_PARAGRAPH.LEFT, space_after=6)
+    ins_p("This project documentation has been submitted for examination with my approval as the designated university supervisor.")
+
+    ins_p("\nSignature: ____________________________________          Date: ________________________\n"
+          "PROJECT SUPERVISOR\n"
+          "Department of ICT and Computer Science\n"
+          "Zetech University\n", align=WD_ALIGN_PARAGRAPH.LEFT, space_after=14)
+
+    ins_page_break()
+
+    # --- DEDICATION ---
+    ins_p("DEDICATION", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
+    ins_p("I dedicate this project documentation to my beloved family for their steadfast prayers, boundless encouragement, "
+          "and sacrifices throughout my academic journey at Zetech University; to my lecturers and mentors who ignited my passion "
+          "for systems programming and virtualization; and to all technical students who strive to master computing through hands-on "
+          "laboratory practice.")
+
+    ins_page_break()
+
+    # --- ACKNOWLEDGEMENTS ---
+    ins_p("ACKNOWLEDGEMENTS", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
+    ins_p("First and foremost, I offer my profound gratitude to the Almighty God for granting me health, intellect, and perseverance "
+          "to successfully design, build, and document this project.")
+    ins_p("I express my deepest appreciation to my project supervisor for their invaluable technical guidance, insightful critiques, "
+          "and rigorous academic standards throughout each milestone of this development lifecycle. Their guidance was instrumental "
+          "in refining both the system architecture and this documentation.")
+    ins_p("I extend sincere thanks to the Department of ICT and Computer Science at Zetech University, the project coordinators, and the "
+          "technical laboratory staff for providing an enabling environment. Lastly, I am grateful to my colleagues and peers whose feedback "
+          "and shared discussions enriched this work.")
+
+    ins_page_break()
+
+    # --- ABSTRACT ---
+    ins_p("ABSTRACT", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
+    ins_p("Virtual machines (VMs) form the educational backbone of modern technical training institutions, allowing learners to experiment "
+          "with operating systems, networking, and security in isolated environments. However, student experimentation frequently triggers "
+          "catastrophic operating system crashes, frozen kernels, and misconfigurations that disrupt instructional continuity, waste valuable lab time, "
+          "and place immense operational burdens on technical staff. Traditional laboratory solutions—relying on manual hypervisor snapshots or complete "
+          "operating system reinstalls—are slow, uncoordinated, and reactive.")
+    ins_p("This project details the design, implementation, and deployment of the Automated Virtual Machine Instability Management System "
+          "(VMRecovery) for IT training laboratories. Developed using Python 3.14, Flask, SQLite with Write-Ahead Logging (WAL) concurrency, and "
+          "Oracle VirtualBox VBoxManage CLI integration, the system delivers unattended, zero-touch self-healing for lab virtual machines. The system "
+          "implements scheduled snapshot automation, event-driven pre-session baselines, non-intrusive guest property heartbeat interrogation, debounced "
+          "fault detection, and autonomous rollback to pristine snapshots in under 10 seconds without human intervention. Beyond core recovery, the platform "
+          "provides student self-service provisioning from Golden Master templates (linked and full clones), independent .ova appliance disaster recovery, "
+          "multi-channel alerting via SMTP and HMAC-SHA256 signed webhooks, and a token-authenticated RESTful API.")
+    ins_p("The system was deployed and validated within a hybrid edge-cloud architecture utilizing Linux systemd service hardening on the physical lab "
+          "hypervisor host, Cloudflare Zero-Trust ingress tunneling for firewall-free remote HTTPS access, and Amazon Web Services (AWS S3) for offsite 3-2-1 "
+          "disaster recovery. Empirical validation across an automated suite of 152 test cases achieved a 100% pass rate with zero defects. The resulting system "
+          "guarantees instructional continuity, protects learning progress, and automates laboratory administration.")
+
+    ins_page_break()
+
+    # --- TABLE OF CONTENTS ---
+    ins_p("TABLE OF CONTENTS", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
+    toc_items = [
+        ("Declaration and Approval", "ii"),
+        ("Dedication", "iii"),
+        ("Acknowledgements", "iv"),
+        ("Abstract", "v"),
+        ("Table of Contents", "vi"),
+        ("List of Figures", "vii"),
+        ("List of Tables", "viii"),
+        ("List of Abbreviations and Acronyms", "ix"),
+        ("CHAPTER ONE: PROJECT PLANNING AND ANALYSIS", "1"),
+        ("  1.1 Statement of Problem", "1"),
+        ("  1.2 Study Justification", "2"),
+        ("  1.3 System Objectives", "2"),
+        ("    1.3.1 General Objective", "2"),
+        ("    1.3.2 Specific Objectives", "2"),
+        ("  1.4 Functional Requirements", "3"),
+        ("  1.5 Breakdown of Tools & Resources to Be Used", "4"),
+        ("  1.6 Project Schedule Breakdown (Gantt Chart)", "6"),
+        ("CHAPTER TWO: DESIGN AND MODELING", "8"),
+        ("  2.1 Introduction to Modelling", "8"),
+        ("  2.2 User Interface Models", "8"),
+        ("    2.2.1 Login Page", "8"),
+        ("    2.2.2 Dashboard", "9"),
+        ("    2.2.3 Virtual Machines Registry", "10"),
+        ("    2.2.4 Snapshots and Restore", "11"),
+        ("    2.2.5 Event Log", "12"),
+        ("    2.2.6 Reports", "13"),
+        ("    2.2.7 Virtual Machine Provisioning Requests", "14"),
+        ("    2.2.8 System Health and Notification Audit", "15"),
+        ("  2.3 Logic Models", "16"),
+        ("    2.3.1 Login Process Flowchart", "16"),
+        ("    2.3.2 System Flowchart", "17"),
+        ("    2.3.3 Data Flow Diagrams (Level 0 and Level 1)", "19"),
+        ("    2.3.4 Entity Relationship Diagram (ERD)", "22"),
+        ("    2.3.5 Use Case Diagram", "24"),
+        ("    2.3.6 Class Diagram", "26"),
+        ("CHAPTER THREE: SYSTEM IMPLEMENTATION AND TESTING", "28"),
+        ("  3.1 System Architecture and Modular Organization", "28"),
+        ("  3.2 Implementation Environment and Technology Stack", "29"),
+        ("  3.3 Database Development and Schema Migrations (DB Development & Integration)", "30"),
+        ("  3.4 Feature-by-Feature Implementation and Debugging (Part 1 - Core Modules)", "35"),
+        ("  3.5 Feature Debugging and Problem-Solving Log (Part 1)", "38"),
+        ("  3.6 Unit and Integration Testing (Part 1)", "40"),
+        ("  3.7 Summary of Milestone 3 Achievements", "42"),
+        ("  3.8 Automated Snapshot Engine and Retention Policy Enforcement", "43"),
+        ("  3.9 Autonomous Recovery Engine and Failure Modes Handling", "44"),
+        ("  3.10 Disaster Recovery: Independent Appliance (.ova) Engine and Online Backups", "46"),
+        ("  3.11 Golden Master Template Provisioning and Student Request Workflow", "47"),
+        ("  3.12 Multi-Channel Alert and Notification Engine", "48"),
+        ("  3.13 RESTful API and Administrative Command-Line Interface (CLI)", "49"),
+        ("  3.14 Advanced Feature Debugging and Problem-Solving Log (Part 2)", "50"),
+        ("  3.15 Comprehensive System Testing Matrix (Full 152-Test Verification)", "52"),
+        ("  3.16 Summary of Milestone 4 Achievements", "54"),
+        ("  3.17 Deployment Strategy and Hybrid Edge-Cloud Architecture", "55"),
+        ("  3.18 Production Host Setup and Systemd Daemon Hardening", "56"),
+        ("  3.19 Cloudflare Zero-Trust Tunnel Configuration and Edge Ingress", "57"),
+        ("  3.20 AWS Cloud Disaster Recovery Integration (3-2-1 Backup Strategy)", "58"),
+        ("  3.21 Operational Validation and Deployment Testing Results", "59"),
+        ("  3.22 Summary of Milestone 5 Achievements", "61"),
+        ("CHAPTER FOUR: CONCLUSIONS AND RECOMMENDATIONS", "62"),
+        ("  4.1 Summary of Project Achievements", "62"),
+        ("  4.2 Challenges Encountered and Technical Mitigations", "63"),
+        ("  4.3 Recommendations for Future Work", "64"),
+        ("  4.4 Concluding Remarks", "65"),
+        ("REFERENCES (APA 7th Edition)", "66")
+    ]
+    for item, pg in toc_items:
+        dots = ". " * int((60 - len(item)) / 2)
+        ins_p(f"{item} {dots} {pg}", align=WD_ALIGN_PARAGRAPH.LEFT, space_after=3, line_spacing=1.0)
+
+    ins_page_break()
+
+    # --- LIST OF FIGURES ---
+    ins_p("LIST OF FIGURES", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
+    figs = [
+        ("Figure 2.2.1: Login Page", "9"),
+        ("Figure 2.2.2: Dashboard Interface", "10"),
+        ("Figure 2.2.3: Virtual Machine Registration and Snapshot Policy Form", "11"),
+        ("Figure 2.2.4: Snapshot History and Restore Confirmation", "12"),
+        ("Figure 2.2.5: Event Log Page", "13"),
+        ("Figure 2.2.6: Reports Interface", "14"),
+        ("Figure 2.2.7: Virtual Machine Provisioning Requests Page", "15"),
+        ("Figure 2.2.8: System Health and Notification Audit Page", "16"),
+        ("Figure 2.3.1: Login Process Flowchart", "17"),
+        ("Figure 2.3.2a: System Flowchart (User Operations)", "18"),
+        ("Figure 2.3.2b: Automated Snapshot and Recovery Flowchart", "19"),
+        ("Figure 2.3.3a: Level 0 Data Flow Diagram (Context Diagram)", "20"),
+        ("Figure 2.3.3b: Level 1 Data Flow Diagram", "21"),
+        ("Figure 2.3.4: Complete Entity Relationship Diagram (10 Tables)", "23"),
+        ("Figure 2.3.5: Complete UML Use Case Diagram", "25"),
+        ("Figure 2.3.6: Complete UML Architectural Class Diagram", "27"),
+        ("Figure 3.1: Modular System Architecture and Process Interaction Model", "29"),
+        ("Figure 3.2: SQLite WAL Concurrency and Migration Architecture", "32"),
+        ("Figure 3.3: Authentication & Secure Role-Based Access Control Interface", "36"),
+        ("Figure 3.4: Virtual Machine Registry Management Interface", "37"),
+        ("Figure 3.5: Real-Time Laboratory VM Health Monitoring Dashboard", "38"),
+        ("Figure 3.6: Background Worker Cycle & Fault Detection Flowchart", "39"),
+        ("Figure 3.7: Hybrid Edge-Cloud Production Deployment Architecture", "56")
+    ]
+    for ftitle, fpg in figs:
+        dots = ". " * int((58 - len(ftitle)) / 2)
+        ins_p(f"{ftitle} {dots} {fpg}", align=WD_ALIGN_PARAGRAPH.LEFT, space_after=3, line_spacing=1.0)
+
+    ins_page_break()
+
+    # --- LIST OF TABLES ---
+    ins_p("LIST OF TABLES", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
+    tbls = [
+        ("Table 1.4.1: Functional Requirements Specification", "4"),
+        ("Table 1.6.1: Project Schedule Breakdown (Gantt Chart)", "7"),
+        ("Table 3.2.1: Implementation Technology Stack", "30"),
+        ("Table 3.3.1: Complete Relational Database Data Dictionary", "33"),
+        ("Table 3.3.2: Numbered Database Migrations Record (Schema Version 8)", "34"),
+        ("Table 3.6.1: Core Module Unit and Integration Testing Execution Matrix", "41"),
+        ("Table 3.15.1: Comprehensive System Testing Execution Matrix (152 Total Tests)", "53"),
+        ("Table 3.21.1: Production Deployment Environment Verification Matrix", "60")
+    ]
+    for ttitle, tpg in tbls:
+        dots = ". " * int((58 - len(ttitle)) / 2)
+        ins_p(f"{ttitle} {dots} {tpg}", align=WD_ALIGN_PARAGRAPH.LEFT, space_after=3, line_spacing=1.0)
+
+    ins_page_break()
+
+    # --- LIST OF ABBREVIATIONS AND ACRONYMS ---
+    ins_p("LIST OF ABBREVIATIONS AND ACRONYMS", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
+    acronyms = [
+        ("API", "Application Programming Interface"),
+        ("AWS", "Amazon Web Services"),
+        ("CLI", "Command Line Interface"),
+        ("CPU", "Central Processing Unit"),
+        ("CSRF", "Cross-Site Request Forgery"),
+        ("DFD", "Data Flow Diagram"),
+        ("ERD", "Entity Relationship Diagram"),
+        ("FK", "Foreign Key"),
+        ("GUI", "Graphical User Interface"),
+        ("HMAC", "Hash-based Message Authentication Code"),
+        ("HTTP", "Hypertext Transfer Protocol"),
+        ("HTTPS", "Hypertext Transfer Protocol Secure"),
+        ("IPC", "Inter-Process Communication"),
+        ("IT", "Information Technology"),
+        ("JSON", "JavaScript Object Notation"),
+        ("NAT", "Network Address Translation"),
+        ("NVMe", "Non-Volatile Memory Express"),
+        ("OS", "Operating System"),
+        ("OVA", "Open Virtualization Appliance"),
+        ("PBKDF2", "Password-Based Key Derivation Function 2"),
+        ("PK", "Primary Key"),
+        ("RAM", "Random Access Memory"),
+        ("RBAC", "Role-Based Access Control"),
+        ("REST", "Representational State Transfer"),
+        ("RFC", "Request for Comments"),
+        ("S3", "Simple Storage Service (Amazon AWS)"),
+        ("SHA", "Secure Hash Algorithm"),
+        ("SIEM", "Security Information and Event Management"),
+        ("SMTP", "Simple Mail Transfer Protocol"),
+        ("SQL", "Structured Query Language"),
+        ("SSL", "Secure Sockets Layer"),
+        ("TLS", "Transport Layer Security"),
+        ("UI", "User Interface"),
+        ("UML", "Unified Modeling Language"),
+        ("UUID", "Universally Unique Identifier"),
+        ("VBox", "Oracle VirtualBox"),
+        ("VM", "Virtual Machine"),
+        ("VMM", "Virtual Machine Monitor / Hypervisor"),
+        ("VT-x", "Intel Virtualization Technology"),
+        ("WAL", "Write-Ahead Logging"),
+        ("WSGI", "Web Server Gateway Interface")
+    ]
+    for acr, full in acronyms:
+        ins_p(f"{acr:<8} :  {full}", align=WD_ALIGN_PARAGRAPH.LEFT, space_after=2, line_spacing=1.0)
+
+    ins_page_break()
+    print("Preliminary pages inserted successfully.")
+
+    # -------------------------------------------------------------
+    # 2. CHAPTER FOUR: CONCLUSIONS AND RECOMMENDATIONS
+    # -------------------------------------------------------------
+    print("Appending Chapter Four and References at document end...")
+    doc.add_page_break()
+
+    add_heading_1(doc, "CHAPTER FOUR: CONCLUSIONS AND RECOMMENDATIONS")
+
+    add_heading_2(doc, "4.1 Summary of Project Achievements")
+    add_p(doc,
+        "The primary purpose of this project was to resolve the severe operational and educational disruption caused by virtual machine "
+        "instabilities in IT training laboratories. By designing, developing, and deploying the Automated Virtual Machine Recovery System "
+        "(VMRecovery), this research successfully achieved every general and specific objective established in Chapter One:"
+    )
+    add_p(doc,
+        "1. Realization of the Virtual Machine Registry Module: Successfully established a centralized repository linking Oracle VirtualBox "
+        "hardware UUIDs to academic class groups, custom snapshot cadences, and student ownership, verified by direct CLI hardware discovery.\n"
+        "2. Implementation of Automated Snapshot Scheduling: Engineered an automated snapshot engine executing both interval-based snapshots "
+        "and pre-session baseline captures, protected by automated retention pruning and disk space thresholds.\n"
+        "3. Development of Autonomous Zero-Touch Recovery: Built a self-healing recovery worker that interrogates guest property heartbeats, "
+        "debounces transient operating system stalls, and autonomously executes snapshot rollbacks upon confirmed crashes or kernel freezes in under "
+        "10 seconds without human intervention.\n"
+        "4. Deployment of an Operational Dashboard and Audit Trail: Created a centralized web dashboard providing real-time health indicators, "
+        "bulk machine power controls, and an immutable audit log tracking state transitions and recovery elapsed durations.\n"
+        "5. Provisioning and Enterprise Cloud Disaster Recovery: Developed a self-service student VM request portal based on Golden Master "
+        "templates, integrated multi-channel alerting (SMTP/Webhooks), and deployed an offsite 3-2-1 backup pipeline replicating .ova appliance archives "
+        "and SQLite database hot backups to Amazon Web Services (AWS S3).",
+        align=WD_ALIGN_PARAGRAPH.LEFT
+    )
+
+    add_heading_2(doc, "4.2 Challenges Encountered and Technical Mitigations")
+    add_p(doc,
+        "Throughout the practical implementation and deployment of this system, several significant technical and architectural hurdles were "
+        "encountered. The engineering mitigations devised during this project provide valuable insights for systems engineering:"
+    )
+    add_p(doc,
+        "• Public Cloud Virtualization Limitations: Standard cloud virtual machines (e.g., AWS EC2 t3 instances) do not support nested hardware "
+        "virtualization (VT-x/AMD-V), while bare-metal cloud servers carry prohibitive rental fees. This was mitigated by developing a 3-Pillar "
+        "Hybrid Edge-Cloud Architecture that retains the physical hypervisor on-premises while using Cloudflare Zero-Trust tunnels for global HTTPS "
+        "access and AWS S3 for offsite disaster storage.\n"
+        "• SQLite Concurrency Lock Contention: Default SQLite rollback journals locked the entire database during worker write cycles, causing "
+        "concurrent web requests to throw 'database is locked' errors. This was resolved by enabling Write-Ahead Logging (WAL) mode and setting a "
+        "15-second busy timeout (PRAGMA busy_timeout = 15000), allowing non-blocking concurrent reads and writes.\n"
+        "• Intentional Pause Misidentification: Initial recovery routines mistook an instructor's instructional pause for an operating system freeze. "
+        "This was corrected by creating database migration #7, introducing an admin_paused flag that suppresses automated rollback during deliberate pauses.\n"
+        "• Hypervisor Inter-Process Communication (IPC) Socket Isolation: Systemd's default PrivateTmp security hardening severed communication "
+        "with VirtualBox's background daemon (/tmp/.vbox-$USER-ipc). This was resolved by explicitly disabling PrivateTmp in the service unit.\n"
+        "• Recovery Thrashing Prevention: Repeatedly rolling back an intrinsically corrupted guest operating system caused continuous recovery loops. "
+        "This was resolved by implementing an anti-thrashing circuit breaker that caps automated restores at 3 attempts per hour before flagging "
+        "the machine for administrative intervention.",
+        align=WD_ALIGN_PARAGRAPH.LEFT
+    )
+
+    add_heading_2(doc, "4.3 Recommendations for Future Work")
+    add_p(doc,
+        "While the VMRecovery system successfully fulfills all operational requirements for single-server laboratory environments, "
+        "the following architectural enhancements are recommended for future academic research and commercial expansion:"
+    )
+    add_p(doc,
+        "1. Distributed Multi-Node Hypervisor Clustering: Extend the single-node architecture into a distributed cluster. A central management "
+        "controller could coordinate lightweight worker agents installed across multiple physical laboratory servers, enabling centralized "
+        "snapshot policies and cross-node live migrations.\n"
+        "2. Multi-Hypervisor Abstraction Layer: Expand the hypervisor integration module (app/vbox.py) to support Type-1 bare-metal and open-source "
+        "hypervisors, including Kernel-based Virtual Machine (KVM/QEMU), Proxmox VE, and VMware ESXi, using a standardized virtualization driver interface.\n"
+        "3. Hardware-Level Out-of-Band Power Management: Integrate IPMI (Intelligent Platform Management Interface) and Wake-on-LAN protocols to allow "
+        "the management system to autonomously power on physical host servers before scheduled morning laboratory classes and gracefully shut them down "
+        "in the evening to reduce institutional power consumption.\n"
+        "4. Institutional Single Sign-On (SSO) Integration: Integrate the user authentication module with campus-wide directory services such as "
+        "OpenLDAP, Microsoft Active Directory, or OAuth2/SAML, allowing students and faculty to log in using their institutional credentials.",
+        align=WD_ALIGN_PARAGRAPH.LEFT
+    )
+
+    add_heading_2(doc, "4.4 Concluding Remarks")
+    add_p(doc,
+        "The Automated Virtual Machine Recovery System establishes a resilient, scalable, and autonomous platform for managing virtualized technical "
+        "training environments. By eliminating reliance on manual hypervisor interventions, the software guarantees that student technical progress "
+        "is continuously protected and that laboratory classes proceed without interruption. The empirical testing and real-world deployment results "
+        "validate that hybrid edge-cloud architectures combine the performance of local hardware virtualization with the resilience and accessibility "
+        "of enterprise cloud computing. This system delivers a cost-effective, dependable solution for educational institutions striving to provide "
+        "world-class, uninterrupted hands-on technical training."
+    )
+
+    # -------------------------------------------------------------
+    # 3. REFERENCES (APA 7th Edition)
+    # -------------------------------------------------------------
+    doc.add_page_break()
+    add_heading_1(doc, "REFERENCES")
+
+    references = [
+        "Amazon Web Services. (2024). AWS Well-Architected Framework: Reliability pillar (AWS Whitepaper). Amazon Web Services, Inc. https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/",
+        "Beck, K. (2003). Test-driven development: By example. Addison-Wesley Professional.",
+        "Cloudflare. (2025). Cloudflare Zero Trust: Secure access to internal resources without a VPN. Cloudflare, Inc. https://developers.cloudflare.com/cloudflare-one/",
+        "Fielding, R. T. (2000). Architectural styles and the design of network-based software architectures (Doctoral dissertation, University of California, Irvine).",
+        "Grinberg, M. (2018). Flask web development: Developing web applications with Python (2nd ed.). O'Reilly Media.",
+        "Hipp, R. D. (2024). SQLite Write-Ahead Logging (WAL) technical specification. SQLite Consortium. https://www.sqlite.org/wal.html",
+        "Mohan, C., Haderle, D., Lindsay, B., Pirahesh, H., & Schwarz, P. (1992). ARIES: A transaction recovery method supporting fine-granularity locking and partial rollbacks using write-ahead logging. ACM Transactions on Database Systems (TODS), 17(1), 94-162. https://doi.org/10.1145/128765.128770",
+        "Oracle Corporation. (2024). Oracle VM VirtualBox® user manual for release 7.0 & 7.1. Oracle Corporation. https://www.virtualbox.org/manual/",
+        "Owens, M., & Allen, G. (2010). The definitive guide to SQLite (2nd ed.). Apress.",
+        "Popek, G. J., & Goldberg, R. P. (1974). Formal requirements for virtualizable third generation architectures. Communications of the ACM, 17(7), 412-421. https://doi.org/10.1145/361011.361073",
+        "Rose, S., Borchert, O., Mitchell, S., & Connelly, S. (2020). Zero Trust Architecture (NIST Special Publication 800-207). National Institute of Standards and Technology. https://doi.org/10.6028/NIST.SP.800-207",
+        "Silberschatz, A., Galvin, P. B., & Gagne, G. (2018). Operating system concepts (10th ed.). John Wiley & Sons.",
+        "Smith, J. E., & Nair, R. (2005). Virtual machines: Versatile platforms for systems and processes. Elsevier / Morgan Kaufmann.",
+        "Tanenbaum, A. S., & Bos, H. (2015). Modern operating systems (4th ed.). Pearson Education.",
+        "van Rossum, G., & Drake, F. L. (2024). Python 3.14 reference manual. Python Software Foundation. https://docs.python.org/3.14/"
+    ]
+
+    for ref in references:
+        add_p(doc, ref, align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8, line_spacing=1.15)
+
+    print(f"Saving compiled final documentation book to {out_docx6}...")
+    doc.save(out_docx6)
+    print(f"SUCCESS: Created {out_docx6}!")
+
+if __name__ == '__main__':
+    build_milestone6()

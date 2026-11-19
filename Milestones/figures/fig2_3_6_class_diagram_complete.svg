@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1350 960" width="100%" height="100%">
+  <defs>
+    <filter id="clsShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+    <marker id="clsArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#166534"/>
+    </marker>
+  </defs>
+
+  <rect width="1350" height="960" fill="#FFFFFF"/>
+
+  <!-- Title -->
+  <text x="675" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#0F172A" text-anchor="middle">Figure 2.3.6: Complete UML Architectural Class Diagram</text>
+  <text x="675" y="60" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">Object-Oriented Domain Entities and Service Controller Abstractions</text>
+
+  <!-- CONTROLLER 1: VBoxController -->
+  <g transform="translate(40, 100)" filter="url(#clsShadow)">
+    <rect width="280" height="230" rx="4" fill="#FFFFFF" stroke="#047857" stroke-width="2"/>
+    <rect width="280" height="30" rx="4" fill="#047857"/>
+    <text x="140" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">&lt;&lt;controller&gt;&gt; VBoxController</text>
+    <!-- Attributes -->
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">- vboxmanage_bin: str</text>
+    <text x="12" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">- action_timeout: int</text>
+    <line x1="0" y1="80" x2="280" y2="80" stroke="#CBD5E1" stroke-width="1"/>
+    <!-- Methods -->
+    <text x="12" y="98" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ list_vms(): list</text>
+    <text x="12" y="114" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ get_state(uuid): str</text>
+    <text x="12" y="130" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ start_vm(uuid, type)</text>
+    <text x="12" y="146" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ power_off_vm(uuid)</text>
+    <text x="12" y="162" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ take_snapshot(uuid, name)</text>
+    <text x="12" y="178" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ restore_snapshot(uuid, name)</text>
+    <text x="12" y="194" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ clone_vm(src, new, mode)</text>
+    <text x="12" y="210" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ get_guest_property(uuid, prop)</text>
+  </g>
+
+  <!-- CONTROLLER 2: Worker Daemon -->
+  <g transform="translate(370, 100)" filter="url(#clsShadow)">
+    <rect width="280" height="230" rx="4" fill="#FFFFFF" stroke="#047857" stroke-width="2"/>
+    <rect width="280" height="30" rx="4" fill="#047857"/>
+    <text x="140" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">&lt;&lt;service&gt;&gt; Worker (Daemon)</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">- interval_seconds: int = 10</text>
+    <text x="12" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">- thread: Thread</text>
+    <text x="12" y="84" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">- stop_event: Event</text>
+    <line x1="0" y1="95" x2="280" y2="95" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="12" y="115" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ start()</text>
+    <text x="12" y="133" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ stop()</text>
+    <text x="12" y="151" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ run_cycle(conn, vbox)</text>
+    <text x="12" y="169" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ check_heartbeat(vm, vbox)</text>
+    <text x="12" y="187" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ trigger_recovery(vm, vbox)</text>
+    <text x="12" y="205" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ prune_snapshots(vm, vbox)</text>
+  </g>
+
+  <!-- CONTROLLER 3: Notifier Engine -->
+  <g transform="translate(700, 100)" filter="url(#clsShadow)">
+    <rect width="280" height="230" rx="4" fill="#FFFFFF" stroke="#047857" stroke-width="2"/>
+    <rect width="280" height="30" rx="4" fill="#047857"/>
+    <text x="140" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">&lt;&lt;service&gt;&gt; Notifier</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">- smtp_host: str</text>
+    <text x="12" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">- webhook_url: str</text>
+    <text x="12" y="84" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">- webhook_secret: str</text>
+    <line x1="0" y1="95" x2="280" y2="95" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="12" y="115" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ notify(subject, body, sev)</text>
+    <text x="12" y="133" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ send_smtp(to, subject, body)</text>
+    <text x="12" y="151" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ send_webhook(payload, url)</text>
+    <text x="12" y="169" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ sign_hmac_sha256(data)</text>
+    <text x="12" y="187" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ test_channels()</text>
+  </g>
+
+  <!-- CONTROLLER 4: Settings Layer -->
+  <g transform="translate(1030, 100)" filter="url(#clsShadow)">
+    <rect width="280" height="230" rx="4" fill="#FFFFFF" stroke="#047857" stroke-width="2"/>
+    <rect width="280" height="30" rx="4" fill="#047857"/>
+    <text x="140" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">&lt;&lt;config&gt;&gt; Settings</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">- host, port: int</text>
+    <text x="12" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">- fail_threshold: int = 2</text>
+    <text x="12" y="84" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">- heartbeat_timeout: int = 90</text>
+    <line x1="0" y1="95" x2="280" y2="95" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="12" y="115" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ from_env(): Settings</text>
+    <text x="12" y="133" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ apply_db_overrides(conn)</text>
+    <text x="12" y="151" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ get_effective(key): val</text>
+    <text x="12" y="169" font-family="'Courier New', monospace" font-size="10.5" fill="#047857">+ is_production(): bool</text>
+  </g>
+
+  <!-- DOMAIN ENTITY 1: VirtualMachine -->
+  <g transform="translate(40, 420)" filter="url(#clsShadow)">
+    <rect width="280" height="230" rx="4" fill="#FFFFFF" stroke="#1E40AF" stroke-width="2"/>
+    <rect width="280" height="30" rx="4" fill="#1E40AF"/>
+    <text x="140" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">&lt;&lt;entity&gt;&gt; VirtualMachine</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ vm_id: int</text>
+    <text x="12" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ vm_name: str</text>
+    <text x="12" y="84" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ vbox_uuid: str</text>
+    <text x="12" y="100" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ class_group: str</text>
+    <text x="12" y="116" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ is_template: bool</text>
+    <text x="12" y="132" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ admin_paused: bool</text>
+    <line x1="0" y1="142" x2="280" y2="142" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="12" y="162" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ start(type='headless')</text>
+    <text x="12" y="180" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ power_off()</text>
+    <text x="12" y="198" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ pause() / resume()</text>
+    <text x="12" y="216" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ update_policy(interval, keep)</text>
+  </g>
+
+  <!-- DOMAIN ENTITY 2: Snapshot -->
+  <g transform="translate(370, 420)" filter="url(#clsShadow)">
+    <rect width="280" height="230" rx="4" fill="#FFFFFF" stroke="#1E40AF" stroke-width="2"/>
+    <rect width="280" height="30" rx="4" fill="#1E40AF"/>
+    <text x="140" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">&lt;&lt;entity&gt;&gt; Snapshot</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ snapshot_id: int</text>
+    <text x="12" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ vm_id: int</text>
+    <text x="12" y="84" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ snapshot_name: str</text>
+    <text x="12" y="100" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ snapshot_type: str</text>
+    <text x="12" y="116" font-family="'Courier New', monospace" font-size="10.5" fill="#64748B">+ created_at: str</text>
+    <line x1="0" y1="130" x2="280" y2="130" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="12" y="152" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ take(conn, vbox, type): str</text>
+    <text x="12" y="172" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ restore(conn, vbox): bool</text>
+    <text x="12" y="192" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ delete(conn, vbox): bool</text>
+    <text x="12" y="212" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ prune_oldest(conn, keep)</text>
+  </g>
+
+  <!-- DOMAIN ENTITY 3: VMRequest (Provisioning) -->
+  <g transform="translate(700, 420)" filter="url(#clsShadow)">
+    <rect width="280" height="230" rx="4" fill="#FFFFFF" stroke="#1E40AF" stroke-width="2"/>
+    <rect width="280" height="30" rx="4" fill="#1E40AF"/>
+    <text x="140" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">&lt;&lt;entity&gt;&gt; VMRequest</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ request_id: int</text>
+    <text x="12" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ user_id: int (Student)</text>
+    <text x="12" y="84" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ requested_name: str</text>
+    <text x="12" y="100" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ clone_type: str</text>
+    <text x="12" y="116" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ status: str</text>
+    <line x1="0" y1="130" x2="280" y2="130" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="12" y="152" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ submit(template, name)</text>
+    <text x="12" y="172" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ approve(admin_id): int</text>
+    <text x="12" y="192" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ reject(admin_id, reason)</text>
+    <text x="12" y="212" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ list_pending(user_id)</text>
+  </g>
+
+  <!-- DOMAIN ENTITY 4: User & RBAC -->
+  <g transform="translate(1030, 420)" filter="url(#clsShadow)">
+    <rect width="280" height="230" rx="4" fill="#FFFFFF" stroke="#1E40AF" stroke-width="2"/>
+    <rect width="280" height="30" rx="4" fill="#1E40AF"/>
+    <text x="140" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">&lt;&lt;entity&gt;&gt; User (RBAC)</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ user_id: int</text>
+    <text x="12" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ username: str</text>
+    <text x="12" y="84" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ role: str</text>
+    <text x="12" y="100" font-family="'Courier New', monospace" font-size="10.5" fill="#64748B">+ created_at: str</text>
+    <line x1="0" y1="120" x2="280" y2="120" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="12" y="145" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ authenticate(password): bool</text>
+    <text x="12" y="165" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ change_password(new_pass)</text>
+    <text x="12" y="185" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ has_permission(role): bool</text>
+    <text x="12" y="205" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ list_assigned_vms(): list</text>
+  </g>
+
+  <!-- ENTITIES: Bottom Row -->
+  <!-- ClassSession -->
+  <g transform="translate(180, 720)" filter="url(#clsShadow)">
+    <rect width="280" height="180" rx="4" fill="#FFFFFF" stroke="#1E40AF" stroke-width="2"/>
+    <rect width="280" height="30" rx="4" fill="#1E40AF"/>
+    <text x="140" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">&lt;&lt;entity&gt;&gt; ClassSession</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ session_id: int</text>
+    <text x="12" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ class_group: str, status: str</text>
+    <line x1="0" y1="80" x2="280" y2="80" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="12" y="105" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ start(class_group, trainer_id)</text>
+    <text x="12" y="125" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ end(power_off=True)</text>
+    <text x="12" y="145" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ is_active(class_group): bool</text>
+  </g>
+
+  <!-- EventLog -->
+  <g transform="translate(530, 720)" filter="url(#clsShadow)">
+    <rect width="280" height="180" rx="4" fill="#FFFFFF" stroke="#1E40AF" stroke-width="2"/>
+    <rect width="280" height="30" rx="4" fill="#1E40AF"/>
+    <text x="140" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">&lt;&lt;entity&gt;&gt; EventLog</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ event_id: int, vm_id: int</text>
+    <text x="12" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ event_type: str, result: str</text>
+    <text x="12" y="84" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ duration_seconds: float</text>
+    <line x1="0" y1="95" x2="280" y2="95" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="12" y="120" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ log(event_type, details)</text>
+    <text x="12" y="140" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ export_csv(): bytes</text>
+    <text x="12" y="160" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ prune_older_than(days)</text>
+  </g>
+
+  <!-- Backup -->
+  <g transform="translate(880, 720)" filter="url(#clsShadow)">
+    <rect width="280" height="180" rx="4" fill="#FFFFFF" stroke="#1E40AF" stroke-width="2"/>
+    <rect width="280" height="30" rx="4" fill="#1E40AF"/>
+    <text x="140" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">&lt;&lt;entity&gt;&gt; Backup (.ova)</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ backup_id: int, vm_id: int</text>
+    <text x="12" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#334155">+ file_path: str, size: int</text>
+    <line x1="0" y1="80" x2="280" y2="80" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="12" y="105" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ create(vbox, backup_dir)</text>
+    <text x="12" y="125" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ restore(vbox): bool</text>
+    <text x="12" y="145" font-family="'Courier New', monospace" font-size="10.5" fill="#1E40AF">+ delete(): bool</text>
+  </g>
+
+  <!-- Arrows (Controllers to Entities) -->
+  <path d="M 180 330 L 180 420" fill="none" stroke="#166534" stroke-width="1.8" marker-end="url(#clsArr)"/>
+  <path d="M 510 330 L 510 420" fill="none" stroke="#166534" stroke-width="1.8" marker-end="url(#clsArr)"/>
+  <path d="M 840 330 L 840 420" fill="none" stroke="#166534" stroke-width="1.8" marker-end="url(#clsArr)"/>
+</svg>

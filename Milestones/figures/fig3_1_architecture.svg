@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 750" width="100%" height="100%">
+  <defs>
+    <filter id="archShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrArch" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1E293B"/>
+    </marker>
+    <marker id="arrArchBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#2563EB"/>
+    </marker>
+  </defs>
+
+  <rect width="1100" height="750" fill="#FFFFFF"/>
+  <text x="550" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#0F172A" text-anchor="middle">Figure 3.1: Modular System Architecture and Process Interaction Model</text>
+  <text x="550" y="60" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">Concurrent Dual-Flow Architecture: Synchronous WSGI Web Tier &amp; Autonomous Worker Daemon</text>
+
+  <!-- Ingress Clients (Left) -->
+  <g transform="translate(30, 110)" filter="url(#archShadow)">
+    <rect width="180" height="110" rx="8" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/>
+    <rect width="180" height="28" rx="8" fill="#475569"/>
+    <text x="90" y="19" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">WEB BROWSERS</text>
+    <text x="90" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#1E293B" text-anchor="middle">Lab Stakeholders</text>
+    <text x="90" y="74" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569" text-anchor="middle">• Lab Administrator</text>
+    <text x="90" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569" text-anchor="middle">• Course Trainers &amp; Students</text>
+  </g>
+
+  <g transform="translate(30, 480)" filter="url(#archShadow)">
+    <rect width="180" height="100" rx="8" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/>
+    <rect width="180" height="28" rx="8" fill="#475569"/>
+    <text x="90" y="19" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL SYSTEMS</text>
+    <text x="90" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#1E293B" text-anchor="middle">REST API Ingress</text>
+    <text x="90" y="74" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569" text-anchor="middle">• Campus SIEM Dashboards</text>
+    <text x="90" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569" text-anchor="middle">• Token Authenticated Clients</text>
+  </g>
+
+  <!-- SINGLE PROCESS BOUNDARY -->
+  <rect x="250" y="90" width="560" height="630" rx="12" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6,4"/>
+  <rect x="270" y="76" width="360" height="26" rx="4" fill="#E2E8F0"/>
+  <text x="450" y="94" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#334155" text-anchor="middle">SINGLE PROCESS EXECUTION BOUNDARY (app/)</text>
+
+  <!-- Web Tier -->
+  <g transform="translate(280, 120)" filter="url(#archShadow)">
+    <rect width="230" height="140" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="230" height="30" rx="8" fill="#2563EB"/>
+    <text x="115" y="20" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">WEB TIER (Flask + WSGI)</text>
+    <text x="15" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="600" fill="#1E40AF">app/views.py (UI Blueprints)</text>
+    <text x="15" y="75" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">• Dashboard, VMs, Snapshots</text>
+    <text x="15" y="92" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">• Student Self-Service Portal</text>
+    <text x="15" y="112" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="600" fill="#1E40AF">app/api.py (JSON REST API)</text>
+    <text x="15" y="128" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">• Bearer Token Verified Endpoints</text>
+  </g>
+
+  <!-- Worker Tier -->
+  <g transform="translate(280, 460)" filter="url(#archShadow)">
+    <rect width="230" height="140" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+    <rect width="230" height="30" rx="8" fill="#EA580C"/>
+    <text x="115" y="20" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">WORKER DAEMON (Daemon)</text>
+    <text x="15" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="600" fill="#C2410C">app/worker.py (Background)</text>
+    <text x="15" y="75" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">• 10s Continuous Polling Loop</text>
+    <text x="15" y="92" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">• 2-Cycle Failure Debouncer</text>
+    <text x="15" y="110" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">• Hourly SQLite Online Backup</text>
+    <text x="15" y="128" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">• Retention &amp; Log Pruning</text>
+  </g>
+
+  <!-- Core Services -->
+  <g transform="translate(560, 240)" filter="url(#archShadow)">
+    <rect width="220" height="240" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="2"/>
+    <rect width="220" height="30" rx="8" fill="#16A34A"/>
+    <text x="110" y="20" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">CORE SERVICES LAYER</text>
+    <text x="15" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#15803D">app/services.py</text>
+    <text x="15" y="78" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1E293B">• VM Registry &amp; Policies</text>
+    <text x="15" y="98" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1E293B">• Snapshot Scheduling</text>
+    <text x="15" y="118" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1E293B">• Autonomous Crash Healing</text>
+    <text x="15" y="138" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1E293B">• Circuit-Breaker Guard</text>
+    <text x="15" y="158" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1E293B">• Student Request Cloner</text>
+    <text x="15" y="178" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1E293B">• Disaster Recovery (.ova)</text>
+    <text x="15" y="198" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1E293B">• Role-Based Access Control</text>
+    <text x="15" y="218" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1E293B">• Runtime Configuration</text>
+  </g>
+
+  <!-- Subsystems (Right Inside Boundary) -->
+  <g transform="translate(560, 120)" filter="url(#archShadow)">
+    <rect width="220" height="95" rx="6" fill="#FAF5FF" stroke="#9333EA" stroke-width="2"/>
+    <rect width="220" height="24" rx="6" fill="#9333EA"/>
+    <text x="110" y="17" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">HYPERVISOR DRIVER</text>
+    <text x="15" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#7E22CE">app/vbox.py</text>
+    <text x="15" y="63" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• VBoxManage CLI Adapter</text>
+    <text x="15" y="80" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• Guest Property Telemetry</text>
+  </g>
+
+  <g transform="translate(560, 510)" filter="url(#archShadow)">
+    <rect width="220" height="95" rx="6" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+    <rect width="220" height="24" rx="6" fill="#DC2626"/>
+    <text x="110" y="17" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">PERSISTENCE SUBSYSTEM</text>
+    <text x="15" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#B91C1C">app/db.py</text>
+    <text x="15" y="63" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• SQLite in WAL Mode</text>
+    <text x="15" y="80" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• 8 Numbered Schema Migrations</text>
+  </g>
+
+  <g transform="translate(280, 620)" filter="url(#archShadow)">
+    <rect width="500" height="80" rx="6" fill="#FFFBEB" stroke="#D97706" stroke-width="1.8"/>
+    <text x="250" y="24" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#B45309" text-anchor="middle">NOTIFICATION SUBSYSTEM (app/notifier.py)</text>
+    <text x="250" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#78350F" text-anchor="middle">SMTP Dispatch with STARTTLS Encryption &amp; Real-Time HMAC-SHA256 Signed JSON Webhooks</text>
+    <text x="250" y="66" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#92400E" text-anchor="middle">(Non-blocking asynchronous delivery with automated retry &amp; audit logging in notifications table)</text>
+  </g>
+
+  <!-- External Physical Hypervisor (Far Right) -->
+  <g transform="translate(860, 180)" filter="url(#archShadow)">
+    <rect width="210" height="180" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+    <rect width="210" height="28" rx="8" fill="#D97706"/>
+    <text x="105" y="19" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">ORACLE VIRTUALBOX 7.2</text>
+    <text x="15" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#92400E">Hardware Hypervisor Layer</text>
+    <text x="15" y="74" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1E293B">• VT-x/AMD-V Hardware Accel</text>
+    <text x="15" y="94" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1E293B">• Differencing VDI Disks</text>
+    <text x="15" y="114" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1E293B">• Headless Execution Engine</text>
+    <text x="15" y="134" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1E293B">• Guest Properties Engine</text>
+    <text x="15" y="156" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="600" fill="#B45309">Registered: agnes, debian, etc.</text>
+  </g>
+
+  <!-- Storage Database (Far Right Bottom) -->
+  <g transform="translate(860, 480)" filter="url(#archShadow)">
+    <rect width="210" height="130" rx="8" fill="#F8FAFC" stroke="#0284C7" stroke-width="2"/>
+    <rect width="210" height="28" rx="8" fill="#0284C7"/>
+    <text x="105" y="19" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">PHYSICAL STORAGE</text>
+    <text x="15" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#0369A1">instance/vmrecovery.db</text>
+    <text x="15" y="70" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• WAL Journal File (-wal)</text>
+    <text x="15" y="88" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• Shared Memory Index (-shm)</text>
+    <text x="15" y="108" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="600" fill="#0369A1">backups/ (OVA &amp; Hot DBs)</text>
+  </g>
+
+  <!-- Arrows -->
+  <path d="M 210 165 L 280 165" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrArchBlue)"/>
+  <path d="M 210 530 L 280 530" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrArchBlue)"/>
+  <path d="M 510 190 L 560 260" fill="none" stroke="#1E293B" stroke-width="2" marker-end="url(#arrArch)"/>
+  <path d="M 510 520 L 560 450" fill="none" stroke="#1E293B" stroke-width="2" marker-end="url(#arrArch)"/>
+  <path d="M 670 240 L 670 215" fill="none" stroke="#9333EA" stroke-width="2" marker-end="url(#arrArch)"/>
+  <path d="M 670 480 L 670 510" fill="none" stroke="#DC2626" stroke-width="2" marker-end="url(#arrArch)"/>
+  <path d="M 780 165 L 860 230" fill="none" stroke="#D97706" stroke-width="2" marker-end="url(#arrArch)"/>
+  <path d="M 780 560 L 860 540" fill="none" stroke="#0284C7" stroke-width="2" marker-end="url(#arrArch)"/>
+</svg>

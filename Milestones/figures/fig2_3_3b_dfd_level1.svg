@@ -1,0 +1,209 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 880" width="100%" height="100%">
+  <defs>
+    <filter id="shadow1" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="2" dy="2" stdDeviation="2.5" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#334155"/>
+    </marker>
+    <marker id="arr-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#2563EB"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="880" fill="#FFFFFF"/>
+
+  <!-- Title -->
+  <text x="600" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#0F172A" text-anchor="middle">Figure 2.3.3b: Level 1 Data Flow Diagram (Functional Decomposition)</text>
+  <text x="600" y="60" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">Decomposition of the 8 Subsystem Processes and 9 Relational Data Stores</text>
+
+  <!-- 3 External Entities (Left) -->
+  <g transform="translate(30, 110)" filter="url(#shadow1)">
+    <rect width="130" height="60" rx="4" fill="#F1F5F9" stroke="#334155" stroke-width="2"/>
+    <text x="65" y="35" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#0F172A" text-anchor="middle">Administrator</text>
+  </g>
+
+  <g transform="translate(30, 360)" filter="url(#shadow1)">
+    <rect width="130" height="60" rx="4" fill="#F1F5F9" stroke="#334155" stroke-width="2"/>
+    <text x="65" y="35" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#0F172A" text-anchor="middle">Trainer</text>
+  </g>
+
+  <g transform="translate(30, 620)" filter="url(#shadow1)">
+    <rect width="130" height="60" rx="4" fill="#F1F5F9" stroke="#334155" stroke-width="2"/>
+    <text x="65" y="35" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#0F172A" text-anchor="middle">Student</text>
+  </g>
+
+  <!-- 2 External Entities (Right) -->
+  <g transform="translate(1030, 260)" filter="url(#shadow1)">
+    <rect width="140" height="70" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+    <text x="70" y="34" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#78350F" text-anchor="middle">VirtualBox</text>
+    <text x="70" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#92400E" text-anchor="middle">Hypervisor Host</text>
+  </g>
+
+  <g transform="translate(1030, 540)" filter="url(#shadow1)">
+    <rect width="140" height="70" rx="4" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+    <text x="70" y="34" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#991B1B" text-anchor="middle">Notification</text>
+    <text x="70" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#B91C1C" text-anchor="middle">Gateways</text>
+  </g>
+
+  <!-- 8 PROCESSES (Rounded Blue Cards) -->
+  <!-- P1.0 -->
+  <g transform="translate(250, 95)" filter="url(#shadow1)">
+    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
+    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">1.0</text>
+    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">User Authentication &amp;</text>
+    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">RBAC Role Enforcement</text>
+  </g>
+
+  <!-- P2.0 -->
+  <g transform="translate(250, 195)" filter="url(#shadow1)">
+    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
+    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">2.0</text>
+    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">VM Registry &amp; Policy</text>
+    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">Configuration Management</text>
+  </g>
+
+  <!-- P3.0 -->
+  <g transform="translate(250, 295)" filter="url(#shadow1)">
+    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
+    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">3.0</text>
+    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">Snapshot Automation &amp;</text>
+    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">Pre-Session Baselines</text>
+  </g>
+
+  <!-- P4.0 -->
+  <g transform="translate(250, 395)" filter="url(#shadow1)">
+    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
+    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">4.0</text>
+    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">Guest Heartbeat &amp;</text>
+    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">State Interrogation Loop</text>
+  </g>
+
+  <!-- P5.0 -->
+  <g transform="translate(250, 495)" filter="url(#shadow1)">
+    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
+    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">5.0</text>
+    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">Autonomous Recovery &amp;</text>
+    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">Debounced Rollback</text>
+  </g>
+
+  <!-- P6.0 -->
+  <g transform="translate(250, 595)" filter="url(#shadow1)">
+    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
+    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">6.0</text>
+    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">Student VM Provisioning</text>
+    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">&amp; Template Cloning</text>
+  </g>
+
+  <!-- P7.0 -->
+  <g transform="translate(250, 695)" filter="url(#shadow1)">
+    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
+    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">7.0</text>
+    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">Appliance Backup (.ova)</text>
+    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">&amp; Database Hot-Backup</text>
+  </g>
+
+  <!-- P8.0 -->
+  <g transform="translate(250, 790)" filter="url(#shadow1)">
+    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
+    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">8.0</text>
+    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">Multi-Channel Alerting</text>
+    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">&amp; Signed Webhooks</text>
+  </g>
+
+  <!-- 9 DATA STORES (Center-Right, Open Double-Line Store Boxes) -->
+  <g transform="translate(680, 100)">
+    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
+    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
+    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D1</text>
+    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">users (Auth &amp; Roles)</text>
+  </g>
+
+  <g transform="translate(680, 180)">
+    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
+    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
+    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D2</text>
+    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">vms (Hardware Registry)</text>
+  </g>
+
+  <g transform="translate(680, 260)">
+    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
+    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
+    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D3</text>
+    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">snapshots (Point-in-Time)</text>
+  </g>
+
+  <g transform="translate(680, 340)">
+    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
+    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
+    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D4</text>
+    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">class_sessions (Classes)</text>
+  </g>
+
+  <g transform="translate(680, 420)">
+    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
+    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
+    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D5</text>
+    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">vm_requests (Clones)</text>
+  </g>
+
+  <g transform="translate(680, 500)">
+    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
+    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
+    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D6</text>
+    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">events (Audit Log)</text>
+  </g>
+
+  <g transform="translate(680, 580)">
+    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
+    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
+    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D7</text>
+    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">backups (.ova Appliances)</text>
+  </g>
+
+  <g transform="translate(680, 660)">
+    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
+    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
+    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D8</text>
+    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">app_settings (Overrides)</text>
+  </g>
+
+  <g transform="translate(680, 740)">
+    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
+    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
+    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D9</text>
+    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">notifications (Dispatches)</text>
+  </g>
+
+  <!-- Connectors (Entities to Processes) -->
+  <path d="M 160 135 L 250 135" stroke="#334155" stroke-width="1.8" marker-end="url(#arr)"/>
+  <path d="M 160 150 L 210 150 L 210 225 L 250 225" stroke="#334155" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
+  <path d="M 160 380 L 250 325" stroke="#334155" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
+  <path d="M 160 400 L 250 525" stroke="#334155" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
+  <path d="M 160 650 L 250 625" stroke="#334155" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
+
+  <!-- Connectors (Processes to Data Stores) -->
+  <path d="M 500 130 L 680 120" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+  <path d="M 500 225 L 680 200" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+  <path d="M 500 325 L 680 280" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+  <path d="M 500 425 L 680 215" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+  <path d="M 500 525 L 680 290" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+  <path d="M 500 625 L 680 440" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+  <path d="M 500 725 L 680 600" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+  <path d="M 500 815 L 680 760" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+
+  <!-- Connectors (Processes to VirtualBox / Notifications) -->
+  <path d="M 500 335 L 1030 290" stroke="#D97706" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
+  <path d="M 1030 305 L 500 435" stroke="#D97706" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
+  <path d="M 500 535 L 1030 320" stroke="#D97706" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
+  <path d="M 500 830 L 1030 575" stroke="#DC2626" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
+</svg>

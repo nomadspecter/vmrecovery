@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1350 960" width="100%" height="100%">
+  <defs>
+    <filter id="erdShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+    <marker id="erdArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#DC2626"/>
+    </marker>
+  </defs>
+
+  <rect width="1350" height="960" fill="#FFFFFF"/>
+
+  <!-- Title -->
+  <text x="675" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#0F172A" text-anchor="middle">Figure 2.3.4: Complete Entity Relationship Diagram (10 Relational Tables)</text>
+  <text x="675" y="60" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">SQLite Relational Database Architecture in WAL Mode (Schema Version 8)</text>
+
+  <!-- TABLE 1: users -->
+  <g transform="translate(40, 100)" filter="url(#erdShadow)">
+    <rect width="210" height="150" rx="6" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="210" height="30" rx="6" fill="#2563EB"/>
+    <text x="105" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">USERS</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#D97706">[PK] user_id</text>
+    <text x="12" y="72" font-family="'Courier New', monospace" font-size="11" fill="#334155">     username</text>
+    <text x="12" y="92" font-family="'Courier New', monospace" font-size="11" fill="#334155">     password_hash</text>
+    <text x="12" y="112" font-family="'Courier New', monospace" font-size="11" fill="#334155">     role</text>
+    <text x="12" y="132" font-family="'Courier New', monospace" font-size="11" fill="#64748B">     created_at</text>
+  </g>
+
+  <!-- TABLE 2: vms -->
+  <g transform="translate(360, 100)" filter="url(#erdShadow)">
+    <rect width="240" height="280" rx="6" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="240" height="30" rx="6" fill="#2563EB"/>
+    <text x="120" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">VMS (REGISTRY)</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#D97706">[PK] vm_id</text>
+    <text x="12" y="72" font-family="'Courier New', monospace" font-size="11" fill="#334155">     vm_name</text>
+    <text x="12" y="92" font-family="'Courier New', monospace" font-size="11" fill="#334155">     vbox_uuid</text>
+    <text x="12" y="112" font-family="'Courier New', monospace" font-size="11" fill="#334155">     class_group</text>
+    <text x="12" y="132" font-family="'Courier New', monospace" font-size="11" fill="#334155">     interval_minutes</text>
+    <text x="12" y="152" font-family="'Courier New', monospace" font-size="11" fill="#334155">     retention_count</text>
+    <text x="12" y="172" font-family="'Courier New', monospace" font-size="11" fill="#334155">     pre_session_snapshot</text>
+    <text x="12" y="192" font-family="'Courier New', monospace" font-size="11" fill="#334155">     heartbeat_property</text>
+    <text x="12" y="212" font-family="'Courier New', monospace" font-size="11" fill="#334155">     is_template</text>
+    <text x="12" y="232" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#2563EB">[FK] user_id (Student)</text>
+    <text x="12" y="252" font-family="'Courier New', monospace" font-size="11" fill="#334155">     status, last_checked</text>
+    <text x="12" y="272" font-family="'Courier New', monospace" font-size="11" fill="#059669">     admin_paused</text>
+  </g>
+
+  <!-- TABLE 3: snapshots -->
+  <g transform="translate(710, 100)" filter="url(#erdShadow)">
+    <rect width="220" height="150" rx="6" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="220" height="30" rx="6" fill="#2563EB"/>
+    <text x="110" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">SNAPSHOTS</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#D97706">[PK] snapshot_id</text>
+    <text x="12" y="72" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#2563EB">[FK] vm_id</text>
+    <text x="12" y="92" font-family="'Courier New', monospace" font-size="11" fill="#334155">     snapshot_name</text>
+    <text x="12" y="112" font-family="'Courier New', monospace" font-size="11" fill="#334155">     snapshot_type</text>
+    <text x="12" y="132" font-family="'Courier New', monospace" font-size="11" fill="#64748B">     created_at</text>
+  </g>
+
+  <!-- TABLE 4: backups -->
+  <g transform="translate(1040, 100)" filter="url(#erdShadow)">
+    <rect width="230" height="150" rx="6" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="230" height="30" rx="6" fill="#2563EB"/>
+    <text x="115" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">BACKUPS (.OVA)</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#D97706">[PK] backup_id</text>
+    <text x="12" y="72" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#2563EB">[FK] vm_id</text>
+    <text x="12" y="92" font-family="'Courier New', monospace" font-size="11" fill="#334155">     backup_name</text>
+    <text x="12" y="112" font-family="'Courier New', monospace" font-size="11" fill="#334155">     file_path, size_bytes</text>
+    <text x="12" y="132" font-family="'Courier New', monospace" font-size="11" fill="#64748B">     created_at</text>
+  </g>
+
+  <!-- TABLE 5: vm_requests -->
+  <g transform="translate(40, 440)" filter="url(#erdShadow)">
+    <rect width="250" height="230" rx="6" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="250" height="30" rx="6" fill="#2563EB"/>
+    <text x="125" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">VM_REQUESTS</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#D97706">[PK] request_id</text>
+    <text x="12" y="72" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#2563EB">[FK] user_id (Student)</text>
+    <text x="12" y="92" font-family="'Courier New', monospace" font-size="11" fill="#334155">     template_vbox_uuid</text>
+    <text x="12" y="112" font-family="'Courier New', monospace" font-size="11" fill="#334155">     template_name</text>
+    <text x="12" y="132" font-family="'Courier New', monospace" font-size="11" fill="#334155">     requested_name</text>
+    <text x="12" y="152" font-family="'Courier New', monospace" font-size="11" fill="#334155">     class_group, clone_type</text>
+    <text x="12" y="172" font-family="'Courier New', monospace" font-size="11" fill="#059669">     status, rejection_reason</text>
+    <text x="12" y="192" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#2563EB">[FK] created_vm_id</text>
+    <text x="12" y="212" font-family="'Courier New', monospace" font-size="11" fill="#64748B">     created_at, updated_at</text>
+  </g>
+
+  <!-- TABLE 6: class_sessions -->
+  <g transform="translate(360, 440)" filter="url(#erdShadow)">
+    <rect width="240" height="170" rx="6" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="240" height="30" rx="6" fill="#2563EB"/>
+    <text x="120" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">CLASS_SESSIONS</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#D97706">[PK] session_id</text>
+    <text x="12" y="72" font-family="'Courier New', monospace" font-size="11" fill="#334155">     class_group</text>
+    <text x="12" y="92" font-family="'Courier New', monospace" font-size="11" fill="#334155">     status (active/ended)</text>
+    <text x="12" y="112" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#2563EB">[FK] started_by (Trainer)</text>
+    <text x="12" y="132" font-family="'Courier New', monospace" font-size="11" fill="#334155">     started_at</text>
+    <text x="12" y="152" font-family="'Courier New', monospace" font-size="11" fill="#334155">     ended_at</text>
+  </g>
+
+  <!-- TABLE 7: events -->
+  <g transform="translate(710, 440)" filter="url(#erdShadow)">
+    <rect width="250" height="190" rx="6" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="250" height="30" rx="6" fill="#2563EB"/>
+    <text x="125" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">EVENTS (AUDIT LOG)</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#D97706">[PK] event_id</text>
+    <text x="12" y="72" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#2563EB">[FK] vm_id (nullable)</text>
+    <text x="12" y="92" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#2563EB">[FK] user_id (nullable)</text>
+    <text x="12" y="112" font-family="'Courier New', monospace" font-size="11" fill="#334155">     event_type</text>
+    <text x="12" y="132" font-family="'Courier New', monospace" font-size="11" fill="#334155">     details, result</text>
+    <text x="12" y="152" font-family="'Courier New', monospace" font-size="11" fill="#059669">     duration_seconds</text>
+    <text x="12" y="172" font-family="'Courier New', monospace" font-size="11" fill="#64748B">     created_at</text>
+  </g>
+
+  <!-- TABLE 8: notifications -->
+  <g transform="translate(1040, 440)" filter="url(#erdShadow)">
+    <rect width="240" height="190" rx="6" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="240" height="30" rx="6" fill="#2563EB"/>
+    <text x="120" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">NOTIFICATIONS</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#D97706">[PK] notification_id</text>
+    <text x="12" y="72" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#2563EB">[FK] vm_id (nullable)</text>
+    <text x="12" y="92" font-family="'Courier New', monospace" font-size="11" fill="#334155">     channel (smtp/webhook)</text>
+    <text x="12" y="112" font-family="'Courier New', monospace" font-size="11" fill="#334155">     recipient, subject</text>
+    <text x="12" y="132" font-family="'Courier New', monospace" font-size="11" fill="#334155">     severity, status</text>
+    <text x="12" y="152" font-family="'Courier New', monospace" font-size="11" fill="#64748B">     sent_at</text>
+  </g>
+
+  <!-- TABLE 9: app_settings -->
+  <g transform="translate(200, 750)" filter="url(#erdShadow)">
+    <rect width="230" height="130" rx="6" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="230" height="30" rx="6" fill="#2563EB"/>
+    <text x="115" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">APP_SETTINGS</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#D97706">[PK] key</text>
+    <text x="12" y="72" font-family="'Courier New', monospace" font-size="11" fill="#334155">     value</text>
+    <text x="12" y="92" font-family="'Courier New', monospace" font-size="11" fill="#334155">     updated_at</text>
+    <text x="12" y="112" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#2563EB">[FK] updated_by</text>
+  </g>
+
+  <!-- TABLE 10: schema_meta -->
+  <g transform="translate(560, 750)" filter="url(#erdShadow)">
+    <rect width="210" height="110" rx="6" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <rect width="210" height="30" rx="6" fill="#2563EB"/>
+    <text x="105" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">SCHEMA_META</text>
+    <text x="12" y="52" font-family="'Courier New', monospace" font-size="11" font-weight="700" fill="#D97706">[PK] key</text>
+    <text x="12" y="72" font-family="'Courier New', monospace" font-size="11" fill="#334155">     value ('8')</text>
+    <text x="12" y="92" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#64748B">(Auto-migration tracker)</text>
+  </g>
+
+  <!-- RELATIONSHIP LINES (Red dashed arrows) -->
+  <!-- users -> vms -->
+  <path d="M 250 170 L 360 170" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#erdArr)"/>
+  <!-- vms -> snapshots -->
+  <path d="M 600 170 L 710 170" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#erdArr)"/>
+  <!-- vms -> backups -->
+  <path d="M 930 170 L 1040 170" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#erdArr)"/>
+  <!-- users -> vm_requests -->
+  <path d="M 140 250 L 140 440" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#erdArr)"/>
+  <!-- vms -> vm_requests (created_vm_id) -->
+  <path d="M 380 380 L 380 410 L 290 470" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#erdArr)"/>
+  <!-- users -> class_sessions (started_by) -->
+  <path d="M 210 250 L 210 390 L 360 480" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#erdArr)"/>
+  <!-- vms -> events -->
+  <path d="M 600 240 L 710 470" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#erdArr)"/>
+  <!-- vms -> notifications -->
+  <path d="M 600 300 L 980 300 L 980 470 L 1040 470" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#erdArr)"/>
+</svg>
