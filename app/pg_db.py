@@ -89,6 +89,10 @@ class PgCursorWrapper:
         self.lastrowid = None
         self._col_names = []
 
+    @property
+    def rowcount(self):
+        return self._cur.rowcount
+
     def execute(self, sql: str, params=None):
         translated, is_insert = _translate_sql(sql)
         args = tuple(params) if params is not None else ()

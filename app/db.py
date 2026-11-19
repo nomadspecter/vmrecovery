@@ -266,6 +266,9 @@ def backup_database(path: str, dest_dir: str, keep: int = 10) -> str:
     SQLite's online backup API is used, so a backup taken while the service
     is running is consistent rather than a torn copy of a live file.
     """
+    if is_postgres_url(path):
+        log.info("PostgreSQL database is managed externally (Supabase cloud automated backups)")
+        return ""
     import time
     from datetime import datetime
 
