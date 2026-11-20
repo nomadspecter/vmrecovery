@@ -266,7 +266,7 @@ def init_pg_db(url: str) -> None:
         "and multi-user role-based access control.\n"
         "2. Achieved 100% test pass rate across 154 unit, integration, recovery, and security tests, proving sub-10-second crash restoration.\n"
         "3. Transitioned the software to a hardened production systemd service running Waitress WSGI on the physical laboratory host with Cloudflare Zero-Trust ingress.\n"
-        "4. Implemented an automated 3-2-1 offsite disaster recovery replication pipeline leveraging Amazon Web Services S3 object storage.\n"
+        "4. Implemented standalone Open Virtualization Appliance (.ova) disaster recovery archives and automated hourly hot backups with 7-day retention pruning.\n"
         "5. Deployed a live cloud demonstration platform on Render with Supabase Managed PostgreSQL for remote evaluation and accessibility."
     )
     add_p(doc,

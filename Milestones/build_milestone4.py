@@ -423,8 +423,8 @@ def require_token(f):
     )
     add_p(doc,
         "With full software construction and validation achieved, the subsequent sections present the operational deployment into a simulated "
-        "and real-world laboratory environment utilizing a hybrid on-premises hypervisor, Cloudflare Zero-Trust ingress tunnel, AWS cloud storage, "
-        "and the Render + Supabase cloud demonstration tier."
+        "and real-world laboratory environment utilizing a hybrid on-premises hypervisor, Cloudflare Zero-Trust ingress tunnel, Supabase cloud database replication, "
+        "and the Render cloud demonstration tier."
     )
 
     print(f"Saving compiled document to {out_docx4}...")
