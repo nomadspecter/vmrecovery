@@ -646,7 +646,7 @@ def backup_delete(vm_id, backup_id):
 
 # ------------------------------------------------------------------ VM requests & approval
 @bp.route("/requests")
-@role_required("admin", "trainer")
+@role_required("admin", "trainer", "student")
 def requests_list():
     conn = get_db()
     uid = None if g.user["role"] == "admin" else g.user["user_id"]
@@ -656,7 +656,7 @@ def requests_list():
 
 
 @bp.route("/requests/new", methods=["POST"])
-@role_required("admin", "trainer")
+@role_required("admin", "trainer", "student")
 def request_new():
     choice = request.form.get("template_choice", "")
     uuid, _, name = choice.partition("|")
