@@ -4,26 +4,29 @@ import subprocess
 os.makedirs('Milestones/figures', exist_ok=True)
 
 # -----------------------------------------------------------------------------
-# 1. Level 0 DFD (Context Diagram) - Native Clean SVG
+# 1. Level 0 DFD (Context Diagram) - Native Clean Orthogonal SVG
 # -----------------------------------------------------------------------------
 def generate_dfd_level0_svg():
-    svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 750" width="100%" height="100%">
+    svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" width="100%" height="100%">
   <defs>
     <filter id="drop-shadow" x="-10%" y="-10%" width="125%" height="125%">
-      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.15"/>
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.14"/>
     </filter>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
       <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1E293B"/>
     </marker>
-    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
       <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#2563EB"/>
     </marker>
-    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
       <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#EA580C"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#DC2626"/>
     </marker>
     <linearGradient id="procGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#2563EB"/>
-      <stop offset="100%" stop-color="#1D4ED8"/>
+      <stop offset="100%" stop-color="#1E40AF"/>
     </linearGradient>
     <linearGradient id="entGrad" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#F8FAFC"/>
@@ -36,129 +39,138 @@ def generate_dfd_level0_svg():
   </defs>
 
   <!-- Background -->
-  <rect width="1100" height="750" fill="#FFFFFF"/>
+  <rect width="1200" height="760" fill="#FFFFFF"/>
 
   <!-- Title -->
-  <text x="550" y="38" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="20" font-weight="700" fill="#0F172A" text-anchor="middle">Figure 2.3.3a: Level 0 Data Flow Diagram (Context Diagram)</text>
-  <text x="550" y="60" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">Automated Virtual Machine Instability Management System (VMRecovery)</text>
+  <text x="600" y="38" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="700" fill="#0F172A" text-anchor="middle">Figure 2.3.3a: Level 0 Data Flow Diagram (Context Diagram)</text>
+  <text x="600" y="60" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5" fill="#64748B" text-anchor="middle">Automated Virtual Machine Instability Management System (VMRecovery)</text>
+
+  <!-- ================================================================== -->
+  <!-- LAYER 1: ORTHOGONAL FLOW ARROWS (Drawn FIRST so text never clips!) -->
+  <!-- ================================================================== -->
+
+  <!-- Admin <-> System (Top Left) -->
+  <path d="M 225 140 H 545 V 275" fill="none" stroke="#2563EB" stroke-width="2.2" marker-end="url(#arrow-blue)"/>
+  <path d="M 510 275 V 188 H 225" fill="none" stroke="#2563EB" stroke-width="2.2" marker-end="url(#arrow-blue)"/>
+
+  <!-- Trainer <-> System (Middle Left) -->
+  <path d="M 225 338 H 472" fill="none" stroke="#1E293B" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M 472 384 H 225" fill="none" stroke="#1E293B" stroke-width="2.2" marker-end="url(#arrow)"/>
+
+  <!-- Student <-> System (Bottom Left) -->
+  <path d="M 225 538 H 510 V 448" fill="none" stroke="#2563EB" stroke-width="2.2" marker-end="url(#arrow-blue)"/>
+  <path d="M 545 448 V 586 H 225" fill="none" stroke="#2563EB" stroke-width="2.2" marker-end="url(#arrow-blue)"/>
+
+  <!-- System <-> Oracle VirtualBox (Top Right) -->
+  <path d="M 655 275 V 175 H 958" fill="none" stroke="#EA580C" stroke-width="2.2" marker-end="url(#arrow-orange)"/>
+  <path d="M 958 228 H 690 V 275" fill="none" stroke="#EA580C" stroke-width="2.2" marker-end="url(#arrow-orange)"/>
+
+  <!-- System <-> Alert Gateways (Bottom Right) -->
+  <path d="M 690 448 V 495 H 958" fill="none" stroke="#DC2626" stroke-width="2.2" marker-end="url(#arrow-red)"/>
+  <path d="M 958 548 H 655 V 448" fill="none" stroke="#DC2626" stroke-width="2.2" marker-end="url(#arrow-red)"/>
+
+  <!-- ================================================================== -->
+  <!-- LAYER 2: OPAQUE FLOW LABEL PILLS (Drawn OVER paths cleanly)        -->
+  <!-- ================================================================== -->
+
+  <!-- Admin Labels -->
+  <rect x="262" y="125" width="216" height="28" rx="14" fill="#EFF6FF" stroke="#93C5FD" stroke-width="1.2"/>
+  <text x="370" y="143" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#1E40AF" text-anchor="middle">VM Config, Policies &amp; Settings</text>
+
+  <rect x="262" y="174" width="216" height="28" rx="14" fill="#FFFFFF" stroke="#93C5FD" stroke-width="1.2"/>
+  <text x="370" y="192" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#1E40AF" text-anchor="middle">Dashboard, Audit Logs &amp; Alerts</text>
+
+  <!-- Trainer Labels -->
+  <rect x="252" y="324" width="194" height="26" rx="13" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.2"/>
+  <text x="349" y="341" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="600" fill="#0F172A" text-anchor="middle">Session Start/End, Approvals</text>
+
+  <rect x="252" y="371" width="194" height="26" rx="13" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2"/>
+  <text x="349" y="388" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="600" fill="#0F172A" text-anchor="middle">VM Status &amp; Class Telemetry</text>
+
+  <!-- Student Labels -->
+  <rect x="262" y="524" width="216" height="28" rx="14" fill="#EFF6FF" stroke="#93C5FD" stroke-width="1.2"/>
+  <text x="370" y="542" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#1E40AF" text-anchor="middle">VM Clone &amp; Restore Requests</text>
+
+  <rect x="262" y="572" width="216" height="28" rx="14" fill="#FFFFFF" stroke="#93C5FD" stroke-width="1.2"/>
+  <text x="370" y="590" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#1E40AF" text-anchor="middle">Assigned VM Status &amp; Approvals</text>
+
+  <!-- VirtualBox Labels -->
+  <rect x="722" y="161" width="206" height="28" rx="14" fill="#FFF7ED" stroke="#FDBA74" stroke-width="1.2"/>
+  <text x="825" y="179" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#9A3412" text-anchor="middle">startvm, snapshot, restore, clone</text>
+
+  <rect x="722" y="214" width="206" height="28" rx="14" fill="#FFFFFF" stroke="#FDBA74" stroke-width="1.2"/>
+  <text x="825" y="232" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#9A3412" text-anchor="middle">Power States &amp; Guest Heartbeats</text>
+
+  <!-- Alert Gateways Labels -->
+  <rect x="722" y="481" width="206" height="28" rx="14" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1.2"/>
+  <text x="825" y="499" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#991B1B" text-anchor="middle">Incident Alerts &amp; HMAC Webhooks</text>
+
+  <rect x="722" y="534" width="206" height="28" rx="14" fill="#FFFFFF" stroke="#FCA5A5" stroke-width="1.2"/>
+  <text x="825" y="552" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#991B1B" text-anchor="middle">SMTP Receipts &amp; HTTP Status</text>
+
+  <!-- ================================================================== -->
+  <!-- LAYER 3: CENTER PROCESS & EXTERNAL ENTITIES                        -->
+  <!-- ================================================================== -->
 
   <!-- CENTER PROCESS: 0.0 -->
-  <g transform="translate(430, 260)" filter="url(#drop-shadow)">
-    <rect width="240" height="150" rx="75" fill="url(#procGrad)" stroke="#1E40AF" stroke-width="3"/>
-    <line x1="20" y1="50" x2="220" y2="50" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="4,3"/>
-    <text x="120" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="800" fill="#DBEAFE" text-anchor="middle">0.0</text>
-    <text x="120" y="80" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">VM INSTABILITY</text>
-    <text x="120" y="102" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">MANAGEMENT SYSTEM</text>
-    <text x="120" y="124" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#BFDBFE" text-anchor="middle">(Core Engine &amp; Daemon)</text>
+  <g transform="translate(475, 278)" filter="url(#drop-shadow)">
+    <rect width="250" height="166" rx="83" fill="url(#procGrad)" stroke="#1E3A8A" stroke-width="3"/>
+    <line x1="28" y1="52" x2="222" y2="52" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <text x="125" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#DBEAFE" text-anchor="middle">0.0</text>
+    <text x="125" y="84" font-family="'Segoe UI', Roboto, sans-serif" font-size="15.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">VM INSTABILITY</text>
+    <text x="125" y="106" font-family="'Segoe UI', Roboto, sans-serif" font-size="15.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">MANAGEMENT SYSTEM</text>
+    <text x="125" y="132" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="500" fill="#BFDBFE" text-anchor="middle">(Web Tier + Recovery Daemon)</text>
   </g>
 
   <!-- EXTERNAL ENTITIES: Left Side -->
-  <!-- Admin -->
-  <g transform="translate(40, 110)" filter="url(#drop-shadow)">
-    <rect width="180" height="85" rx="6" fill="url(#entGrad)" stroke="#334155" stroke-width="2"/>
-    <rect x="0" y="0" width="180" height="26" rx="6" fill="#334155"/>
-    <text x="90" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL ENTITY</text>
-    <text x="90" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#0F172A" text-anchor="middle">Lab Administrator</text>
-    <text x="90" y="70" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569" text-anchor="middle">(System &amp; Policies)</text>
+  <g transform="translate(35, 118)" filter="url(#drop-shadow)">
+    <rect width="190" height="90" rx="6" fill="url(#entGrad)" stroke="#334155" stroke-width="2"/>
+    <rect x="0" y="0" width="190" height="26" rx="6" fill="#334155"/>
+    <text x="95" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL ENTITY</text>
+    <text x="95" y="54" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#0F172A" text-anchor="middle">Lab Administrator</text>
+    <text x="95" y="74" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569" text-anchor="middle">(System &amp; Policies)</text>
   </g>
 
-  <!-- Trainer -->
-  <g transform="translate(40, 290)" filter="url(#drop-shadow)">
-    <rect width="180" height="85" rx="6" fill="url(#entGrad)" stroke="#334155" stroke-width="2"/>
-    <rect x="0" y="0" width="180" height="26" rx="6" fill="#334155"/>
-    <text x="90" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL ENTITY</text>
-    <text x="90" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#0F172A" text-anchor="middle">Trainer</text>
-    <text x="90" y="70" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569" text-anchor="middle">(Class Sessions &amp; Labs)</text>
+  <g transform="translate(35, 316)" filter="url(#drop-shadow)">
+    <rect width="190" height="90" rx="6" fill="url(#entGrad)" stroke="#334155" stroke-width="2"/>
+    <rect x="0" y="0" width="190" height="26" rx="6" fill="#334155"/>
+    <text x="95" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL ENTITY</text>
+    <text x="95" y="54" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#0F172A" text-anchor="middle">Trainer</text>
+    <text x="95" y="74" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569" text-anchor="middle">(Class Sessions &amp; Labs)</text>
   </g>
 
-  <!-- Student -->
-  <g transform="translate(40, 480)" filter="url(#drop-shadow)">
-    <rect width="180" height="85" rx="6" fill="url(#entGrad)" stroke="#334155" stroke-width="2"/>
-    <rect x="0" y="0" width="180" height="26" rx="6" fill="#334155"/>
-    <text x="90" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL ENTITY</text>
-    <text x="90" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#0F172A" text-anchor="middle">Student</text>
-    <text x="90" y="70" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569" text-anchor="middle">(Learner / Workstation)</text>
+  <g transform="translate(35, 514)" filter="url(#drop-shadow)">
+    <rect width="190" height="90" rx="6" fill="url(#entGrad)" stroke="#334155" stroke-width="2"/>
+    <rect x="0" y="0" width="190" height="26" rx="6" fill="#334155"/>
+    <text x="95" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL ENTITY</text>
+    <text x="95" y="54" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#0F172A" text-anchor="middle">Student</text>
+    <text x="95" y="74" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569" text-anchor="middle">(Learner / Workstation)</text>
   </g>
 
   <!-- EXTERNAL ENTITIES: Right Side -->
-  <!-- VirtualBox Hypervisor -->
-  <g transform="translate(870, 160)" filter="url(#drop-shadow)">
-    <rect width="190" height="95" rx="6" fill="url(#sysGrad)" stroke="#D97706" stroke-width="2"/>
-    <rect x="0" y="0" width="190" height="26" rx="6" fill="#D97706"/>
-    <text x="95" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">HARDWARE HYPERVISOR</text>
-    <text x="95" y="54" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#78350F" text-anchor="middle">Oracle VirtualBox</text>
-    <text x="95" y="72" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#92400E" text-anchor="middle">VBoxManage CLI &amp; IPC</text>
-    <text x="95" y="86" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" fill="#B45309" text-anchor="middle">(/tmp/.vbox-nomad-ipc)</text>
+  <g transform="translate(960, 150)" filter="url(#drop-shadow)">
+    <rect width="205" height="102" rx="6" fill="url(#sysGrad)" stroke="#D97706" stroke-width="2"/>
+    <rect x="0" y="0" width="205" height="26" rx="6" fill="#D97706"/>
+    <text x="102" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">HARDWARE HYPERVISOR</text>
+    <text x="102" y="54" font-family="'Segoe UI', Roboto, sans-serif" font-size="13.5" font-weight="700" fill="#78350F" text-anchor="middle">Oracle VirtualBox 7.2</text>
+    <text x="102" y="74" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#92400E" text-anchor="middle">VBoxManage CLI &amp; IPC</text>
+    <text x="102" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" fill="#B45309" text-anchor="middle">(/tmp/.vbox-nomad-ipc)</text>
   </g>
 
-  <!-- Notification Gateways -->
-  <g transform="translate(870, 420)" filter="url(#drop-shadow)">
-    <rect width="190" height="90" rx="6" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
-    <rect x="0" y="0" width="190" height="26" rx="6" fill="#DC2626"/>
-    <text x="95" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL GATEWAY</text>
-    <text x="95" y="54" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#991B1B" text-anchor="middle">Alert Gateways</text>
-    <text x="95" y="72" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#B91C1C" text-anchor="middle">SMTP &amp; Signed Webhooks</text>
+  <g transform="translate(960, 470)" filter="url(#drop-shadow)">
+    <rect width="205" height="98" rx="6" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+    <rect x="0" y="0" width="205" height="26" rx="6" fill="#DC2626"/>
+    <text x="102" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL GATEWAY</text>
+    <text x="102" y="56" font-family="'Segoe UI', Roboto, sans-serif" font-size="13.5" font-weight="700" fill="#991B1B" text-anchor="middle">Alert Gateways</text>
+    <text x="102" y="76" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#B91C1C" text-anchor="middle">SMTP &amp; Signed Webhooks</text>
   </g>
-
-  <!-- FLOWS: Administrator -->
-  <!-- Admin -> System -->
-  <path d="M 220 135 L 435 285" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
-  <rect x="235" y="185" width="170" height="28" rx="4" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
-  <text x="320" y="203" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">VM Config, Policies, Settings</text>
-
-  <!-- System -> Admin -->
-  <path d="M 430 310 L 220 170" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
-  <rect x="230" y="235" width="175" height="28" rx="4" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
-  <text x="317" y="253" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">Dashboard, Logs, Health Alerts</text>
-
-  <!-- FLOWS: Trainer -->
-  <!-- Trainer -> System -->
-  <path d="M 220 320 L 430 320" fill="none" stroke="#1E293B" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="325" y="312" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#0F172A" text-anchor="middle">Session Start/End, Restore Reqs</text>
-
-  <!-- System -> Trainer -->
-  <path d="M 430 350 L 220 350" fill="none" stroke="#1E293B" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="325" y="366" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#0F172A" text-anchor="middle">VM Status, Session Telemetry</text>
-
-  <!-- FLOWS: Student -->
-  <!-- Student -> System -->
-  <path d="M 220 495 L 435 385" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
-  <rect x="230" y="445" width="180" height="28" rx="4" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
-  <text x="320" y="463" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">VM Clone Request, Password</text>
-
-  <!-- System -> Student -->
-  <path d="M 435 415 L 220 525" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
-  <rect x="230" y="495" width="180" height="28" rx="4" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
-  <text x="320" y="513" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">Assigned VM Status, Approval</text>
-
-  <!-- FLOWS: VirtualBox -->
-  <!-- System -> VBox -->
-  <path d="M 670 300 L 870 215" fill="none" stroke="#EA580C" stroke-width="2" marker-end="url(#arrow-orange)"/>
-  <rect x="685" y="235" width="170" height="28" rx="4" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1"/>
-  <text x="770" y="253" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#9A3412" text-anchor="middle">startvm, snapshot, restore</text>
-
-  <!-- VBox -> System -->
-  <path d="M 870 245 L 670 330" fill="none" stroke="#EA580C" stroke-width="2" marker-end="url(#arrow-orange)"/>
-  <rect x="685" y="295" width="170" height="28" rx="4" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1"/>
-  <text x="770" y="313" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#9A3412" text-anchor="middle">Guest Heartbeats, States</text>
-
-  <!-- FLOWS: Notification Gateways -->
-  <!-- System -> Notifications -->
-  <path d="M 670 360 L 870 450" fill="none" stroke="#DC2626" stroke-width="2" marker-end="url(#arrow)"/>
-  <rect x="685" y="405" width="175" height="28" rx="4" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
-  <text x="772" y="423" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#991B1B" text-anchor="middle">Incident Alert, HMAC Webhook</text>
-
-  <!-- Notifications -> System -->
-  <path d="M 870 480 L 670 390" fill="none" stroke="#DC2626" stroke-width="2" marker-end="url(#arrow)"/>
-  <rect x="685" y="460" width="175" height="28" rx="4" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
-  <text x="772" y="478" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#991B1B" text-anchor="middle">Delivery Receipts, HTTP Status</text>
 
   <!-- Footer Note -->
-  <rect x="50" y="670" width="1000" height="50" rx="6" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
-  <text x="550" y="692" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#334155" text-anchor="middle">
-    Architecture Boundary: Local hypervisor engine controls physical VirtualBox VMs; management plane is accessible via LAN / Cloudflare Tunnel.
+  <rect x="50" y="675" width="1100" height="54" rx="6" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="600" y="698" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="600" fill="#334155" text-anchor="middle">
+    Architecture Boundary: Local hypervisor engine controls physical VirtualBox VMs; management plane is accessible via LAN / Cloudflare Tunnel / Render Cloud Demo.
   </text>
-  <text x="550" y="708" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#64748B" text-anchor="middle">
+  <text x="600" y="716" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#64748B" text-anchor="middle">
     Hands-on student guest OS execution is conducted over SSH (Port 22) and RDP/VRDP (Port 3389).
   </text>
 </svg>'''
@@ -168,13 +180,13 @@ def generate_dfd_level0_svg():
     print("Generated Native SVG: fig2_3_3a_dfd_level0.svg -> PNG")
 
 # -----------------------------------------------------------------------------
-# 2. Level 1 DFD - Native Clean SVG
+# 2. Level 1 DFD - Zero-Crossing 3-Column Labeled Native SVG
 # -----------------------------------------------------------------------------
 def generate_dfd_level1_svg():
-    svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 880" width="100%" height="100%">
+    svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 960" width="100%" height="100%">
   <defs>
     <filter id="shadow1" x="-10%" y="-10%" width="125%" height="125%">
-      <feDropShadow dx="2" dy="2" stdDeviation="2.5" flood-opacity="0.12"/>
+      <feDropShadow dx="1.5" dy="2" stdDeviation="2.5" flood-opacity="0.11"/>
     </filter>
     <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#334155"/>
@@ -182,203 +194,338 @@ def generate_dfd_level1_svg():
     <marker id="arr-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#2563EB"/>
     </marker>
+    <marker id="arr-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#D97706"/>
+    </marker>
+    <marker id="arr-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#DC2626"/>
+    </marker>
   </defs>
 
   <!-- Background -->
-  <rect width="1200" height="880" fill="#FFFFFF"/>
+  <rect width="1360" height="960" fill="#FFFFFF"/>
 
   <!-- Title -->
-  <text x="600" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#0F172A" text-anchor="middle">Figure 2.3.3b: Level 1 Data Flow Diagram (Functional Decomposition)</text>
-  <text x="600" y="60" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">Decomposition of the 8 Subsystem Processes and 9 Relational Data Stores</text>
+  <text x="680" y="36" font-family="'Segoe UI', Roboto, sans-serif" font-size="21" font-weight="700" fill="#0F172A" text-anchor="middle">Figure 2.3.3b: Level 1 Data Flow Diagram (Functional Decomposition)</text>
+  <text x="680" y="58" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" fill="#64748B" text-anchor="middle">Zero-Crossing Decomposition of 5 External Interactors, 8 Core Processes &amp; 9 Connected Relational Data Stores</text>
 
-  <!-- 3 External Entities (Left) -->
-  <g transform="translate(30, 110)" filter="url(#shadow1)">
-    <rect width="130" height="60" rx="4" fill="#F1F5F9" stroke="#334155" stroke-width="2"/>
-    <text x="65" y="35" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#0F172A" text-anchor="middle">Administrator</text>
+  <!-- Column Headers -->
+  <rect x="30" y="74" width="185" height="24" rx="4" fill="#F1F5F9" stroke="#CBD5E1"/>
+  <text x="122" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="700" fill="#475569" text-anchor="middle">EXTERNAL INTERACTORS</text>
+
+  <rect x="470" y="74" width="290" height="24" rx="4" fill="#EFF6FF" stroke="#BFDBFE"/>
+  <text x="615" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="700" fill="#1E40AF" text-anchor="middle">SUBSYSTEM PROCESSES (1.0 – 8.0)</text>
+
+  <rect x="1030" y="74" width="295" height="24" rx="4" fill="#F8FAFC" stroke="#CBD5E1"/>
+  <text x="1177" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="700" fill="#334155" text-anchor="middle">RELATIONAL DATA STORES (D1 – D9)</text>
+
+  <!-- ================================================================== -->
+  <!-- LAYER 1: ALL ORTHOGONAL CONNECTORS (ZERO BOX CROSSINGS!)           -->
+  <!-- ================================================================== -->
+
+  <!-- LEFT CHANNEL: External Interactors -> Processes (x=215..470) -->
+  <!-- Admin -> P1.0 & P2.0 -->
+  <path d="M 215 142 H 468" fill="none" stroke="#334155" stroke-width="1.9" marker-end="url(#arr)"/>
+  <path d="M 215 168 H 248 V 242 H 468" fill="none" stroke="#334155" stroke-width="1.9" marker-end="url(#arr)"/>
+
+  <!-- Trainer -> P3.0 & P6.0 -->
+  <path d="M 215 335 H 468" fill="none" stroke="#334155" stroke-width="1.9" marker-end="url(#arr)"/>
+  <path d="M 215 362 H 235 V 632 H 468" fill="none" stroke="#334155" stroke-width="1.7" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+  <!-- VirtualBox <-> P3.0, P4.0, P5.0, P7.0 -->
+  <path d="M 470 356 H 272 V 452 H 217" fill="none" stroke="#D97706" stroke-width="1.9" marker-end="url(#arr-orange)"/>
+  <path d="M 215 462 H 468" fill="none" stroke="#D97706" stroke-width="1.9" marker-end="url(#arr-orange)"/>
+  <path d="M 470 545 H 272 V 496 H 217" fill="none" stroke="#D97706" stroke-width="1.9" marker-end="url(#arr-orange)"/>
+  <path d="M 470 742 H 255 V 514 H 217" fill="none" stroke="#D97706" stroke-width="1.7" stroke-dasharray="4,3" marker-end="url(#arr-orange)"/>
+
+  <!-- Student -> P6.0 -->
+  <path d="M 215 658 H 468" fill="none" stroke="#334155" stroke-width="1.9" marker-end="url(#arr)"/>
+
+  <!-- P8.0 -> Notification Gateways -->
+  <path d="M 470 842 H 217" fill="none" stroke="#DC2626" stroke-width="2.0" marker-end="url(#arr-red)"/>
+
+  <!-- RIGHT CHANNEL: Processes -> Data Stores (x=760..1030) -->
+  <!-- P1.0 -> D1 users -->
+  <path d="M 760 142 H 1028" fill="none" stroke="#2563EB" stroke-width="1.9" marker-end="url(#arr-blue)"/>
+
+  <!-- P2.0 -> D2 vms & D8 app_settings -->
+  <path d="M 760 228 H 1028" fill="none" stroke="#2563EB" stroke-width="1.9" marker-end="url(#arr-blue)"/>
+  <path d="M 760 254 H 795 V 314 H 1028" fill="none" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+
+  <!-- P3.0 -> D3 snapshots & D4 class_sessions -->
+  <path d="M 760 336 H 782 V 398 H 1028" fill="none" stroke="#2563EB" stroke-width="1.9" marker-end="url(#arr-blue)"/>
+  <path d="M 760 358 H 772 V 478 H 1028" fill="none" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+
+  <!-- P4.0 -> D2 vms (status update) & D6 events -->
+  <path d="M 760 436 H 808 V 242 H 1028" fill="none" stroke="#2563EB" stroke-width="1.7" stroke-dasharray="4,3" marker-end="url(#arr-blue)"/>
+  <path d="M 760 462 H 795 V 558 H 1028" fill="none" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+
+  <!-- P5.0 -> D3 snapshots (read latest) & D6 events (audit log) -->
+  <path d="M 1030 416 H 822 V 536 H 762" fill="none" stroke="#2563EB" stroke-width="1.7" stroke-dasharray="4,3" marker-end="url(#arr-blue)"/>
+  <path d="M 760 558 H 1028" fill="none" stroke="#2563EB" stroke-width="1.9" marker-end="url(#arr-blue)"/>
+
+  <!-- P6.0 -> D5 vm_requests -->
+  <path d="M 760 644 H 1028" fill="none" stroke="#2563EB" stroke-width="1.9" marker-end="url(#arr-blue)"/>
+
+  <!-- P7.0 -> D7 backups -->
+  <path d="M 760 742 H 1028" fill="none" stroke="#2563EB" stroke-width="1.9" marker-end="url(#arr-blue)"/>
+
+  <!-- P8.0 -> D9 notifications -->
+  <path d="M 760 842 H 1028" fill="none" stroke="#2563EB" stroke-width="1.9" marker-end="url(#arr-blue)"/>
+
+  <!-- ================================================================== -->
+  <!-- LAYER 2: FLOW LABELS (Crisp Opaque Pills on Horizontal Segments)   -->
+  <!-- ================================================================== -->
+
+  <!-- Left Labels -->
+  <rect x="285" y="130" width="152" height="22" rx="11" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="361" y="145" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E293B" text-anchor="middle">Login Credentials &amp; Roles</text>
+
+  <rect x="285" y="230" width="152" height="22" rx="11" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="361" y="245" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E293B" text-anchor="middle">VM Policies &amp; Settings</text>
+
+  <rect x="285" y="323" width="152" height="22" rx="11" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="361" y="338" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E293B" text-anchor="middle">Start/End Class Session</text>
+
+  <rect x="292" y="346" width="146" height="20" rx="10" fill="#FFFBEB" stroke="#FDBA74"/>
+  <text x="365" y="360" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" font-weight="600" fill="#9A3412" text-anchor="middle">snapshot take / delete</text>
+
+  <rect x="285" y="451" width="152" height="22" rx="11" fill="#FFFBEB" stroke="#FDBA74"/>
+  <text x="361" y="466" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#9A3412" text-anchor="middle">VMState &amp; Heartbeats</text>
+
+  <rect x="285" y="534" width="152" height="22" rx="11" fill="#FFFBEB" stroke="#FDBA74"/>
+  <text x="361" y="549" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#9A3412" text-anchor="middle">poweroff, restore, startvm</text>
+
+  <rect x="285" y="621" width="152" height="20" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="361" y="635" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" font-weight="600" fill="#475569" text-anchor="middle">Approve / Reject Request</text>
+
+  <rect x="285" y="647" width="152" height="22" rx="11" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="361" y="662" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E293B" text-anchor="middle">Clone &amp; Restore Request</text>
+
+  <rect x="285" y="731" width="152" height="22" rx="11" fill="#FFFBEB" stroke="#FDBA74"/>
+  <text x="361" y="746" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#9A3412" text-anchor="middle">export / import .ova</text>
+
+  <rect x="285" y="831" width="152" height="22" rx="11" fill="#FEF2F2" stroke="#FCA5A5"/>
+  <text x="361" y="846" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#991B1B" text-anchor="middle">SMTP &amp; HMAC Webhook</text>
+
+  <!-- Right Labels -->
+  <rect x="838" y="131" width="156" height="22" rx="11" fill="#EFF6FF" stroke="#93C5FD"/>
+  <text x="916" y="146" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">Verify PBKDF2 / Roles</text>
+
+  <rect x="838" y="217" width="156" height="22" rx="11" fill="#EFF6FF" stroke="#93C5FD"/>
+  <text x="916" y="232" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">Register UUID &amp; Policy</text>
+
+  <rect x="838" y="303" width="156" height="22" rx="11" fill="#EFF6FF" stroke="#93C5FD"/>
+  <text x="916" y="318" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">Runtime Overrides</text>
+
+  <rect x="838" y="387" width="156" height="22" rx="11" fill="#EFF6FF" stroke="#93C5FD"/>
+  <text x="916" y="402" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">Record / Prune Snapshots</text>
+
+  <rect x="838" y="467" width="156" height="22" rx="11" fill="#EFF6FF" stroke="#93C5FD"/>
+  <text x="916" y="482" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">Log Class Session State</text>
+
+  <rect x="838" y="547" width="156" height="22" rx="11" fill="#EFF6FF" stroke="#93C5FD"/>
+  <text x="916" y="562" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">Audit Incidents &amp; Rollback</text>
+
+  <rect x="838" y="633" width="156" height="22" rx="11" fill="#EFF6FF" stroke="#93C5FD"/>
+  <text x="916" y="648" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">Store &amp; Fulfill Clones</text>
+
+  <rect x="838" y="731" width="156" height="22" rx="11" fill="#EFF6FF" stroke="#93C5FD"/>
+  <text x="916" y="746" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">Archive Metadata &amp; Size</text>
+
+  <rect x="838" y="831" width="156" height="22" rx="11" fill="#EFF6FF" stroke="#93C5FD"/>
+  <text x="916" y="846" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#1E40AF" text-anchor="middle">Log Dispatch Status</text>
+
+  <!-- ================================================================== -->
+  <!-- LAYER 3: EXTERNAL INTERACTORS (Left Column)                        -->
+  <!-- ================================================================== -->
+
+  <g transform="translate(30, 120)" filter="url(#shadow1)">
+    <rect width="185" height="68" rx="6" fill="#F1F5F9" stroke="#334155" stroke-width="2"/>
+    <rect width="185" height="22" rx="6" fill="#334155"/>
+    <text x="92" y="15" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL ENTITY</text>
+    <text x="92" y="48" font-family="'Segoe UI', Roboto, sans-serif" font-size="13.5" font-weight="700" fill="#0F172A" text-anchor="middle">Administrator</text>
   </g>
 
-  <g transform="translate(30, 360)" filter="url(#shadow1)">
-    <rect width="130" height="60" rx="4" fill="#F1F5F9" stroke="#334155" stroke-width="2"/>
-    <text x="65" y="35" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#0F172A" text-anchor="middle">Trainer</text>
+  <g transform="translate(30, 312)" filter="url(#shadow1)">
+    <rect width="185" height="68" rx="6" fill="#F1F5F9" stroke="#334155" stroke-width="2"/>
+    <rect width="185" height="22" rx="6" fill="#334155"/>
+    <text x="92" y="15" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL ENTITY</text>
+    <text x="92" y="48" font-family="'Segoe UI', Roboto, sans-serif" font-size="13.5" font-weight="700" fill="#0F172A" text-anchor="middle">Trainer</text>
   </g>
 
-  <g transform="translate(30, 620)" filter="url(#shadow1)">
-    <rect width="130" height="60" rx="4" fill="#F1F5F9" stroke="#334155" stroke-width="2"/>
-    <text x="65" y="35" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#0F172A" text-anchor="middle">Student</text>
+  <g transform="translate(30, 442)" filter="url(#shadow1)">
+    <rect width="185" height="84" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+    <rect width="185" height="22" rx="6" fill="#D97706"/>
+    <text x="92" y="15" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#FFFFFF" text-anchor="middle">HARDWARE HYPERVISOR</text>
+    <text x="92" y="48" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#78350F" text-anchor="middle">Oracle VirtualBox</text>
+    <text x="92" y="68" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#92400E" text-anchor="middle">VBoxManage CLI</text>
   </g>
 
-  <!-- 2 External Entities (Right) -->
-  <g transform="translate(1030, 260)" filter="url(#shadow1)">
-    <rect width="140" height="70" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
-    <text x="70" y="34" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#78350F" text-anchor="middle">VirtualBox</text>
-    <text x="70" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#92400E" text-anchor="middle">Hypervisor Host</text>
+  <g transform="translate(30, 622)" filter="url(#shadow1)">
+    <rect width="185" height="68" rx="6" fill="#F1F5F9" stroke="#334155" stroke-width="2"/>
+    <rect width="185" height="22" rx="6" fill="#334155"/>
+    <text x="92" y="15" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL ENTITY</text>
+    <text x="92" y="48" font-family="'Segoe UI', Roboto, sans-serif" font-size="13.5" font-weight="700" fill="#0F172A" text-anchor="middle">Student</text>
   </g>
 
-  <g transform="translate(1030, 540)" filter="url(#shadow1)">
-    <rect width="140" height="70" rx="4" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
-    <text x="70" y="34" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#991B1B" text-anchor="middle">Notification</text>
-    <text x="70" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#B91C1C" text-anchor="middle">Gateways</text>
+  <g transform="translate(30, 804)" filter="url(#shadow1)">
+    <rect width="185" height="76" rx="6" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+    <rect width="185" height="22" rx="6" fill="#DC2626"/>
+    <text x="92" y="15" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#FFFFFF" text-anchor="middle">EXTERNAL GATEWAY</text>
+    <text x="92" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#991B1B" text-anchor="middle">Alert Gateways</text>
+    <text x="92" y="64" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#B91C1C" text-anchor="middle">SMTP &amp; Webhooks</text>
   </g>
 
-  <!-- 8 PROCESSES (Rounded Blue Cards) -->
-  <!-- P1.0 -->
-  <g transform="translate(250, 95)" filter="url(#shadow1)">
-    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
-    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
-    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">1.0</text>
-    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">User Authentication &amp;</text>
-    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">RBAC Role Enforcement</text>
+  <!-- ================================================================== -->
+  <!-- LAYER 4: 8 PROCESSES (Center Column)                               -->
+  <!-- ================================================================== -->
+
+  <g transform="translate(470, 110)" filter="url(#shadow1)">
+    <rect width="290" height="64" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="30" cy="32" r="16" fill="#2563EB"/>
+    <text x="30" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">1.0</text>
+    <text x="58" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#1E3A8A">User Authentication &amp;</text>
+    <text x="58" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1D4ED8">RBAC Role Enforcement</text>
   </g>
 
-  <!-- P2.0 -->
-  <g transform="translate(250, 195)" filter="url(#shadow1)">
-    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
-    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
-    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">2.0</text>
-    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">VM Registry &amp; Policy</text>
-    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">Configuration Management</text>
+  <g transform="translate(470, 210)" filter="url(#shadow1)">
+    <rect width="290" height="64" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="30" cy="32" r="16" fill="#2563EB"/>
+    <text x="30" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">2.0</text>
+    <text x="58" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#1E3A8A">VM Registry &amp; Policy</text>
+    <text x="58" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1D4ED8">Configuration Management</text>
   </g>
 
-  <!-- P3.0 -->
-  <g transform="translate(250, 295)" filter="url(#shadow1)">
-    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
-    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
-    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">3.0</text>
-    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">Snapshot Automation &amp;</text>
-    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">Pre-Session Baselines</text>
+  <g transform="translate(470, 310)" filter="url(#shadow1)">
+    <rect width="290" height="64" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="30" cy="32" r="16" fill="#2563EB"/>
+    <text x="30" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">3.0</text>
+    <text x="58" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#1E3A8A">Snapshot Automation &amp;</text>
+    <text x="58" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1D4ED8">Pre-Session Baselines</text>
   </g>
 
-  <!-- P4.0 -->
-  <g transform="translate(250, 395)" filter="url(#shadow1)">
-    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
-    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
-    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">4.0</text>
-    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">Guest Heartbeat &amp;</text>
-    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">State Interrogation Loop</text>
+  <g transform="translate(470, 410)" filter="url(#shadow1)">
+    <rect width="290" height="64" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="30" cy="32" r="16" fill="#2563EB"/>
+    <text x="30" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">4.0</text>
+    <text x="58" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#1E3A8A">Guest Heartbeat &amp;</text>
+    <text x="58" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1D4ED8">State Interrogation Loop</text>
   </g>
 
-  <!-- P5.0 -->
-  <g transform="translate(250, 495)" filter="url(#shadow1)">
-    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
-    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
-    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">5.0</text>
-    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">Autonomous Recovery &amp;</text>
-    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">Debounced Rollback</text>
+  <g transform="translate(470, 510)" filter="url(#shadow1)">
+    <rect width="290" height="64" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="30" cy="32" r="16" fill="#2563EB"/>
+    <text x="30" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">5.0</text>
+    <text x="58" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#1E3A8A">Autonomous Recovery &amp;</text>
+    <text x="58" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1D4ED8">Debounced Rollback Engine</text>
   </g>
 
-  <!-- P6.0 -->
-  <g transform="translate(250, 595)" filter="url(#shadow1)">
-    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
-    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
-    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">6.0</text>
-    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">Student VM Provisioning</text>
-    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">&amp; Template Cloning</text>
+  <g transform="translate(470, 610)" filter="url(#shadow1)">
+    <rect width="290" height="64" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="30" cy="32" r="16" fill="#2563EB"/>
+    <text x="30" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">6.0</text>
+    <text x="58" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#1E3A8A">Student VM Provisioning</text>
+    <text x="58" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1D4ED8">&amp; Golden Master Cloning</text>
   </g>
 
-  <!-- P7.0 -->
-  <g transform="translate(250, 695)" filter="url(#shadow1)">
-    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
-    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
-    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">7.0</text>
-    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">Appliance Backup (.ova)</text>
-    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">&amp; Database Hot-Backup</text>
+  <g transform="translate(470, 710)" filter="url(#shadow1)">
+    <rect width="290" height="64" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="30" cy="32" r="16" fill="#2563EB"/>
+    <text x="30" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">7.0</text>
+    <text x="58" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#1E3A8A">Appliance Backup (.ova)</text>
+    <text x="58" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1D4ED8">&amp; Database Hot-Backup</text>
   </g>
 
-  <!-- P8.0 -->
-  <g transform="translate(250, 790)" filter="url(#shadow1)">
-    <rect width="250" height="65" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
-    <circle cx="28" cy="32" r="16" fill="#2563EB"/>
-    <text x="28" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">8.0</text>
-    <text x="56" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#1E3A8A">Multi-Channel Alerting</text>
-    <text x="56" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#1D4ED8">&amp; Signed Webhooks</text>
+  <g transform="translate(470, 810)" filter="url(#shadow1)">
+    <rect width="290" height="64" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+    <circle cx="30" cy="32" r="16" fill="#2563EB"/>
+    <text x="30" y="37" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">8.0</text>
+    <text x="58" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#1E3A8A">Multi-Channel Alerting</text>
+    <text x="58" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#1D4ED8">&amp; Signed Webhooks</text>
   </g>
 
-  <!-- 9 DATA STORES (Center-Right, Open Double-Line Store Boxes) -->
-  <g transform="translate(680, 100)">
-    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
-    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
-    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D1</text>
-    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">users (Auth &amp; Roles)</text>
+  <!-- ================================================================== -->
+  <!-- LAYER 5: 9 DATA STORES (Right Column, Gane-Sarson Open-Right)      -->
+  <!-- ================================================================== -->
+
+  <g transform="translate(1030, 118)">
+    <rect x="0" y="0" width="295" height="48" fill="#F8FAFC"/>
+    <path d="M 295 0 H 0 V 48 H 295" stroke="#334155" stroke-width="2" fill="none"/>
+    <line x1="48" y1="0" x2="48" y2="48" stroke="#334155" stroke-width="1.8"/>
+    <text x="24" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#2563EB" text-anchor="middle">D1</text>
+    <text x="62" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">users (Auth &amp; Roles)</text>
   </g>
 
-  <g transform="translate(680, 180)">
-    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
-    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
-    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D2</text>
-    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">vms (Hardware Registry)</text>
+  <g transform="translate(1030, 204)">
+    <rect x="0" y="0" width="295" height="48" fill="#F8FAFC"/>
+    <path d="M 295 0 H 0 V 48 H 295" stroke="#334155" stroke-width="2" fill="none"/>
+    <line x1="48" y1="0" x2="48" y2="48" stroke="#334155" stroke-width="1.8"/>
+    <text x="24" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#2563EB" text-anchor="middle">D2</text>
+    <text x="62" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">vms (Hardware Registry)</text>
   </g>
 
-  <g transform="translate(680, 260)">
-    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
-    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
-    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D3</text>
-    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">snapshots (Point-in-Time)</text>
+  <g transform="translate(1030, 290)">
+    <rect x="0" y="0" width="295" height="48" fill="#F8FAFC"/>
+    <path d="M 295 0 H 0 V 48 H 295" stroke="#334155" stroke-width="2" fill="none"/>
+    <line x1="48" y1="0" x2="48" y2="48" stroke="#334155" stroke-width="1.8"/>
+    <text x="24" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#2563EB" text-anchor="middle">D8</text>
+    <text x="62" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">app_settings (Overrides)</text>
   </g>
 
-  <g transform="translate(680, 340)">
-    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
-    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
-    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D4</text>
-    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">class_sessions (Classes)</text>
+  <g transform="translate(1030, 376)">
+    <rect x="0" y="0" width="295" height="48" fill="#F8FAFC"/>
+    <path d="M 295 0 H 0 V 48 H 295" stroke="#334155" stroke-width="2" fill="none"/>
+    <line x1="48" y1="0" x2="48" y2="48" stroke="#334155" stroke-width="1.8"/>
+    <text x="24" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#2563EB" text-anchor="middle">D3</text>
+    <text x="62" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">snapshots (Point-in-Time)</text>
   </g>
 
-  <g transform="translate(680, 420)">
-    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
-    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
-    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D5</text>
-    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">vm_requests (Clones)</text>
+  <g transform="translate(1030, 454)">
+    <rect x="0" y="0" width="295" height="48" fill="#F8FAFC"/>
+    <path d="M 295 0 H 0 V 48 H 295" stroke="#334155" stroke-width="2" fill="none"/>
+    <line x1="48" y1="0" x2="48" y2="48" stroke="#334155" stroke-width="1.8"/>
+    <text x="24" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#2563EB" text-anchor="middle">D4</text>
+    <text x="62" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">class_sessions (Classes)</text>
   </g>
 
-  <g transform="translate(680, 500)">
-    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
-    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
-    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D6</text>
-    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">events (Audit Log)</text>
+  <g transform="translate(1030, 534)">
+    <rect x="0" y="0" width="295" height="48" fill="#F8FAFC"/>
+    <path d="M 295 0 H 0 V 48 H 295" stroke="#334155" stroke-width="2" fill="none"/>
+    <line x1="48" y1="0" x2="48" y2="48" stroke="#334155" stroke-width="1.8"/>
+    <text x="24" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#2563EB" text-anchor="middle">D6</text>
+    <text x="62" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">events (Immutable Audit Log)</text>
   </g>
 
-  <g transform="translate(680, 580)">
-    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
-    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
-    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D7</text>
-    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">backups (.ova Appliances)</text>
+  <g transform="translate(1030, 620)">
+    <rect x="0" y="0" width="295" height="48" fill="#F8FAFC"/>
+    <path d="M 295 0 H 0 V 48 H 295" stroke="#334155" stroke-width="2" fill="none"/>
+    <line x1="48" y1="0" x2="48" y2="48" stroke="#334155" stroke-width="1.8"/>
+    <text x="24" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#2563EB" text-anchor="middle">D5</text>
+    <text x="62" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">vm_requests (Student Clones)</text>
   </g>
 
-  <g transform="translate(680, 660)">
-    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
-    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
-    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D8</text>
-    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">app_settings (Overrides)</text>
+  <g transform="translate(1030, 718)">
+    <rect x="0" y="0" width="295" height="48" fill="#F8FAFC"/>
+    <path d="M 295 0 H 0 V 48 H 295" stroke="#334155" stroke-width="2" fill="none"/>
+    <line x1="48" y1="0" x2="48" y2="48" stroke="#334155" stroke-width="1.8"/>
+    <text x="24" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#2563EB" text-anchor="middle">D7</text>
+    <text x="62" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">backups (.ova Appliances)</text>
   </g>
 
-  <g transform="translate(680, 740)">
-    <path d="M 0 0 L 220 0 M 0 45 L 220 45" stroke="#475569" stroke-width="2" fill="none"/>
-    <rect x="0" y="2" width="220" height="41" fill="#F8FAFC"/>
-    <text x="15" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#2563EB">D9</text>
-    <text x="50" y="27" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">notifications (Dispatches)</text>
+  <g transform="translate(1030, 818)">
+    <rect x="0" y="0" width="295" height="48" fill="#F8FAFC"/>
+    <path d="M 295 0 H 0 V 48 H 295" stroke="#334155" stroke-width="2" fill="none"/>
+    <line x1="48" y1="0" x2="48" y2="48" stroke="#334155" stroke-width="1.8"/>
+    <text x="24" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="700" fill="#2563EB" text-anchor="middle">D9</text>
+    <text x="62" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0F172A">notifications (Dispatches)</text>
   </g>
 
-  <!-- Connectors (Entities to Processes) -->
-  <path d="M 160 135 L 250 135" stroke="#334155" stroke-width="1.8" marker-end="url(#arr)"/>
-  <path d="M 160 150 L 210 150 L 210 225 L 250 225" stroke="#334155" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
-  <path d="M 160 380 L 250 325" stroke="#334155" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
-  <path d="M 160 400 L 250 525" stroke="#334155" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
-  <path d="M 160 650 L 250 625" stroke="#334155" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
-
-  <!-- Connectors (Processes to Data Stores) -->
-  <path d="M 500 130 L 680 120" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
-  <path d="M 500 225 L 680 200" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
-  <path d="M 500 325 L 680 280" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
-  <path d="M 500 425 L 680 215" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
-  <path d="M 500 525 L 680 290" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
-  <path d="M 500 625 L 680 440" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
-  <path d="M 500 725 L 680 600" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
-  <path d="M 500 815 L 680 760" stroke="#2563EB" stroke-width="1.8" marker-end="url(#arr-blue)"/>
-
-  <!-- Connectors (Processes to VirtualBox / Notifications) -->
-  <path d="M 500 335 L 1030 290" stroke="#D97706" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
-  <path d="M 1030 305 L 500 435" stroke="#D97706" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
-  <path d="M 500 535 L 1030 320" stroke="#D97706" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
-  <path d="M 500 830 L 1030 575" stroke="#DC2626" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
+  <!-- Legend Footer -->
+  <rect x="30" y="902" width="1295" height="36" rx="6" fill="#F8FAFC" stroke="#CBD5E1"/>
+  <text x="678" y="925" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569" text-anchor="middle">
+    Notation: Gane-Sarson / Yourdon-DeMarco Standard — Rectangles: External Interactors | Rounded Cards: System Processes (1.0–8.0) | Open-Right Boxes: SQLite / Supabase Data Stores (D1–D9)
+  </text>
 </svg>'''
     with open('Milestones/figures/fig2_3_3b_dfd_level1.svg', 'w') as f:
         f.write(svg)
