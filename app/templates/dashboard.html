@@ -22,16 +22,34 @@
 {% endif %}
 
 {% if user.role == 'student' %}
+  <div class="cards">
+    <div class="card">Assigned VMs<b>{{ student_counts.assigned }}</b></div>
+    <div class="card green">Running<b>{{ student_counts.running }}</b></div>
+    {% if student_counts.needs_attention %}
+    <div class="card red">Needs Attention<b>{{ student_counts.needs_attention }}</b></div>
+    {% endif %}
+    <div class="card {{ 'amber' if student_counts.pending_requests else '' }}">Pending Requests<b><a href="{{ url_for('main.requests_list') }}" style="color:inherit;text-decoration:none">{{ student_counts.pending_requests }}</a></b></div>
+    <div class="card {{ 'green' if monitoring_active else 'amber' }}" title="Last monitoring cycle: {{ worker_last_cycle or 'not yet run' }}">
+      Monitoring Service<b>{{ 'Active' if monitoring_active else 'Standby' }}</b>
+    </div>
+  </div>
+
   <div class="panel">
     <h4>Student Workstation</h4>
-    <p class="muted" style="margin-bottom:12px">Your training virtual machine is monitored by the automated recovery system. If your environment freezes or crashes, it can be restored to your latest snapshot.</p>
+    <p class="muted" style="margin-bottom:12px">Your training virtual machine is monitored by the automated recovery system. If your environment freezes or crashes, it is automatically restored to your latest protected snapshot.</p>
     {% if student_vms %}
       <div class="table-wrap"><table>
-        <tr><th>Virtual Machine</th><th>Status</th><th>Last Protected Snapshot</th><th>Action</th></tr>
+        <tr><th>Virtual Machine</th><th>Status</th><th>Last Checked</th><th>Last Protected Snapshot</th><th>Action</th></tr>
         {% for vm in student_vms %}
         <tr>
           <td><b>{{ vm.vm_name }}</b> ({{ vm.class_group }})</td>
-          <td><span class="pill {{ pill(vm.status) }}">{{ vm.status|capitalize }}</span></td>
+          <td>
+            <span class="pill {{ pill(vm.status) }}">{{ vm.status|capitalize }}</span>
+            {% if vm.status in ('crashed', 'frozen') %}
+              <span class="badge" style="background:#fee2e2;color:#991b1b;border:1px solid #f87171;font-size:10px;font-weight:700;display:inline-block;margin-top:2px">AUTO-RECOVERY ACTIVE</span>
+            {% endif %}
+          </td>
+          <td class="muted">{{ vm.last_checked or 'Pending check' }}</td>
           <td>{{ vm.last_snapshot or 'No snapshots recorded yet' }}</td>
           <td>
             <form class="inline" method="post" action="{{ url_for('main.request_restore', vm_id=vm.vm_id) }}">
@@ -47,6 +65,32 @@
       <a href="{{ url_for('main.requests_list') }}" class="btn">Request New VM from Template</a>
     {% endif %}
   </div>
+
+  {% if student_requests %}
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h4 style="margin:0">My Recent VM Requests</h4>
+      <a href="{{ url_for('main.requests_list') }}" class="btn s">View All Requests</a>
+    </div>
+    <div class="table-wrap"><table>
+      <tr><th>Requested VM</th><th>Template</th><th>Class Group</th><th>Status</th><th>Submitted</th></tr>
+      {% for r in student_requests %}
+      <tr>
+        <td><b>{{ r.requested_name }}</b></td>
+        <td>{{ r.template_name }}</td>
+        <td>{{ r.class_group }}</td>
+        <td>
+          <span class="pill {{ 'g' if r.status == 'approved' else ('r' if r.status in ('rejected','failed') else 'o') }}">{{ r.status|capitalize }}</span>
+          {% if r.status == 'rejected' and r.rejection_reason %}
+            <div class="muted" style="font-size:11px;margin-top:2px">{{ r.rejection_reason }}</div>
+          {% endif %}
+        </td>
+        <td class="muted">{{ r.created_at }}</td>
+      </tr>
+      {% endfor %}
+    </table></div>
+  </div>
+  {% endif %}
 
 {% else %}
   <div class="cards">

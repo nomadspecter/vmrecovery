@@ -256,7 +256,23 @@ def dashboard():
     conn = get_db()
     if g.user["role"] == "student":
         student_vms = services.get_student_vms(conn, g.user["user_id"])
-        return render_template("dashboard.html", student_vms=student_vms)
+        student_requests = services.list_vm_requests(conn, user_id=g.user["user_id"])
+        worker_state, worker_stale = _worker_state()
+        student_counts = {
+            "assigned": len(student_vms),
+            "running": sum(1 for v in student_vms if v["status"] == "running"),
+            "needs_attention": sum(1 for v in student_vms if v["status"] in ("frozen", "crashed", "needs_admin")),
+            "pending_requests": sum(1 for r in student_requests if r["status"] in ("pending", "creating")),
+        }
+        monitoring_active = bool(worker_state and worker_state.get("running") and not worker_stale)
+        return render_template(
+            "dashboard.html",
+            student_vms=student_vms,
+            student_requests=student_requests[:5],
+            student_counts=student_counts,
+            monitoring_active=monitoring_active,
+            worker_last_cycle=worker_state.get("last_cycle") if worker_state else None,
+        )
     data = services.dashboard_data(conn, settings=settings(), vbox=vbox())
     pending = services.pending_requests(conn) if g.user["role"] == "admin" else []
     return render_template("dashboard.html", pending=pending, **data)
