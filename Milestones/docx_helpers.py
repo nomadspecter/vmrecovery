@@ -111,7 +111,32 @@ def add_image_box(doc, img_path, caption_text, width=Inches(6.0)):
     else:
         print(f"Warning: image path not found: {img_path}")
 
-def add_code_snippet(doc, code_str, caption_title):
+def add_code_snippet(doc, code_str, caption_title, img_path=None):
+    # Auto-map to VS Code screenshots if not explicitly provided
+    if not img_path:
+        mapping = {
+            'Listing 3.3.1': 'Milestones/figures/code_3_3_db_wal.png',
+            'Listing 3.4.1': 'Milestones/figures/code_3_4_auth.png',
+            'Listing 3.5.1': 'Milestones/figures/code_3_5_vbox.png',
+            'Listing 3.6.1': 'Milestones/figures/code_3_6_worker.png',
+            'Listing 4.1.1': 'Milestones/figures/code_4_1_snapshot.png',
+            'Listing 4.2.1': 'Milestones/figures/code_4_2_recovery.png',
+            'Listing 4.3.1': 'Milestones/figures/code_4_3_backup.png',
+            'Listing 4.4.1': 'Milestones/figures/code_4_4_provisioning.png',
+            'Listing 4.5.1': 'Milestones/figures/code_4_5_notifier.png',
+            'Listing 4.6.1': 'Milestones/figures/code_4_6_api.png',
+            'Listing 4.11.1': 'Milestones/figures/code_4_11_systemd.png',
+            'Listing 4.13.1': 'Milestones/figures/code_4_13_s3_sync.png',
+        }
+        for prefix, path in mapping.items():
+            if prefix in caption_title:
+                img_path = path
+                break
+
+    if img_path and os.path.exists(img_path):
+        add_image_box(doc, img_path, caption_title, width=Inches(6.2))
+        return
+
     add_caption(doc, caption_title)
     tbl = doc.add_table(rows=1, cols=1)
     tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
