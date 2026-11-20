@@ -33,7 +33,7 @@ def set_table_borders(table):
                         f'</w:tblBorders>')
     tblPr.append(borders)
 
-def add_p(doc, text, style=None, bold_prefix="", italic=False, align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=10, line_spacing=1.15):
+def add_p(doc, text, style=None, bold_prefix="", italic=False, align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=6, line_spacing=1.15):
     p = doc.add_paragraph()
     p.alignment = align
     p.paragraph_format.space_after = Pt(space_after)
@@ -56,8 +56,9 @@ def add_heading_1(doc, text):
     p = doc.add_paragraph()
     p.style = 'Heading 1'
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    p.paragraph_format.space_before = Pt(18)
-    p.paragraph_format.space_after = Pt(8)
+    p.paragraph_format.space_before = Pt(12)
+    p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.keep_with_next = True
     r = p.add_run(text)
     r.font.name = 'Montserrat Medium'
     r.font.size = Pt(15)
@@ -68,8 +69,9 @@ def add_heading_2(doc, text):
     p = doc.add_paragraph()
     p.style = 'Heading 2'
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    p.paragraph_format.space_before = Pt(14)
-    p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.space_before = Pt(10)
+    p.paragraph_format.space_after = Pt(4)
+    p.paragraph_format.keep_with_next = True
     r = p.add_run(text)
     r.font.name = 'Montserrat Medium'
     r.font.size = Pt(13)
@@ -80,8 +82,9 @@ def add_heading_3(doc, text):
     p = doc.add_paragraph()
     p.style = 'Heading 3'
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    p.paragraph_format.space_before = Pt(10)
-    p.paragraph_format.space_after = Pt(4)
+    p.paragraph_format.space_before = Pt(8)
+    p.paragraph_format.space_after = Pt(3)
+    p.paragraph_format.keep_with_next = True
     r = p.add_run(text)
     r.font.name = 'Montserrat Medium'
     r.font.size = Pt(12)
@@ -90,23 +93,37 @@ def add_heading_3(doc, text):
 
 def add_caption(doc, text):
     p = doc.add_paragraph()
-    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    p.paragraph_format.space_before = Pt(6)
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(3)
     p.paragraph_format.space_after = Pt(6)
     r = p.add_run(text)
     r.font.name = 'Montserrat Medium'
-    r.font.size = Pt(11)
+    r.font.size = Pt(10.5)
     r.bold = True
     return p
 
-def add_image_box(doc, img_path, caption_text, width=Inches(6.0)):
+def add_image_box(doc, img_path, caption_text, width=Inches(5.6), max_height=Inches(3.85)):
     if os.path.exists(img_path):
+        from PIL import Image
+        with Image.open(img_path) as im:
+            iw, ih = im.size
+        ratio = iw / ih
+        w_in = width.inches if hasattr(width, 'inches') else float(width)
+        max_h_in = max_height.inches if hasattr(max_height, 'inches') else float(max_height)
+        if w_in > 5.8:
+            w_in = 5.8
+        h_in = w_in / ratio
+        if h_in > max_h_in:
+            h_in = max_h_in
+            w_in = h_in * ratio
+
         p_img = doc.add_paragraph()
         p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img.paragraph_format.space_before = Pt(8)
-        p_img.paragraph_format.space_after = Pt(4)
+        p_img.paragraph_format.space_before = Pt(4)
+        p_img.paragraph_format.space_after = Pt(2)
+        p_img.paragraph_format.keep_with_next = True
         run = p_img.add_run()
-        run.add_picture(img_path, width=width)
+        run.add_picture(img_path, width=Inches(w_in), height=Inches(h_in))
         add_caption(doc, caption_text)
     else:
         print(f"Warning: image path not found: {img_path}")
@@ -134,7 +151,7 @@ def add_code_snippet(doc, code_str, caption_title, img_path=None):
                 break
 
     if img_path and os.path.exists(img_path):
-        add_image_box(doc, img_path, caption_title, width=Inches(6.2))
+        add_image_box(doc, img_path, caption_title, width=Inches(5.8), max_height=Inches(3.95))
         return
 
     add_caption(doc, caption_title)

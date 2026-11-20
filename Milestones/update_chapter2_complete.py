@@ -1,5 +1,6 @@
 import os
 import docx
+from PIL import Image
 from docx.shared import Inches, Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx_helpers import set_cell_margins, set_cell_shading, set_table_borders, add_heading_3, add_caption, add_p
@@ -8,7 +9,7 @@ def update_chapter2_doc(doc_path):
     print(f"Loading {doc_path} for Chapter Two complete update...")
     doc = docx.Document(doc_path)
 
-    # 1. Update Image Blobs for Figures in Chapter Two
+    # 1. Update Image Blobs AND True Aspect-Ratio Dimensions for Figures in Chapter Two
     replacements = {
         'rId11': 'Milestones/figures/screen_login.png',                # Figure 2.2.1 Login page
         'rId12': 'Milestones/figures/screen_dashboard.png',            # Figure 2.2.2 Dashboard
@@ -18,8 +19,8 @@ def update_chapter2_doc(doc_path):
         'rId16': 'Milestones/figures/screen_reports.png',              # Figure 2.2.6 Reports
         'rId26': 'Milestones/figures/screen_requests.png',             # Figure 2.2.7 VM Provisioning Requests
         'rId27': 'Milestones/figures/screen_system.png',               # Figure 2.2.8 System Health & Notification Audit
-        'rId20': 'Milestones/figures/fig2_3_3a_dfd_level0.png',        # Figure 2.3.3a Level 0 DFD (from SVG)
-        'rId21': 'Milestones/figures/fig2_3_3b_dfd_level1.png',        # Figure 2.3.3b Level 1 DFD (from SVG)
+        'rId20': 'Milestones/figures/fig2_3_3a_dfd_level0.png',        # Figure 2.3.3a Level 0 DFD (4K SVG)
+        'rId21': 'Milestones/figures/fig2_3_3b_dfd_level1.png',        # Figure 2.3.3b Level 1 DFD (4K SVG)
         'rId22': 'Milestones/figures/fig2_3_4_erd_complete.png',       # Figure 2.3.4 Complete ERD (from SVG)
         'rId23': 'Milestones/figures/fig2_3_5_use_case_complete.png',  # Figure 2.3.5 Complete Use Case (from SVG)
         'rId24': 'Milestones/figures/fig2_3_6_class_diagram_complete.png' # Figure 2.3.6 Complete Class Diagram (from SVG)
@@ -32,6 +33,43 @@ def update_chapter2_doc(doc_path):
             print(f"  -> Replaced image for {rid} with {img_file}")
         else:
             print(f"  -> Warning: {rid} not found in doc or {img_file} missing")
+
+    # Fix inline_shape width & height to match each replacement PNG's TRUE aspect ratio
+    # (prevents Word from squishing Level 0 DFD to 6.25"x1.79" or stretching Level 1 DFD!)
+    max_w_in = 5.8
+    max_h_in = 4.2
+    for shape in doc.inline_shapes:
+        blip = shape._inline.xpath('.//a:blip/@r:embed')
+        rid = blip[0] if blip else None
+        if rid in replacements and os.path.exists(replacements[rid]):
+            with Image.open(replacements[rid]) as im:
+                iw, ih = im.size
+            ratio = iw / ih
+            w_in = max_w_in
+            h_in = w_in / ratio
+            if h_in > max_h_in:
+                h_in = max_h_in
+                w_in = h_in * ratio
+            new_cx = int(Inches(w_in))
+            new_cy = int(Inches(h_in))
+            shape.width = new_cx
+            shape.height = new_cy
+            # Also sync inner <a:ext> inside <pic:spPr><a:xfrm> so LibreOffice & Word both respect it
+            for ext in shape._inline.xpath('.//a:ext'):
+                ext.set('cx', str(new_cx))
+                ext.set('cy', str(new_cy))
+
+    # Remove unnecessary mid-Chapter-2 page breaks that cause half-page blank white gaps
+    for idx, p in enumerate(list(doc.paragraphs)):
+        brs = p._p.xpath('.//w:br[@w:type="page"]')
+        if brs and idx > 0:
+            prev_txt = doc.paragraphs[idx - 1].text.strip()
+            if prev_txt.startswith("The first flowchart follows") or prev_txt.startswith("The context diagram"):
+                for br in brs:
+                    br.getparent().remove(br)
+                if not p.text.strip() and not p._p.xpath('.//w:drawing'):
+                    p._element.getparent().remove(p._element)
+                print(f"  -> Removed unnecessary mid-section page break after: {prev_txt[:45]!r}")
 
     # 2. Update Narrative Paragraphs in Chapter One and Chapter Two
     for i, p in enumerate(doc.paragraphs):

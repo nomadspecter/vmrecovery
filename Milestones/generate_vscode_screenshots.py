@@ -47,42 +47,61 @@ def render_vscode_screenshot(page, code_text, filepath, start_line=1, lexer=Pyth
     display: inline-block;
   }}
   .vscode-window {{
-    width: 960px;
+    width: 980px;
     background: #1E1E1E;
-    border-radius: 10px;
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 0 1px #3C3C3C;
     overflow: hidden;
-    font-family: 'Consolas', 'Fira Code', 'DejaVu Sans Mono', 'Courier New', monospace;
+    font-family: 'DejaVu Sans Mono', 'Fira Code', 'Consolas', monospace;
   }}
   .title-bar {{
-    background: #2D2D2D;
-    height: 38px;
+    background: #323233;
+    height: 34px;
     display: flex;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 0 0 10px;
     user-select: none;
-    border-bottom: 1px solid #181818;
+    border-bottom: 1px solid #1E1E1E;
+    font-family: 'Segoe UI', Roboto, Ubuntu, sans-serif;
   }}
-  .traffic-lights {{
+  .vscode-menu {{
     display: flex;
-    gap: 8px;
-    margin-right: 18px;
+    align-items: center;
+    gap: 10px;
+    color: #CCCCCC;
+    font-size: 12px;
   }}
-  .traffic-light {{
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
+  .vscode-logo {{
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #007ACC;
+    font-weight: 800;
+    font-size: 13px;
+    margin-right: 2px;
   }}
-  .tl-red {{ background: #FF5F56; border: 1px solid #E0443E; }}
-  .tl-yellow {{ background: #FFBD2E; border: 1px solid #DEA123; }}
-  .tl-green {{ background: #27C93F; border: 1px solid #1AAB29; }}
   .title-text {{
     flex: 1;
     text-align: center;
     color: #CCCCCC;
-    font-size: 13px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    letter-spacing: 0.3px;
+    font-size: 12.5px;
+    font-family: 'Segoe UI', Roboto, Ubuntu, sans-serif;
+    letter-spacing: 0.2px;
+  }}
+  .win-controls {{
+    display: flex;
+    height: 34px;
+  }}
+  .win-btn {{
+    width: 38px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #CCCCCC;
+    font-size: 12px;
   }}
   .tabs-bar {{
     background: #252526;
@@ -172,12 +191,22 @@ def render_vscode_screenshot(page, code_text, filepath, start_line=1, lexer=Pyth
 <body>
   <div class="vscode-window">
     <div class="title-bar">
-      <div class="traffic-lights">
-        <div class="traffic-light tl-red"></div>
-        <div class="traffic-light tl-yellow"></div>
-        <div class="traffic-light tl-green"></div>
+      <div class="vscode-menu">
+        <span class="vscode-logo">❖</span>
+        <span>File</span>
+        <span>Edit</span>
+        <span>Selection</span>
+        <span>View</span>
+        <span>Go</span>
+        <span>Run</span>
+        <span>Terminal</span>
       </div>
-      <div class="title-text">{filename} — vmrecovery [Visual Studio Code]</div>
+      <div class="title-text">{filename} — vmrecovery — Visual Studio Code</div>
+      <div class="win-controls">
+        <div class="win-btn">─</div>
+        <div class="win-btn">□</div>
+        <div class="win-btn">✕</div>
+      </div>
     </div>
     <div class="tabs-bar">
       <div class="tab">
@@ -194,13 +223,14 @@ def render_vscode_screenshot(page, code_text, filepath, start_line=1, lexer=Pyth
     </div>
     <div class="status-bar">
       <div class="status-left">
-        <span>⎇ main*</span>
+        <span>⎇ main</span>
         <span>⊗ 0  ⚠ 0</span>
       </div>
       <div class="status-right">
         <span>Ln {start_line}, Col 1</span>
         <span>Spaces: 4</span>
         <span>UTF-8</span>
+        <span>LF</span>
         <span>{lang_label}</span>
       </div>
     </div>
@@ -500,7 +530,8 @@ WantedBy=multi-user.target'''
         m = re.search(r"://([^:]+):([^@]+)@db\\.([a-z0-9]+)\\.supabase\\.co", url)
         if m:
             _, pw, ref = m.groups()
-            pooler = f"postgresql://postgres.{ref}:{pw}@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
+            host = "aws-0-eu-central-1.pooler.supabase.com:5432"
+            pooler = f"postgresql://postgres.{ref}:{pw}@{host}/postgres?sslmode=require"
             return PgConnectionWrapper(psycopg2.connect(pooler, connect_timeout=10))
         raise
 

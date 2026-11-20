@@ -176,7 +176,7 @@ def generate_dfd_level0_svg():
 </svg>'''
     with open('Milestones/figures/fig2_3_3a_dfd_level0.svg', 'w') as f:
         f.write(svg)
-    subprocess.run(['rsvg-convert', '-z', '2.5', 'Milestones/figures/fig2_3_3a_dfd_level0.svg', '-o', 'Milestones/figures/fig2_3_3a_dfd_level0.png'], check=True)
+    subprocess.run(['rsvg-convert', '-z', '3.5', 'Milestones/figures/fig2_3_3a_dfd_level0.svg', '-o', 'Milestones/figures/fig2_3_3a_dfd_level0.png'], check=True)
     print("Generated Native SVG: fig2_3_3a_dfd_level0.svg -> PNG")
 
 # -----------------------------------------------------------------------------
@@ -529,7 +529,7 @@ def generate_dfd_level1_svg():
 </svg>'''
     with open('Milestones/figures/fig2_3_3b_dfd_level1.svg', 'w') as f:
         f.write(svg)
-    subprocess.run(['rsvg-convert', '-z', '2.5', 'Milestones/figures/fig2_3_3b_dfd_level1.svg', '-o', 'Milestones/figures/fig2_3_3b_dfd_level1.png'], check=True)
+    subprocess.run(['rsvg-convert', '-z', '3.5', 'Milestones/figures/fig2_3_3b_dfd_level1.svg', '-o', 'Milestones/figures/fig2_3_3b_dfd_level1.png'], check=True)
     print("Generated Native SVG: fig2_3_3b_dfd_level1.svg -> PNG")
 
 # -----------------------------------------------------------------------------
