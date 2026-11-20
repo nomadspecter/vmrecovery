@@ -37,7 +37,7 @@ def connect(path: str):
     conn.execute("PRAGMA busy_timeout = 15000")
     conn.execute("PRAGMA foreign_keys = ON")
     # The journal mode is a property of the file, not of the connection, so
-    # it only has to be set once. Asking for it on every connection takes a
+    # it only has to be set onedece. Asking for it on every connection takes a
     # lock for nothing, and that lock is what the rest of the system waits on.
     if conn.execute("PRAGMA journal_mode").fetchone()[0].lower() != "wal":
         conn.execute("PRAGMA journal_mode = WAL")
