@@ -62,9 +62,10 @@ def build_milestone5():
     )
     add_p(doc,
         "The systemd service unit implements modern Linux security hardening directives while preserving VirtualBox hypervisor compatibility:\n"
-        "• NoNewPrivileges=true: Prevents child processes from gaining elevated privileges via setuid binaries.\n"
         "• ProtectSystem=full: Mounts /usr, /boot, and /etc as read-only to prevent unauthorized system modifications.\n"
         "• UMask=0077: Enforces strict file permissions, ensuring that database files, logs, and snapshot records are readable only by the service owner.\n"
+        "• NoNewPrivileges (Deliberately Omitted): VirtualBox's headless runner (/usr/lib/virtualbox/VBoxHeadless) is a setuid-root binary required to "
+        "access /dev/vboxdrv. Enabling NoNewPrivileges=true blocks setuid execution and causes VMs to terminate on startup with exit code 1 (0x1).\n"
         "• PrivateTmp=false (Deliberately Disabled): VirtualBox relies on an Inter-Process Communication (IPC) socket located in /tmp/.vbox-$USER-ipc "
         "to communicate with its background daemon (VBoxSVC). Enabling PrivateTmp isolates the temporary file system, which severs IPC communication; "
         "deliberately leaving PrivateTmp disabled ensures uninterrupted hypervisor access.",

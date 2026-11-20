@@ -197,6 +197,17 @@ def create_backup(conn, vbox, vm, backup_dir):
         "registers it in the database, assigns ownership to the student, and transitions the request status to 'ready'. If a provisioning error occurs "
         "(such as naming collisions or disk limits), purge_clone_leftovers() automatically rolls back orphaned VirtualBox artifacts, leaving the hypervisor clean."
     )
+    add_p(doc,
+        "Student Dashboard Status Overview: Once authenticated, students land on a dedicated, RBAC-scoped Student Dashboard (app/views.py & "
+        "app/templates/dashboard.html) providing real-time visibility into their laboratory environment without exposing other students' machines:\n"
+        "• Live Status Summary Cards: Displays Assigned VMs, Running count, Needs Attention alerts (if any VM is frozen or crashed), Pending VM Requests, "
+        "and a live Monitoring Service indicator (Active/Standby with the background daemon's last polling timestamp).\n"
+        "• Workstation Telemetry Table: Lists each assigned VM with its live power/health badge, Last Checked timestamp, Last Protected Snapshot, "
+        "an AUTO-RECOVERY ACTIVE indicator during automated healing, and a one-click Request Restore action.\n"
+        "• My Recent VM Requests Panel: Tracks the student's 5 most recent Golden Master clone requests directly on the dashboard with color-coded "
+        "status pills (Pending, Creating, Approved, or Rejected with instructor feedback).",
+        align=WD_ALIGN_PARAGRAPH.LEFT
+    )
 
     code_3_11 = '''# app/services.py: Golden Master template provisioning and cloning workflow
 def approve_vm_request(conn, vbox, request_id, approved_by_user_id):
@@ -407,7 +418,7 @@ def require_token(f):
                   "Figure 4.6: MTTR Analytics and Weekly Virtual Machine Reliability Report", width=Inches(6.0))
 
     add_image_box(doc, 'Milestones/figures/screen_student_dashboard.png', 
-                  "Figure 4.7: Student Dedicated Laboratory Dashboard (VM State & Active Session Monitoring)", width=Inches(6.0))
+                  "Figure 4.7: Student Dedicated Laboratory Dashboard (Live Status Cards, VM Telemetry & Request Tracking)", width=Inches(6.0))
 
     # 4.9 Summary of Core Implementation and Testing
     add_heading_2(doc, "4.9 Summary of Core Implementation and Testing")

@@ -671,7 +671,7 @@ def build_presentation():
         s_ui, 6.83, 5.42, 5.75, 1.40,
         "Student Self-Service Portal (RBAC-Scoped)",
         [
-            "Role-isolated view allowing students to monitor assigned lab VMs, request emergency snapshot restores, and request Golden Master clones."
+            "Live status cards (Assigned VMs, Running, Pending Requests, Monitoring Service), Last Checked telemetry, one-click restore requests, and recent VM clone tracking."
         ],
         accent_color=MAROON, title_size=12.5, body_size=10.5
     )
