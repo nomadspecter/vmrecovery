@@ -3,7 +3,7 @@
 ## The shape of the system
 
 ```
-   browser / LAN (HTTPS:443)  ──► [ Nginx Reverse Proxy & SSL Termination ]
+   browser / Clients  ──► [ Cloudflare Zero-Trust Edge / Render Cloud Proxy ]
                                        │ HTTP (127.0.0.1:5000)
                                        ▼
                        ┌──────────────────────────────────────────┐

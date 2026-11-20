@@ -126,7 +126,7 @@ def add_code_snippet(doc, code_str, caption_title, img_path=None):
             'Listing 4.5.1': 'Milestones/figures/code_4_5_notifier.png',
             'Listing 4.6.1': 'Milestones/figures/code_4_6_api.png',
             'Listing 4.11.1': 'Milestones/figures/code_4_11_systemd.png',
-            'Listing 4.13.1': 'Milestones/figures/code_4_13_s3_sync.png',
+            'Listing 4.13.1': 'Milestones/figures/code_4_13_supabase_pg.png',
         }
         for prefix, path in mapping.items():
             if prefix in caption_title:

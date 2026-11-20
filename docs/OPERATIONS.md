@@ -106,28 +106,27 @@ the worker cleanly and exits.
 
 ---
 
-## 3. Nginx Reverse Proxy with SSL
+## 3. Secure Ingress with Cloudflare Zero-Trust Tunnel & Cloud Deployment
 
-For production access across the local lab network, run Nginx as a reverse proxy in front of Waitress:
+For secure off-premises and campus-wide access without port forwarding or exposed router ports, use the Cloudflare Zero-Trust tunnel (`cloudflared`):
 
 ```bash
-# Run the automated Nginx & SSL setup script:
-sudo ./deploy/setup_nginx_ssl.sh
+# Run the automated Cloudflare tunnel setup script:
+./deploy/install_cloudflare_tunnel.sh
 ```
 
-This script:
-1. Generates an SSL certificate with Subject Alternative Names (SAN) for `localhost`, the hostname, and your LAN IP.
-2. Places the configuration in `/etc/nginx/conf.d/vmrecovery.conf`.
-3. Redirects port 80 (HTTP) to port 443 (HTTPS) automatically.
-4. Proxies requests to Waitress on `http://127.0.0.1:5000` with full client IP preservation (`ProxyFix`).
-5. Sets `VMR_COOKIE_SECURE=1` to enforce secure cookies over TLS.
+This tooling:
+1. Creates an encrypted, outbound-only tunnel to Cloudflare's global edge network.
+2. Automatically terminates SSL/TLS with wildcard certificates at the edge.
+3. Forwards requests locally to Waitress on `http://127.0.0.1:5000`.
+4. Mitigates DDoS attacks and eliminates public port vulnerability.
 
-Access the dashboard via:
-- Local browser: `https://localhost`
-- Network/Lab browser: `https://<server-ip>` (e.g. `https://192.168.100.3`)
+Access options:
+- Local browser: `http://127.0.0.1:5000`
+- Zero-Trust tunnel: `https://vmrecovery.lab.domain` (or Cloudflare quick tunnel URL)
+- Cloud demonstration platform: `https://vmrecovery-demo.onrender.com` (Render PaaS + Supabase Managed PostgreSQL)
 
-See [`docs/DEPLOYMENT_AND_SSL.md`](DEPLOYMENT_AND_SSL.md) for the full deployment architecture,
-SSL management, firewall rules, and troubleshooting guide.
+See [`docs/DEPLOYMENT_AND_SSL.md`](DEPLOYMENT_AND_SSL.md) for full hybrid edge-cloud architecture and configuration details.
 
 ---
 

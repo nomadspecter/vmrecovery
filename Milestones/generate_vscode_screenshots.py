@@ -482,24 +482,42 @@ WantedBy=multi-user.target'''
         render_vscode_screenshot(page, code_4_11, 'deploy/vmrecovery.service', start_line=1, 
                                  lexer=IniLexer(), out_png='Milestones/figures/code_4_11_systemd.png')
 
-        # 12. Listing 4.13.1: Automated AWS S3 Disaster Recovery Synchronization Script
-        code_4_13 = '''#!/usr/bin/env bash
-set -euo pipefail
-BACKUP_DIR="/home/nomad/vmrecovery/backups"
-DB_DIR="/home/nomad/vmrecovery/instance/backups"
-S3_BUCKET="s3://vmrecovery-disaster-recovery-backups"
+        # 12. Listing 4.13.1: Supabase Managed Cloud PostgreSQL Adapter & Auto-Migration
+        code_4_13 = '''def connect_pg(url: str) -> PgConnectionWrapper:
+    """Connect to PostgreSQL/Supabase with SSL and automatic IPv4 pooler fallback."""
+    import psycopg2
+    if url.startswith("postgres://"):
+        url = "postgresql://" + url[len("postgres://"):]
+    if "sslmode" not in url:
+        sep = "&" if "?" in url else "?"
+        url = f"{url}{sep}sslmode=require"
 
-echo "Syncing standalone .ova appliance archives to AWS S3 repository..."
-aws s3 sync "$BACKUP_DIR" "$S3_BUCKET/appliances" \\
-    --exclude "*" --include "*.ova" --storage-class STANDARD_IA
+    try:
+        conn = psycopg2.connect(url, connect_timeout=10)
+        return PgConnectionWrapper(conn)
+    except psycopg2.OperationalError:
+        # Fallback to Supabase connection pooler if IPv6 direct access is unreachable
+        m = re.search(r"://([^:]+):([^@]+)@db\\.([a-z0-9]+)\\.supabase\\.co", url)
+        if m:
+            _, pw, ref = m.groups()
+            pooler = f"postgresql://postgres.{ref}:{pw}@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
+            return PgConnectionWrapper(psycopg2.connect(pooler, connect_timeout=10))
+        raise
 
-echo "Syncing hourly online SQLite hot database snapshots to AWS S3..."
-aws s3 sync "$DB_DIR" "$S3_BUCKET/database" \\
-    --exclude "*" --include "db_backup_*.db" --storage-class STANDARD_IA
-
-echo "AWS S3 3-2-1 offsite replication completed successfully with zero errors."'''
-        render_vscode_screenshot(page, code_4_13, 'deploy/sync_s3_backups.sh', start_line=1, 
-                                 lexer=BashLexer(), out_png='Milestones/figures/code_4_13_s3_sync.png')
+def init_pg_db(url: str) -> None:
+    """Initialize relational PostgreSQL schema on Supabase upon cold start."""
+    conn = connect_pg(url)
+    try:
+        ddl = SCHEMA_PG.read_text()
+        for statement in ddl.split(";"):
+            cleaned = statement.strip()
+            if cleaned:
+                conn.execute(cleaned)
+        conn.commit()
+    finally:
+        conn.close()'''
+        render_vscode_screenshot(page, code_4_13, 'app/pg_db.py', start_line=180, 
+                                 lexer=PythonLexer(), out_png='Milestones/figures/code_4_13_supabase_pg.png')
 
         browser.close()
     print("SUCCESS: All 12 VS Code code screenshots generated successfully!")

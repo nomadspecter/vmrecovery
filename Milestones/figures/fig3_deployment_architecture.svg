@@ -15,19 +15,22 @@
     <marker id="arrDepIndigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#4F46E5"/>
     </marker>
-    <marker id="arrDepGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#16A34A"/>
+    <marker id="arrDepTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#059669"/>
+    </marker>
+    <marker id="arrDepAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#D97706"/>
     </marker>
   </defs>
 
   <rect width="1350" height="920" fill="#FFFFFF"/>
   <text x="675" y="38" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="20" font-weight="700" fill="#0F172A" text-anchor="middle">Figure 4.8: Hybrid Edge-Cloud Production Deployment Architecture</text>
-  <text x="675" y="60" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">4-Pillar Hybrid Architecture: Physical Hypervisor Host, Cloudflare Zero-Trust, AWS S3 3-2-1 Backups &amp; Render/Supabase Cloud Demo</text>
+  <text x="675" y="60" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">4-Pillar Architecture: Physical Hypervisor Host, Cloudflare Zero-Trust, Render Cloud PaaS &amp; Supabase Managed PostgreSQL</text>
 
   <!-- ON-PREMISES HYPERVISOR BOUNDARY (Left) -->
-  <rect x="40" y="85" width="620" height="800" rx="12" fill="#F8FAFC" stroke="#1E40AF" stroke-width="2.5"/>
+  <rect x="40" y="85" width="620" height="805" rx="12" fill="#F8FAFC" stroke="#1E40AF" stroke-width="2.5"/>
   <rect x="60" y="70" width="480" height="28" rx="4" fill="#1E40AF"/>
-  <text x="300" y="89" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle">ON-PREMISES LAB HYPERVISOR HOST (Ubuntu 22.04 LTS / Physical Host)</text>
+  <text x="300" y="89" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle">ON-PREMISES LAB HYPERVISOR HOST (Ubuntu / Bare-Metal Linux Host)</text>
 
   <!-- Systemd Supervisor -->
   <g transform="translate(70, 115)" filter="url(#depShadow)">
@@ -114,66 +117,75 @@
 
   <!-- PILLAR 1: CLOUDFLARE ZERO-TRUST EDGE (Right Top) -->
   <g transform="translate(700, 85)" filter="url(#depShadow)">
-    <rect width="600" height="150" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="2.5"/>
-    <rect width="600" height="30" rx="10" fill="#EA580C"/>
-    <text x="300" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">PILLAR 1: CLOUDFLARE ZERO-TRUST EDGE INGRESS (cloudflared)</text>
-    <text x="20" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#C2410C">• Outbound Encrypted TLS Tunnel (No open router inbound ports / Zero NAT punching)</text>
-    <text x="20" y="75" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Automated Wildcard SSL/TLS Certificate Termination with Edge CDN Caching</text>
-    <text x="20" y="95" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Built-in DDoS Defense, Web Application Firewall (WAF) &amp; Geographic Filtering</text>
-    <text x="20" y="115" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Secure Tunnel Ingress: <tspan font-family="'Courier New', monospace" font-weight="700" fill="#EA580C">https://vmrecovery.lab.domain</tspan></text>
-    <text x="20" y="135" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">Enables University Examiners, Supervisors &amp; Students to inspect lab VMs off-campus securely</text>
+    <rect width="610" height="120" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+    <rect width="610" height="26" rx="8" fill="#EA580C"/>
+    <text x="305" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">PILLAR 1: CLOUDFLARE ZERO-TRUST EDGE INGRESS (cloudflared)</text>
+    <text x="18" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#C2410C">• Outbound Encrypted TLS Tunnel (No open router inbound ports / Zero NAT punching)</text>
+    <text x="18" y="64" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#334155">• Automated Wildcard SSL/TLS Certificate Termination with Edge CDN Caching</text>
+    <text x="18" y="82" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#334155">• Built-in DDoS Defense, Web Application Firewall (WAF) &amp; Secure Host Ingress</text>
+    <text x="18" y="100" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#64748B">Enables University Staff &amp; Students to access on-premise dashboard remotely with zero router ports</text>
   </g>
 
-  <!-- PILLAR 2: PUBLIC CLOUD DEMONSTRATION TIER (Right Second) -->
-  <g transform="translate(700, 255)" filter="url(#depShadow)">
-    <rect width="600" height="185" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2.5"/>
-    <rect width="600" height="30" rx="10" fill="#4F46E5"/>
-    <text x="300" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">PILLAR 2: CLOUD DEMO TIER (Render PaaS &amp; Supabase Managed PostgreSQL)</text>
-    <text x="20" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#4338CA">• Public Cloud Web App: <tspan font-family="'Courier New', monospace" font-weight="700" fill="#3730A3">https://vmrecovery-demo.onrender.com</tspan></text>
-    <text x="20" y="75" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Dedicated Supabase PostgreSQL Instance: <tspan font-family="'Courier New', monospace" font-size="10.5" fill="#4338CA">aws-0-eu-central-1.pooler.supabase.com:5432</tspan></text>
-    <text x="20" y="95" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Automated Cloud Schema Provisioning: Auto-executes migrations on clean start</text>
-    <text x="20" y="115" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#4338CA">• Hypervisor Simulation Engine (VMRECOVERY_SIMULATED=true):</text>
-    <text x="35" y="135" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#334155">Emulates VBoxManage CLI, heartbeat telemetry, freeze timeouts &amp; debounce recovery</text>
-    <text x="20" y="155" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">• Complete Multi-User RBAC: Student self-registration, trainer controls &amp; admin governance</text>
-    <text x="20" y="173" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-style="italic" fill="#6366F1">Allows Examiners &amp; External Reviewers to test live platform anytime with zero hardware setup</text>
+  <!-- PILLAR 2: RENDER PAAS PUBLIC CLOUD APPLICATION -->
+  <g transform="translate(700, 220)" filter="url(#depShadow)">
+    <rect width="610" height="135" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+    <rect width="610" height="26" rx="8" fill="#4F46E5"/>
+    <text x="305" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">PILLAR 2: RENDER PAAS CLOUD APPLICATION (vmrecovery-demo.onrender.com)</text>
+    <text x="18" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#4338CA">• Public Cloud Live App: <tspan font-family="'Courier New', monospace" font-size="10.5">https://vmrecovery-demo.onrender.com</tspan></text>
+    <text x="18" y="64" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#334155">• Continuous Deployment CI/CD: Automated deployment directly from GitHub repository main branch</text>
+    <text x="18" y="82" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#334155">• Hypervisor Simulation Engine (VMRECOVERY_SIMULATED=true) for non-bare-metal cloud environments</text>
+    <text x="18" y="100" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#334155">• Multi-threaded Waitress WSGI server with continuous /healthz monitoring</text>
+    <text x="18" y="118" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-style="italic" fill="#6366F1">Allows Examiners &amp; External Reviewers to test live platform anytime with zero hardware setup</text>
   </g>
 
-  <!-- PILLAR 3: AWS CLOUD DISASTER RECOVERY (Right Third) -->
-  <g transform="translate(700, 460)" filter="url(#depShadow)">
-    <rect width="600" height="185" rx="10" fill="#F0FDF4" stroke="#16A34A" stroke-width="2.5"/>
-    <rect width="600" height="30" rx="10" fill="#16A34A"/>
-    <text x="300" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">PILLAR 3: AMAZON WEB SERVICES (AWS 3-2-1 OFFSITE DISASTER RECOVERY)</text>
-    <text x="20" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#15803D">• AWS S3 Bucket: <tspan font-family="'Courier New', monospace" font-size="10.5" fill="#166534">s3://vmrecovery-disaster-recovery-backups/</tspan></text>
-    <text x="20" y="75" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">  - Independent Open Virtualization Appliance (.ova) archives</text>
-    <text x="20" y="95" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">  - Hourly SQLite Online Hot Backups with SHA-256 Integrity Verification</text>
-    <text x="20" y="118" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#15803D">• Automated Synchronization Pipeline:</text>
-    <text x="35" y="136" font-family="'Courier New', monospace" font-size="10.5" fill="#1E293B">deploy/sync_s3_backups.sh (S3 Standard-IA &amp; Glacier Lifecycle Tiering)</text>
-    <text x="20" y="158" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#15803D">• External Cloud Health Sentinel (AWS EC2 / Cloud Sentry):</text>
-    <text x="35" y="176" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">Independent offsite probe pinging /api/health to alert staff if lab power fails</text>
+  <!-- PILLAR 3: SUPABASE MANAGED POSTGRESQL DATABASE -->
+  <g transform="translate(700, 370)" filter="url(#depShadow)">
+    <rect width="610" height="135" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+    <rect width="610" height="26" rx="8" fill="#059669"/>
+    <text x="305" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">PILLAR 3: SUPABASE MANAGED CLOUD POSTGRESQL DATABASE</text>
+    <text x="18" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#047857">• Dedicated Supabase PostgreSQL Instance: <tspan font-family="'Courier New', monospace" font-size="10">aws-0-eu-central-1.pooler.supabase.com:5432</tspan></text>
+    <text x="18" y="64" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#334155">• Automated Schema Migration Engine: Automatically provisioned tables on first startup (app/pg_db.py)</text>
+    <text x="18" y="82" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#334155">• Dual-Database Architecture: Native SQLite (Local host) &amp; PostgreSQL (Cloud Render deployment)</text>
+    <text x="18" y="100" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#334155">• High Availability &amp; Point-in-time Recovery with TLS-encrypted connection pooling</text>
+    <text x="18" y="118" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-style="italic" fill="#059669">Enterprise managed cloud persistence with zero host maintenance overhead</text>
+  </g>
+
+  <!-- PILLAR 4: INDEPENDENT APPLIANCE (.OVA) DISASTER RECOVERY & BACKUPS -->
+  <g transform="translate(700, 520)" filter="url(#depShadow)">
+    <rect width="610" height="135" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+    <rect width="610" height="26" rx="8" fill="#D97706"/>
+    <text x="305" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">PILLAR 4: INDEPENDENT APPLIANCE (.OVA) DISASTER RECOVERY &amp; BACKUPS</text>
+    <text x="18" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#B45309">• Open Virtualization Appliance (.ova) Standalone Portable Archives</text>
+    <text x="18" y="64" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#334155">• Hourly SQLite Online Hot Backups with SHA-256 integrity verification (backups/ directory)</text>
+    <text x="18" y="82" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#334155">• Automatic 7-day backup retention pruning policy managed by background worker</text>
+    <text x="18" y="100" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#334155">• Zero-Dependency Hardware Portability: Fast import into any VirtualBox / VMware host</text>
+    <text x="18" y="118" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-style="italic" fill="#D97706">Guarantees total system restoration even during catastrophic hardware or network failures</text>
   </g>
 
   <!-- UNIVERSITY STAKEHOLDERS (Right Bottom) -->
-  <g transform="translate(700, 665)" filter="url(#depShadow)">
-    <rect width="600" height="215" rx="8" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/>
-    <rect width="600" height="28" rx="8" fill="#475569"/>
-    <text x="300" y="19" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">UNIVERSITY STAKEHOLDERS &amp; LAB CLIENTS</text>
-    <text x="20" y="52" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#1E293B">1. On-Premises &amp; Remote Web Browser Access (Dashboard Management):</text>
-    <text x="35" y="70" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">Examiners, Administrators, Trainers &amp; Students navigate via HTTPS</text>
-    <text x="35" y="88" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#2563EB">• Local Host: http://127.0.0.1:5000 | Cloudflare: https://vmrecovery.lab.domain</text>
-    <text x="35" y="106" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#4F46E5">• Live Cloud Demo: https://vmrecovery-demo.onrender.com</text>
-    <text x="20" y="132" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#166534">2. Guest Operating System Access (Hands-on Technical Training):</text>
-    <text x="35" y="150" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">Students connect directly from laboratory workstations across local campus LAN</text>
-    <text x="35" y="168" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#166534">• SSH (Port 22) for Linux administration and terminal scripting</text>
-    <text x="35" y="186" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#166534">• RDP / VRDP (Port 3389) for graphical desktop environments</text>
-    <text x="20" y="206" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" font-style="italic" fill="#64748B">Instant snapshot rollback resets guest machine state without disrupting network configurations</text>
+  <g transform="translate(700, 670)" filter="url(#depShadow)">
+    <rect width="610" height="220" rx="8" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/>
+    <rect width="610" height="26" rx="8" fill="#475569"/>
+    <text x="305" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">UNIVERSITY STAKEHOLDERS &amp; LAB CLIENTS</text>
+    <text x="18" y="48" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#1E293B">1. Dashboard Management Access (Examiners, Admins, Trainers &amp; Students via Web HTTPS):</text>
+    <text x="32" y="66" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">• Local Host: http://127.0.0.1:5000 (Waitress WSGI)</text>
+    <text x="32" y="84" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#EA580C">• Cloudflare Ingress: https://vmrecovery.lab.domain (Encrypted Edge Tunnel)</text>
+    <text x="32" y="102" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#4F46E5">• Live Cloud Demo: https://vmrecovery-demo.onrender.com (Render + Supabase PostgreSQL)</text>
+    <text x="18" y="126" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#166534">2. Guest Operating System Access (Hands-on Technical Training):</text>
+    <text x="32" y="144" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#475569">Students connect directly from laboratory workstations across campus LAN</text>
+    <text x="32" y="162" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#166534">• SSH (Port 22) for Linux terminal administration and scripting</text>
+    <text x="32" y="180" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#166534">• RDP / VRDP (Port 3389) for interactive graphical desktop environments</text>
+    <text x="18" y="202" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" font-style="italic" fill="#64748B">Instant snapshot rollback resets guest machine state without disrupting network configurations</text>
   </g>
 
   <!-- Connectors -->
-  <path d="M 630 220 L 700 160" fill="none" stroke="#EA580C" stroke-width="2.2" marker-end="url(#arrDepOrange)"/>
-  <path d="M 630 240 L 700 340" fill="none" stroke="#4F46E5" stroke-width="2.2" stroke-dasharray="5,4" marker-end="url(#arrDepIndigo)"/>
-  <path d="M 500 430 L 700 550" fill="none" stroke="#16A34A" stroke-width="2.2" marker-end="url(#arrDepGreen)"/>
-  <path d="M 350 430 L 700 770" fill="none" stroke="#166534" stroke-width="1.8" stroke-dasharray="5,4" marker-end="url(#arrDep)"/>
-  <path d="M 1000 235 L 1000 255" fill="none" stroke="#4F46E5" stroke-width="1.8" marker-end="url(#arrDepIndigo)"/>
-  <path d="M 1000 440 L 1000 460" fill="none" stroke="#16A34A" stroke-width="1.8" marker-end="url(#arrDepGreen)"/>
-  <path d="M 1000 645 L 1000 665" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrDepBlue)"/>
+  <path d="M 630 220 L 700 145" fill="none" stroke="#EA580C" stroke-width="2.2" marker-end="url(#arrDepOrange)"/>
+  <path d="M 630 240 L 700 280" fill="none" stroke="#4F46E5" stroke-width="2.2" stroke-dasharray="5,4" marker-end="url(#arrDepIndigo)"/>
+  <path d="M 630 350 L 700 435" fill="none" stroke="#059669" stroke-width="2.2" stroke-dasharray="5,4" marker-end="url(#arrDepTeal)"/>
+  <path d="M 630 550 L 700 585" fill="none" stroke="#D97706" stroke-width="2.2" marker-end="url(#arrDepAmber)"/>
+  <path d="M 350 430 L 700 780" fill="none" stroke="#166534" stroke-width="1.8" stroke-dasharray="5,4" marker-end="url(#arrDep)"/>
+  <path d="M 1005 205 L 1005 220" fill="none" stroke="#4F46E5" stroke-width="1.8" marker-end="url(#arrDepIndigo)"/>
+  <path d="M 1005 355 L 1005 370" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#arrDepTeal)"/>
+  <path d="M 1005 505 L 1005 520" fill="none" stroke="#D97706" stroke-width="1.8" marker-end="url(#arrDepAmber)"/>
+  <path d="M 1005 655 L 1005 670" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrDepBlue)"/>
 </svg>

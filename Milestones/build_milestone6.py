@@ -131,7 +131,7 @@ def build_milestone6():
           "multi-channel alerting via SMTP and HMAC-SHA256 signed webhooks, and a token-authenticated RESTful API.")
     ins_p("The system was deployed and validated within a hybrid edge-cloud architecture utilizing Linux systemd service hardening on the physical lab "
           "hypervisor host, Cloudflare Zero-Trust ingress tunneling for firewall-free remote HTTPS access, an offsite 3-2-1 disaster recovery pipeline "
-          "on Amazon Web Services (AWS S3), and a live public demonstration platform on Render with Supabase Managed PostgreSQL. Empirical validation across an automated suite of 154 test cases achieved a 100% pass rate with zero defects. The resulting system "
+          "managed cloud database persistence on Supabase PostgreSQL, and a live public demonstration platform deployed on Render PaaS. Empirical validation across an automated suite of 154 test cases achieved a 100% pass rate with zero defects. The resulting system "
           "guarantees instructional continuity, protects learning progress, and automates laboratory administration.")
 
     ins_page_break()
@@ -195,7 +195,7 @@ def build_milestone6():
         ("  4.10 Deployment Strategy and Hybrid Edge-Cloud Architecture", "55"),
         ("  4.11 Production Host Setup and Systemd Daemon Hardening", "56"),
         ("  4.12 Cloudflare Zero-Trust Tunnel Configuration and Edge Ingress", "57"),
-        ("  4.13 AWS Cloud Disaster Recovery Integration (3-2-1 Backup Strategy)", "58"),
+        ("  4.13 Cloud Database Replication & Supabase Managed PostgreSQL Architecture", "58"),
         ("  4.14 Cloud Demonstration Deployment (Render & Supabase PostgreSQL Integration)", "59"),
         ("  4.15 Operational Validation and Deployment Testing Results", "60"),
         ("  4.16 Summary of Chapter Four Achievements", "62"),
@@ -275,7 +275,6 @@ def build_milestone6():
     ins_p("LIST OF ABBREVIATIONS AND ACRONYMS", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
     acronyms = [
         ("API", "Application Programming Interface"),
-        ("AWS", "Amazon Web Services"),
         ("CLI", "Command Line Interface"),
         ("CPU", "Central Processing Unit"),
         ("CSRF", "Cross-Site Request Forgery"),
@@ -293,13 +292,14 @@ def build_milestone6():
         ("NVMe", "Non-Volatile Memory Express"),
         ("OS", "Operating System"),
         ("OVA", "Open Virtualization Appliance"),
+        ("PaaS", "Platform as a Service"),
         ("PBKDF2", "Password-Based Key Derivation Function 2"),
         ("PK", "Primary Key"),
         ("RAM", "Random Access Memory"),
         ("RBAC", "Role-Based Access Control"),
+        ("RDBMS", "Relational Database Management System"),
         ("REST", "Representational State Transfer"),
         ("RFC", "Request for Comments"),
-        ("S3", "Simple Storage Service (Amazon AWS)"),
         ("SHA", "Secure Hash Algorithm"),
         ("SIEM", "Security Information and Event Management"),
         ("SMTP", "Simple Mail Transfer Protocol"),
@@ -346,9 +346,9 @@ def build_milestone6():
         "10 seconds without human intervention.\n"
         "4. Deployment of an Operational Dashboard and Audit Trail: Created a centralized web dashboard providing real-time health indicators, "
         "bulk machine power controls, and an immutable audit log tracking state transitions and recovery elapsed durations.\n"
-        "5. Provisioning and Enterprise Cloud Disaster Recovery: Developed a self-service student VM request portal based on Golden Master "
-        "templates, integrated multi-channel alerting (SMTP/Webhooks), and deployed an offsite 3-2-1 backup pipeline replicating .ova appliance archives "
-        "and SQLite database hot backups to Amazon Web Services (AWS S3).\n"
+        "5. Provisioning and Disaster Recovery Architecture: Developed a self-service student VM request portal based on Golden Master "
+        "templates, integrated multi-channel alerting (SMTP/Webhooks), deployed independent Open Virtualization Appliance (.ova) backups, "
+        "and architected cloud database replication with Supabase Managed PostgreSQL.\n"
         "6. Public Cloud Demonstration Platform: Deployed a live cloud demonstration tier on Render with Supabase Managed PostgreSQL for "
         "remote assessment, complete with role-based authentication and hypervisor execution simulation.",
         align=WD_ALIGN_PARAGRAPH.LEFT
@@ -360,10 +360,11 @@ def build_milestone6():
         "encountered. The engineering mitigations devised during this project provide valuable insights for systems engineering:"
     )
     add_p(doc,
-        "• Public Cloud Virtualization Limitations: Standard cloud virtual machines (e.g., AWS EC2 t3 instances) do not support nested hardware "
-        "virtualization (VT-x/AMD-V), while bare-metal cloud servers carry prohibitive rental fees. This was mitigated by developing a 3-Pillar "
-        "Hybrid Edge-Cloud Architecture that retains the physical hypervisor on-premises while using Cloudflare Zero-Trust tunnels for global HTTPS "
-        "access, AWS S3 for offsite disaster storage, and Render/Supabase for simulated evaluation.\n"
+        "• Public Cloud Virtualization Limitations: Standard cloud container and shared virtual server environments do not permit direct bare-metal "
+        "hardware virtualization (VT-x/AMD-V) access. This was mitigated by architecting a 4-Pillar Hybrid Edge-Cloud Deployment: running bare-metal "
+        "hypervisor execution and sub-second rollbacks on the physical laboratory host, using Cloudflare Zero-Trust edge tunnels for secure off-campus "
+        "administrative ingress, utilizing Supabase managed cloud PostgreSQL for persistent database replication, and deploying a public demonstration "
+        "platform on Render with simulated hypervisor telemetry.\n"
         "• SQLite Concurrency Lock Contention: Default SQLite rollback journals locked the entire database during worker write cycles, causing "
         "concurrent web requests to throw 'database is locked' errors. This was resolved by enabling Write-Ahead Logging (WAL) mode and setting a "
         "15-second busy timeout (PRAGMA busy_timeout = 15000), allowing non-blocking concurrent reads and writes.\n"
@@ -413,7 +414,6 @@ def build_milestone6():
     add_heading_1(doc, "REFERENCES")
 
     references = [
-        "Amazon Web Services. (2024). AWS Well-Architected Framework: Reliability pillar (AWS Whitepaper). Amazon Web Services, Inc. https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/",
         "Beck, K. (2003). Test-driven development: By example. Addison-Wesley Professional.",
         "Cloudflare. (2025). Cloudflare Zero Trust: Secure access to internal resources without a VPN. Cloudflare, Inc. https://developers.cloudflare.com/cloudflare-one/",
         "Fielding, R. T. (2000). Architectural styles and the design of network-based software architectures (Doctoral dissertation, University of California, Irvine).",
@@ -423,6 +423,7 @@ def build_milestone6():
         "Oracle Corporation. (2024). Oracle VM VirtualBox® user manual for release 7.0 & 7.1. Oracle Corporation. https://www.virtualbox.org/manual/",
         "Owens, M., & Allen, G. (2010). The definitive guide to SQLite (2nd ed.). Apress.",
         "Popek, G. J., & Goldberg, R. P. (1974). Formal requirements for virtualizable third generation architectures. Communications of the ACM, 17(7), 412-421. https://doi.org/10.1145/361011.361073",
+        "PostgreSQL Global Development Group. (2024). PostgreSQL 16.0 documentation: High availability, load balancing, and replication. PostgreSQL Global Development Group. https://www.postgresql.org/docs/16/high-availability.html",
         "Rose, S., Borchert, O., Mitchell, S., & Connelly, S. (2020). Zero Trust Architecture (NIST Special Publication 800-207). National Institute of Standards and Technology. https://doi.org/10.6028/NIST.SP.800-207",
         "Silberschatz, A., Galvin, P. B., & Gagne, G. (2018). Operating system concepts (10th ed.). John Wiley & Sons.",
         "Smith, J. E., & Nair, R. (2005). Virtual machines: Versatile platforms for systems and processes. Elsevier / Morgan Kaufmann.",

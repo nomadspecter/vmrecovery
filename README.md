@@ -451,14 +451,13 @@ sudo journalctl -u vmrecovery -f     # live logs
 The service restarts automatically, waits for VirtualBox, runs as the VM-owning user (with the
 `vboxusers` group when it exists), and stops cleanly on `systemctl stop`.
 
-**Behind a proxy with SSL.** Run Nginx as a reverse proxy in front of Waitress to enforce HTTPS, terminate TLS, and preserve client IP addresses across the lab network:
+**Secure Remote Access with Zero-Trust TLS.** Run Cloudflare Zero-Trust tunnel (`cloudflared`) in front of Waitress to enforce HTTPS, terminate TLS at the edge, and provide secure access across campus or remotely without opening firewall ports or port forwarding:
 
 ```bash
-sudo ./deploy/setup_nginx_ssl.sh       # generates SSL cert with SAN, installs Nginx site config
-sudo systemctl enable --now nginx
+./deploy/install_cloudflare_tunnel.sh
 ```
 
-Full deployment architecture, SSL certificate setup, and network options are detailed in
+For institutional demonstrations without bare-metal hardware, the live cloud platform is deployed on Render (`https://vmrecovery-demo.onrender.com`) backed by a managed Supabase PostgreSQL instance. Full deployment architecture and network options are detailed in
 [`docs/DEPLOYMENT_AND_SSL.md`](docs/DEPLOYMENT_AND_SSL.md).
 
 A day in the life:
