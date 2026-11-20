@@ -45,24 +45,38 @@ def main():
     print(f"Found VS Code ({client['class']}) on workspace {vs_ws}, geom={geom} (original ws={orig_ws})")
 
     os.makedirs("Milestones/figures", exist_ok=True)
-    subprocess.run(["hyprctl", "dispatch", f'hl.dsp.focus({{ workspace = "{vs_ws}" }})'], check=True, stdout=subprocess.DEVNULL)
-    time.sleep(0.6)
+    subprocess.run(["hyprctl", "dispatch", f"hl.dsp.focus({{ workspace = {vs_ws} }})"], check=True, stdout=subprocess.DEVNULL)
+    time.sleep(0.5)
+    cur_ws = get_json(["hyprctl", "activeworkspace", "-j"])["id"]
+    if cur_ws != vs_ws:
+        raise RuntimeError(f"Failed to switch to VS Code workspace {vs_ws} (still on {cur_ws})")
 
     try:
         for out_name, rel_path, line_no in TARGETS:
             abs_path = os.path.join(REPO, rel_path)
+            fname = os.path.basename(rel_path)
             subprocess.run(
                 ["code", "--reuse-window", "--goto", f"{abs_path}:{line_no}:1"],
                 check=True,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
             )
-            time.sleep(1.1)
+            # Wait until VS Code window title actually switches to `fname`
+            deadline = time.time() + 5.0
+            while time.time() < deadline:
+                title = find_vscode_client().get("title", "")
+                if fname in title:
+                    break
+                time.sleep(0.15)
+            time.sleep(0.55)
+            if get_json(["hyprctl", "activeworkspace", "-j"])["id"] != vs_ws:
+                subprocess.run(["hyprctl", "dispatch", f"hl.dsp.focus({{ workspace = {vs_ws} }})"], check=True, stdout=subprocess.DEVNULL)
+                time.sleep(0.35)
             out_path = os.path.join("Milestones/figures", out_name)
             subprocess.run(["grim", "-g", geom, out_path], check=True)
             print(f"  -> Captured REAL VS Code screenshot: {out_path} ({rel_path}:{line_no})")
     finally:
-        subprocess.run(["hyprctl", "dispatch", f'hl.dsp.focus({{ workspace = "{orig_ws}" }})'], check=False, stdout=subprocess.DEVNULL)
+        subprocess.run(["hyprctl", "dispatch", f"hl.dsp.focus({{ workspace = {orig_ws} }})"], check=False, stdout=subprocess.DEVNULL)
         print(f"Restored original workspace {orig_ws}.")
 
 
