@@ -47,29 +47,29 @@ def render_vscode_screenshot(page, code_text, filepath, start_line=1, lexer=Pyth
     display: inline-block;
   }}
   .vscode-window {{
-    width: 980px;
-    background: #1E1E1E;
+    width: 1000px;
+    background: #002B36;
     border-radius: 4px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 0 1px #3C3C3C;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.40), 0 0 0 1px #073642;
     overflow: hidden;
     font-family: 'DejaVu Sans Mono', 'Fira Code', 'Consolas', monospace;
   }}
   .title-bar {{
-    background: #323233;
+    background: #00212B;
     height: 34px;
     display: flex;
     align-items: center;
     padding: 0 0 0 10px;
     user-select: none;
-    border-bottom: 1px solid #1E1E1E;
+    border-bottom: 1px solid #073642;
     font-family: 'Segoe UI', Roboto, Ubuntu, sans-serif;
   }}
   .vscode-menu {{
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #CCCCCC;
-    font-size: 12px;
+    color: #93A1A1;
+    font-size: 11.5px;
   }}
   .vscode-logo {{
     width: 16px;
@@ -77,114 +77,171 @@ def render_vscode_screenshot(page, code_text, filepath, start_line=1, lexer=Pyth
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #007ACC;
+    color: #268BD2;
     font-weight: 800;
     font-size: 13px;
     margin-right: 2px;
   }}
-  .title-text {{
-    flex: 1;
-    text-align: center;
-    color: #CCCCCC;
-    font-size: 12.5px;
+  .search-pill {{
+    margin: 0 auto;
+    background: #073642;
+    border: 1px solid #164C5C;
+    border-radius: 5px;
+    color: #93A1A1;
+    font-size: 11.5px;
+    padding: 3px 90px;
     font-family: 'Segoe UI', Roboto, Ubuntu, sans-serif;
-    letter-spacing: 0.2px;
   }}
   .win-controls {{
     display: flex;
     height: 34px;
   }}
   .win-btn {{
-    width: 38px;
+    width: 36px;
     height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #CCCCCC;
-    font-size: 12px;
+    color: #839496;
+    font-size: 11.5px;
+  }}
+  .main-shell {{
+    display: flex;
+    background: #002B36;
+  }}
+  .activity-bar {{
+    width: 42px;
+    background: #003847;
+    border-right: 1px solid #00212B;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    user-select: none;
+  }}
+  .act-top, .act-bottom {{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }}
+  .act-icon {{
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #586E75;
+    font-size: 16px;
+    position: relative;
+  }}
+  .act-icon.active {{
+    color: #EEE8D5;
+  }}
+  .act-icon.active::before {{
+    content: "";
+    position: absolute;
+    left: -9px;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    background: #2AA198;
+  }}
+  .editor-column {{
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
   }}
   .tabs-bar {{
-    background: #252526;
+    background: #003847;
     display: flex;
-    height: 36px;
+    height: 34px;
     align-items: flex-end;
-    border-bottom: 1px solid #1E1E1E;
+    border-bottom: 1px solid #00212B;
   }}
   .tab {{
-    background: #1E1E1E;
-    color: #FFFFFF;
-    padding: 0 18px;
-    height: 36px;
-    font-size: 13px;
+    background: #002B36;
+    color: #EEE8D5;
+    padding: 0 14px;
+    height: 34px;
+    font-size: 12.5px;
     display: flex;
     align-items: center;
     gap: 8px;
-    border-top: 2px solid #007ACC;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    border-top: 2px solid #2AA198;
+    border-right: 1px solid #00212B;
+    font-family: 'Segoe UI', Roboto, Ubuntu, sans-serif;
+  }}
+  .tab-close {{
+    color: #839496;
+    font-size: 12px;
+    margin-left: 6px;
   }}
   .tab-icon {{
-    font-size: 14px;
+    font-size: 13px;
   }}
   .breadcrumbs {{
-    background: #1E1E1E;
-    color: #8C8C8C;
-    font-size: 12px;
-    padding: 6px 18px;
-    border-bottom: 1px solid #282828;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #002B36;
+    color: #839496;
+    font-size: 11.5px;
+    padding: 5px 16px;
+    border-bottom: 1px solid #073642;
+    font-family: 'Segoe UI', Roboto, Ubuntu, sans-serif;
   }}
   .editor-content {{
     display: flex;
-    padding: 14px 0 18px 0;
+    padding: 12px 0 16px 0;
     font-size: 13.5px;
     line-height: 1.55;
-    background: #1E1E1E;
+    background: #002B36;
   }}
   .gutter {{
     padding: 0 16px 0 14px;
-    color: #6E7681;
+    color: #586E75;
     text-align: right;
     user-select: none;
-    border-right: 1px solid #2D2D2D;
-    font-family: 'Consolas', 'DejaVu Sans Mono', monospace;
-    font-size: 13px;
+    font-family: 'DejaVu Sans Mono', 'Consolas', monospace;
+    font-size: 12.5px;
     line-height: 1.55;
-    min-width: 45px;
+    min-width: 48px;
   }}
   .code-area {{
-    padding: 0 20px;
+    padding: 0 18px 0 4px;
     flex: 1;
-    color: #D4D4D4;
+    color: #839496;
     white-space: pre;
-    font-family: 'Consolas', 'DejaVu Sans Mono', 'Fira Code', monospace;
-    font-size: 13.5px;
+    font-family: 'DejaVu Sans Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 13.2px;
     line-height: 1.55;
   }}
-  /* VS Code Dark+ Colors */
-  .c, .c1, .ch, .cm, .cs {{ color: #6A9955; font-style: italic; }} /* comments */
-  .k, .kd, .kn, .kp, .kr {{ color: #C586C0; }} /* keywords */
-  .ow {{ color: #569CD6; }}
-  .nb, .bp {{ color: #569CD6; }} /* builtins */
-  .nf, .fm {{ color: #DCDCAA; font-weight: 600; }} /* functions */
-  .nc, .nn {{ color: #4EC9B0; font-weight: 600; }} /* classes/modules */
-  .s, .s1, .s2, .sa, .sb, .sc, .sd, .se, .sh, .si, .sx, .sr, .ss {{ color: #CE9178; }} /* strings */
-  .m, .mi, .mf, .mh, .mo, .il {{ color: #B5CEA8; }} /* numbers */
-  .o {{ color: #D4D4D4; }} /* operators */
-  .nd {{ color: #DCDCAA; }} /* decorators */
-  .na {{ color: #9CDCFE; }} /* attribute / ini key */
-  .nv {{ color: #9CDCFE; }} /* variable */
+  /* Exact Solarized Dark Syntax Highlighting (matching user's VS Code) */
+  .c, .c1, .ch, .cm, .cs {{ color: #586E75; font-style: italic; }} /* comments */
+  .k, .kd, .kn, .kp, .kr, .ow {{ color: #859900; }} /* def, if, return, import, for, try */
+  .nb, .bp {{ color: #268BD2; }} /* builtins */
+  .nf, .fm {{ color: #268BD2; }} /* function names */
+  .nc, .nn {{ color: #B58900; }} /* classes / types / constants */
+  .s, .s1, .s2, .sa, .sb, .sc, .sd, .se, .sh, .si, .sx, .sr, .ss {{ color: #2AA198; }} /* strings */
+  .m, .mi, .mf, .mh, .mo, .il {{ color: #D33682; }} /* numbers */
+  .o {{ color: #859900; }} /* operators */
+  .nd {{ color: #CB4B16; }} /* decorators */
+  .na {{ color: #B58900; }} /* attribute / ini key */
+  .nv {{ color: #268BD2; }} /* variable */
+  .p {{ color: #839496; }} /* punctuation */
   .status-bar {{
-    background: #007ACC;
-    color: #FFFFFF;
-    font-size: 11.5px;
-    padding: 4px 16px;
+    background: #00212B;
+    color: #839496;
+    font-size: 11px;
+    padding: 4px 14px;
+    border-top: 1px solid #073642;
     display: flex;
     justify-content: space-between;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', Roboto, Ubuntu, sans-serif;
   }}
   .status-left, .status-right {{
     display: flex;
-    gap: 16px;
+    gap: 14px;
   }}
 </style>
 </head>
@@ -200,30 +257,49 @@ def render_vscode_screenshot(page, code_text, filepath, start_line=1, lexer=Pyth
         <span>Go</span>
         <span>Run</span>
         <span>Terminal</span>
+        <span>Help</span>
       </div>
-      <div class="title-text">{filename} — vmrecovery — Visual Studio Code</div>
+      <div class="search-pill">vmrecovery</div>
       <div class="win-controls">
         <div class="win-btn">─</div>
         <div class="win-btn">□</div>
         <div class="win-btn">✕</div>
       </div>
     </div>
-    <div class="tabs-bar">
-      <div class="tab">
-        <span class="tab-icon">{icon}</span>
-        <span>{filename}</span>
+    <div class="main-shell">
+      <div class="activity-bar">
+        <div class="act-top">
+          <div class="act-icon active">❐</div>
+          <div class="act-icon">⌕</div>
+          <div class="act-icon">⎇</div>
+          <div class="act-icon">▷</div>
+          <div class="act-icon">⊞</div>
+        </div>
+        <div class="act-bottom">
+          <div class="act-icon">◯</div>
+          <div class="act-icon">⚙</div>
+        </div>
       </div>
-    </div>
-    <div class="breadcrumbs">
-      vmrecovery &gt; {folder} &gt; {filename}
-    </div>
-    <div class="editor-content">
-      <div class="gutter">{line_nums_html}</div>
-      <div class="code-area">{highlighted_code}</div>
+      <div class="editor-column">
+        <div class="tabs-bar">
+          <div class="tab">
+            <span class="tab-icon">{icon}</span>
+            <span>{filename}</span>
+            <span class="tab-close">×</span>
+          </div>
+        </div>
+        <div class="breadcrumbs">
+          {folder} &gt; {filename}
+        </div>
+        <div class="editor-content">
+          <div class="gutter">{line_nums_html}</div>
+          <div class="code-area">{highlighted_code}</div>
+        </div>
+      </div>
     </div>
     <div class="status-bar">
       <div class="status-left">
-        <span>⎇ main</span>
+        <span>⎇ main*</span>
         <span>⊗ 0  ⚠ 0</span>
       </div>
       <div class="status-right">
@@ -231,7 +307,7 @@ def render_vscode_screenshot(page, code_text, filepath, start_line=1, lexer=Pyth
         <span>Spaces: 4</span>
         <span>UTF-8</span>
         <span>LF</span>
-        <span>{lang_label}</span>
+        <span>{{}} {lang_label}</span>
       </div>
     </div>
   </div>
