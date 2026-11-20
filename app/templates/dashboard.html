@@ -80,7 +80,7 @@
         <td>{{ r.template_name }}</td>
         <td>{{ r.class_group }}</td>
         <td>
-          <span class="pill {{ 'g' if r.status == 'approved' else ('r' if r.status in ('rejected','failed') else 'o') }}">{{ r.status|capitalize }}</span>
+          <span class="pill {{ 'green' if r.status in ('approved','ready') else ('red' if r.status in ('rejected','failed') else 'amber') }}">{{ r.status|capitalize }}</span>
           {% if r.status == 'rejected' and r.rejection_reason %}
             <div class="muted" style="font-size:11px;margin-top:2px">{{ r.rejection_reason }}</div>
           {% endif %}
