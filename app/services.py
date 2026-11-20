@@ -385,12 +385,13 @@ def power_action(conn, vbox, vm_id, action, user_id=None, now=None):
             vbox.start_vm(uuid)
 
     new_state = vbox.wait_until_ready(uuid).lower()
-    # Only a deliberate pause is remembered; anything else clears the flag so
-    # the monitor judges the machine normally again.
-    admin_paused = 1 if (action == "pause" and new_state == "paused") else 0
-    status = "paused" if admin_paused else _friendly_state(new_state)
-    conn.execute("UPDATE vms SET status=?, fail_count=0, last_checked=?, admin_paused=? WHERE vm_id=?",
-                 (status, ts(now or now_local()), admin_paused, vm_id))
+    # Pausing a machine places it in a frozen state so the recovery worker
+    # automatically restores it back to running on the next monitoring cycle.
+    admin_paused = 0
+    status = _friendly_state(new_state)
+    fail_count = 1 if status == "frozen" else 0
+    conn.execute("UPDATE vms SET status=?, fail_count=?, last_checked=?, admin_paused=? WHERE vm_id=?",
+                 (status, fail_count, ts(now or now_local()), admin_paused, vm_id))
     conn.commit()
     log_event(conn, f"vm_{action}", vm_id, user_id, f"{name}: {action} (was {state})",
               "Success", now)
@@ -1247,8 +1248,7 @@ def observe(vbox, vm, now, settings) -> str:
     if low in CRASHED_STATES:
         return "crashed"
     if low in PAUSED_STATES:
-        # A machine an administrator paused on purpose is left alone.
-        return "paused" if vm["admin_paused"] else "frozen"
+        return "frozen"
     if low == "running":
         prop = vm["heartbeat_property"]
         if prop:

@@ -285,16 +285,11 @@ def test_power_actions_change_the_machine_state(conn, vbox, vm):
     assert vbox.get_state(vm["vbox_uuid"]) == "running"
 
 
-def test_a_deliberate_pause_is_not_treated_as_a_fault(conn, vbox, vm, settings):
+def test_a_paused_machine_is_treated_as_frozen_for_auto_recovery(conn, vbox, vm, settings):
     services.power_action(conn, vbox, vm["vm_id"], "pause")
     fresh = services.get_vm(conn, vm["vm_id"])
-    assert services.observe(vbox, fresh, T0, settings) == "paused"
-
-    # Without the administrator's flag a paused machine is a frozen one.
-    conn.execute("UPDATE vms SET admin_paused=0 WHERE vm_id=?", (vm["vm_id"],))
-    conn.commit()
-    fresh = services.get_vm(conn, vm["vm_id"])
     assert services.observe(vbox, fresh, T0, settings) == "frozen"
+    assert fresh["fail_count"] == 1
 
 
 def test_power_action_records_an_event(conn, vbox, vm, users):

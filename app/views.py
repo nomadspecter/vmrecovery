@@ -824,8 +824,17 @@ def demo(action, vm_id):
     if not settings().simulate or action not in ("crash", "freeze"):
         abort(404)
     vm = vm_or_404(vm_id)
-    getattr(vbox(), action)(vm["vbox_uuid"])
-    flash(f"Simulated {action} on {vm['vm_name']}. The monitor will react within a minute.", "ok")
+    conn = get_db()
+    with vbox_lock():
+        getattr(vbox(), action)(vm["vbox_uuid"])
+        # Ensure admin_paused never suppresses recovery and surface the fault immediately
+        status = "crashed" if action == "crash" else "frozen"
+        conn.execute(
+            "UPDATE vms SET status=?, fail_count=1, admin_paused=0, last_checked=? WHERE vm_id=?",
+            (status, services.ts(services.now_local()), vm_id),
+        )
+        conn.commit()
+    flash(f"Simulated {action} on {vm['vm_name']}. Auto-recovery will restore it on the next monitor cycle (~10s).", "ok")
     return redirect(url_for("main.dashboard"))
 
 

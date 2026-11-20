@@ -32,6 +32,7 @@ def create_app(settings: Settings | None = None, vbox=None) -> Flask:
 
     _load_runtime_settings(app)
     _seed_initial_data(app)
+    _hydrate_simulated_vbox(app)
 
     @app.after_request
     def security_headers(response):
@@ -148,5 +149,48 @@ def _seed_initial_data(app: Flask) -> None:
                 log.info("Initialized demo lab VMs for simulation mode.")
     except Exception as exc:
         log.warning("Could not check/seed initial database records: %s", exc)
+    finally:
+        conn.close()
+
+
+def _hydrate_simulated_vbox(app: Flask) -> None:
+    """Sync existing DB VMs and snapshots into SimulatedVBox after a restart.
+
+    In cloud deployments (Render + Supabase PostgreSQL), the database persists
+    across container restarts while SimulatedVBox starts fresh in memory.
+    Hydrating here guarantees auto-recovery, Sim. freeze/crash, and manual
+    'Review and restore' always find their recorded snapshots.
+    """
+    settings = app.extensions["settings"]
+    if not settings.simulate:
+        return
+    from . import db
+    vbox = app.extensions["vbox"]
+    if not hasattr(vbox, "vms"):
+        return
+    conn = db.connect(settings.db_path)
+    try:
+        state_map = {
+            "running": "running",
+            "powered off": "poweroff",
+            "crashed": "aborted",
+            "frozen": "paused",
+            "paused": "paused",
+        }
+        for vm in conn.execute("SELECT vm_id, vm_name, vbox_uuid, status FROM vms").fetchall():
+            uuid = vm["vbox_uuid"]
+            if uuid not in vbox.vms:
+                vbox.add_vm(vm["vm_name"], uuid, state=state_map.get(vm["status"], "running"))
+            snaps = conn.execute(
+                "SELECT snapshot_name FROM snapshots WHERE vm_id=? ORDER BY snapshot_id ASC",
+                (vm["vm_id"],),
+            ).fetchall()
+            mem_snaps = vbox.vms[uuid]["snapshots"]
+            for s in snaps:
+                if s["snapshot_name"] not in mem_snaps:
+                    mem_snaps.append(s["snapshot_name"])
+        log.info("Hydrated %d simulated VM(s) and their snapshots from database.", len(vbox.vms))
+    except Exception as exc:
+        log.warning("Could not hydrate simulated VBox from database: %s", exc)
     finally:
         conn.close()
