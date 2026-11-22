@@ -204,7 +204,12 @@ def build_milestone6():
         ("  5.2 Challenges Encountered and Technical Mitigations", "64"),
         ("  5.3 Recommendations for Future Work", "65"),
         ("  5.4 Concluding Remarks", "66"),
-        ("REFERENCES (APA 7th Edition)", "67")
+        ("REFERENCES (APA 7th Edition)", "67"),
+        ("APPENDICES", "68"),
+        ("  Appendix A: Project Schedule and Budget", "68"),
+        ("  Appendix B: Installation and Role-Based User Manual", "69"),
+        ("  Appendix C: Administrative CLI and Configuration Reference", "70"),
+        ("  Appendix D: Laboratory Evaluation Questionnaire", "71")
     ]
     for item, pg in toc_items:
         dots = ". " * int((60 - len(item)) / 2)
@@ -433,6 +438,150 @@ def build_milestone6():
 
     for ref in references:
         add_p(doc, ref, align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8, line_spacing=1.15)
+
+    # -------------------------------------------------------------
+    # 4. APPENDICES
+    # -------------------------------------------------------------
+    doc.add_page_break()
+    add_heading_1(doc, "APPENDICES")
+
+    def add_appendix_table(headers, rows):
+        tbl = doc.add_table(rows=1, cols=len(headers))
+        set_table_borders(tbl)
+        tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+        hdr = tbl.rows[0].cells
+        for i, h in enumerate(headers):
+            hdr[i].paragraphs[0].text = h
+            set_cell_shading(hdr[i], "D9D9D9")
+            set_cell_margins(hdr[i], 80, 80, 110, 110)
+            p = hdr[i].paragraphs[0]
+            p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            p.paragraph_format.space_after = Pt(2)
+            for r in p.runs:
+                r.font.name = 'Montserrat Medium'
+                r.font.size = Pt(10.5)
+                r.bold = True
+        for row_vals in rows:
+            row = tbl.add_row()
+            for i, val in enumerate(row_vals):
+                c = row.cells[i]
+                c.paragraphs[0].text = val
+                set_cell_margins(c, 65, 65, 100, 100)
+                p = c.paragraphs[0]
+                p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                p.paragraph_format.space_after = Pt(2)
+                p.paragraph_format.line_spacing = 1.05
+                for r in p.runs:
+                    r.font.name = 'Montserrat Medium'
+                    r.font.size = Pt(9.5)
+                    if i == 0:
+                        r.bold = True
+
+    # Appendix A: Project Schedule & Budget
+    add_heading_2(doc, "Appendix A: Project Schedule and Budget")
+    add_p(doc, "Table A.1 summarizes the phased execution timeline from proposal approval through final defense, and Table A.2 outlines the total project expenditure.")
+    add_appendix_table(
+        ["Phase / Milestone", "Key Deliverables", "Timeline", "Status"],
+        [
+            ("Milestone 1: Proposal", "Problem statement, objectives, scope, literature review", "Weeks 1 – 2", "Completed"),
+            ("Milestone 2: Analysis & Design", "DFDs (Level 0 & 1), 10-table ERD, UML Use Case & Class Diagrams", "Weeks 3 – 4", "Completed"),
+            ("Milestone 3: Architecture & Core", "Flask backend, VBoxManage wrapper, SQLite WAL, worker daemon", "Weeks 5 – 7", "Completed"),
+            ("Milestone 4: Implementation & Testing", "Snapshots, auto-recovery, student portal, 154 automated pytest cases", "Weeks 8 – 10", "Completed"),
+            ("Milestone 5: Deployment", "Systemd service, Cloudflare Zero-Trust, Render PaaS + Supabase DB", "Weeks 11 – 12", "Completed"),
+            ("Milestone 6: Final Documentation", "Compiled documentation book, appendices & project defense deck", "Week 13", "Completed"),
+        ]
+    )
+    add_caption(doc, "Table A.1: Project Implementation Schedule")
+
+    add_appendix_table(
+        ["Item / Resource", "Specification / Provider", "Estimated Cost (KES)"],
+        [
+            ("Development & Hypervisor Workstation", "Existing Student Laptop (Linux, 16 GB RAM, Intel VT-x)", "0 (Existing)"),
+            ("Software & Virtualization Stack", "Python 3.14, Flask, SQLite, Oracle VirtualBox 7.2 (Open Source)", "0"),
+            ("Cloud Hosting & Managed Database", "Render PaaS Free Tier + Supabase PostgreSQL Free Tier + Cloudflare Tunnel", "0"),
+            ("Internet Connectivity & Data Bundles", "Research, package installation, GitHub sync & cloud testing", "3,500"),
+            ("Documentation Printing & Spiral Binding", "Final project book hardcopy submission & defense copies", "2,000"),
+            ("Total Estimated Project Expenditure", "", "5,500"),
+        ]
+    )
+    add_caption(doc, "Table A.2: Project Development Budget")
+
+    # Appendix B: Installation & User Manual
+    add_heading_2(doc, "Appendix B: Installation and Role-Based User Manual")
+    add_p(doc,
+        "1. On-Premises Linux Hypervisor Setup:\n"
+        "• Clone the repository: git clone https://github.com/nomadspecter/vmrecovery.git && cd vmrecovery\n"
+        "• Create virtual environment and install dependencies: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt\n"
+        "• Initialize database and create an administrator: .venv/bin/python manage.py init-db && .venv/bin/python manage.py create-user admin admin\n"
+        "• Install and start the systemd service: sudo ./deploy/install_service.sh && sudo systemctl enable --now vmrecovery.service\n"
+        "• Verify service health: curl -fsS http://127.0.0.1:5000/healthz\n"
+        "• Optional remote HTTPS access: ./deploy/install_cloudflare_tunnel.sh\n"
+        "2. Live Cloud Evaluation Access:\n"
+        "• Open https://vmrecovery-demo.onrender.com in any modern web browser (runs in Simulation Mode backed by Supabase Managed PostgreSQL).",
+        align=WD_ALIGN_PARAGRAPH.LEFT
+    )
+    add_appendix_table(
+        ["User Role", "Primary Capabilities & Operational Workflow"],
+        [
+            ("Administrator", "Full system governance: register/edit/delete VMs, configure snapshot policies, mark Golden Master templates, approve/reject student VM requests, manage users, restore snapshots, export .ova backups, tune runtime settings, and inspect System Health & Audit Logs."),
+            ("Trainer", "Classroom operations: start and end training sessions (triggering pre-session and post-session snapshots), monitor live classroom VM statuses, request emergency restores, and view lab reliability reports."),
+            ("Student", "Self-service lab access: view personal Status Summary Cards (Assigned VMs, Running, Pending Requests, Monitoring Service), check Last Checked timestamps, request emergency snapshot restores, and submit Golden Master VM cloning requests."),
+        ]
+    )
+    add_caption(doc, "Table B.1: Role-Based User Manual Summary")
+
+    # Appendix C: CLI & Environment Reference
+    add_heading_2(doc, "Appendix C: Administrative CLI and Configuration Reference")
+    add_p(doc, "Table C.1 documents the administrative CLI commands provided by manage.py, and Table C.2 lists the primary environment variables supported by the system.")
+    add_appendix_table(
+        ["CLI Command", "Function / Operational Purpose"],
+        [
+            ("python manage.py init-db", "Initialize database tables and apply all pending schema migrations (v1–v8)."),
+            ("python manage.py create-user <user> <role>", "Create a new user account with PBKDF2 password hashing (admin, trainer, or student)."),
+            ("python manage.py set-role <user> <role>", "Update an existing user's RBAC role."),
+            ("python manage.py check", "Execute a single monitoring, fault-detection, and snapshot cycle immediately."),
+            ("python manage.py snapshot <vm>", "Take an immediate manual crash-consistent snapshot of the named VM."),
+            ("python manage.py restore <vm>", "Power off and restore the named VM to its newest valid snapshot."),
+            ("python manage.py start-session <group>", "Boot all VMs in a class group and capture pre-session baseline snapshots."),
+            ("python manage.py end-session <group>", "Capture post-session snapshots, optionally power off VMs, and close session."),
+            ("python manage.py backup-db / restore-db", "Create or restore a consistent online SQLite hot backup."),
+            ("python manage.py export-events <file.csv>", "Export the immutable system audit log to CSV for institutional reporting."),
+        ]
+    )
+    add_caption(doc, "Table C.1: Administrative CLI Reference (manage.py)")
+
+    add_appendix_table(
+        ["Environment Variable", "Default / Example", "Purpose"],
+        [
+            ("DATABASE_URL", "postgresql://... (Supabase)", "Enables cloud PostgreSQL mode via app/pg_db.py; falls back to SQLite if unset."),
+            ("VMR_SIMULATE", "0 (1 on Render Cloud)", "Toggles SimulatedVBox engine for hardware-free testing and cloud demonstrations."),
+            ("VMR_CHECK_SECONDS", "10", "Interval in seconds between background worker health polling cycles."),
+            ("VMR_FAIL_THRESHOLD", "2", "Consecutive failed checks required before triggering autonomous rollback."),
+            ("VMR_MAX_RESTORES_PER_HOUR", "3", "Anti-thrashing circuit breaker limit before escalating to administrator alerts."),
+            ("VMR_API_TOKEN", "(32-byte hex secret)", "Bearer token securing the read-only /api/v1 JSON telemetry endpoints."),
+        ]
+    )
+    add_caption(doc, "Table C.2: Core Runtime Environment Variables")
+
+    # Appendix D: Laboratory User Evaluation Questionnaire
+    add_heading_2(doc, "Appendix D: Laboratory User Evaluation Questionnaire")
+    add_p(doc,
+        "The following structured evaluation instrument was designed to gather post-deployment feedback from laboratory technicians, "
+        "instructors, and Computer Science students regarding system usability, recovery responsiveness, and operational reliability "
+        "(Scale: 1 = Strongly Disagree, 2 = Disagree, 3 = Neutral, 4 = Agree, 5 = Strongly Agree):"
+    )
+    add_appendix_table(
+        ["No.", "Evaluation Statement", "Rating (1 – 5)"],
+        [
+            ("1", "The web dashboard clearly communicates the real-time operational status (Running, Frozen, Crashed) of laboratory virtual machines.", "[ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ]"),
+            ("2", "Automated pre-session and scheduled snapshots eliminate the risk of losing clean lab baselines during practical classes.", "[ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ]"),
+            ("3", "Zero-touch autonomous recovery restores crashed or frozen virtual machines significantly faster than manual VirtualBox troubleshooting.", "[ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ]"),
+            ("4", "The student self-service portal makes requesting a new lab VM or emergency restore straightforward and transparent.", "[ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ]"),
+            ("5", "Role-based access control (Admin, Trainer, Student) appropriately restricts sensitive hypervisor actions to authorized staff.", "[ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ]"),
+            ("6", "Overall, the VMRecovery system improves practical class continuity and reduces laboratory downtime.", "[ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ]"),
+        ]
+    )
+    add_caption(doc, "Table D.1: Post-Deployment Laboratory Evaluation Questionnaire")
 
     print(f"Saving compiled final documentation book to {out_docx6}...")
     doc.save(out_docx6)
