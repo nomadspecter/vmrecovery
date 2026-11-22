@@ -106,11 +106,12 @@ def inject():
             session["csrf"] = secrets.token_hex(16)
         return session["csrf"]
     return {"csrf_token": csrf_token, "user": g.get("user"), "simulate": settings().simulate,
+            "check_seconds": settings().check_seconds,
+            "fail_threshold": settings().fail_threshold,
             "pill": lambda s: {"running": "run", "frozen": "frz", "crashed": "crash",
                                "restoring": "frz", "paused": "off", "suspect": "frz",
                                "needs_admin": "crash", "recovery_failed": "crash",
-                               "recovered": "run", "unknown": "off", "busy": "frz",
-                   "needs_admin": "crash"}.get(s, "off")}
+                               "recovered": "run", "unknown": "off", "busy": "frz"}.get(s, "off")}
 
 
 def login_required(fn):
@@ -576,10 +577,26 @@ def restore(vm_id):
     return redirect(url_for("main.dashboard"))
 
 
+@bp.route("/vms/<int:vm_id>/snapshots/<int:snapshot_id>/delete", methods=["POST"])
+@role_required("admin")
+def snapshot_delete(vm_id, snapshot_id):
+    vm_or_404(vm_id)
+    try:
+        with vbox_lock():
+            services.delete_snapshot_by_id(get_db(), vbox(), vm_id, snapshot_id,
+                                           user_id=g.user["user_id"])
+        flash("Snapshot deleted.", "ok")
+    except (VBoxError, ValueError) as exc:
+        flash_error(f"Could not delete snapshot: {exc}")
+    return redirect(url_for("main.snapshots", vm_id=vm_id))
+
+
 @bp.route("/vms/<int:vm_id>/request-restore", methods=["POST"])
 @role_required("trainer", "admin", "student")
 def request_restore(vm_id):
     vm = vm_or_404(vm_id)
+    if is_student() and vm["assigned_student_id"] != g.user["user_id"]:
+        abort(403, "You can only request a restore for your own assigned virtual machine.")
     services.request_restore(get_db(), vm_id, g.user["user_id"])
     flash("Restore requested. The administrator has been notified on the dashboard.", "ok")
     return redirect(url_for("main.dashboard"))
@@ -817,25 +834,45 @@ def healthz():
     return jsonify(status="ok" if status == 200 else "degraded", checks=checks), status
 
 
-# ------------------------------------------------------------------ demo helpers (simulation only)
+# ------------------------------------------------------------------ fault demonstration (simulated & local VirtualBox)
 @bp.route("/demo/<action>/<int:vm_id>", methods=["POST"])
 @role_required("admin")
 def demo(action, vm_id):
-    if not settings().simulate or action not in ("crash", "freeze"):
+    if action not in ("crash", "freeze"):
         abort(404)
     vm = vm_or_404(vm_id)
     conn = get_db()
-    with vbox_lock():
-        getattr(vbox(), action)(vm["vbox_uuid"])
-        # Ensure admin_paused never suppresses recovery and surface the fault immediately
-        status = "crashed" if action == "crash" else "frozen"
-        conn.execute(
-            "UPDATE vms SET status=?, fail_count=1, admin_paused=0, last_checked=? WHERE vm_id=?",
-            (status, services.ts(services.now_local()), vm_id),
+    has_snap = False
+    try:
+        with vbox_lock():
+            has_snap = services.latest_valid_snapshot(conn, vbox(), vm) is not None
+            getattr(vbox(), action)(vm["vbox_uuid"])
+            # Surface the fault immediately and advance debounce so the next
+            # worker cycle triggers auto-recovery without extra delay.
+            status = "crashed" if action == "crash" else "frozen"
+            initial_fails = max(1, settings().fail_threshold - 1)
+            now_str = services.ts(services.now_local())
+            conn.execute(
+                "UPDATE vms SET status=?, fail_count=?, admin_paused=0, last_checked=?, status_since=? WHERE vm_id=?",
+                (status, initial_fails, now_str, now_str, vm_id),
+            )
+            conn.commit()
+    except VBoxError as exc:
+        flash_error(f"Could not trigger {action} on {vm['vm_name']}: {exc}")
+        return redirect(request.referrer or url_for("main.dashboard"))
+    if has_snap:
+        flash(
+            f"Triggered {action} on {vm['vm_name']}. Auto-recovery will restore it to its latest snapshot "
+            f"on the next monitor cycle (~{settings().check_seconds}s).",
+            "ok",
         )
-        conn.commit()
-    flash(f"Simulated {action} on {vm['vm_name']}. Auto-recovery will restore it on the next monitor cycle (~10s).", "ok")
-    return redirect(url_for("main.dashboard"))
+    else:
+        flash(
+            f"Triggered {action} on {vm['vm_name']}, but no snapshot exists yet. "
+            f"Take a snapshot first so auto-recovery has a restore point.",
+            "error",
+        )
+    return redirect(request.referrer or url_for("main.dashboard"))
 
 
 # ------------------------------------------------------------------ logs and reports

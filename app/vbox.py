@@ -6,8 +6,10 @@ and tested on a machine without VirtualBox. Everything else in the project
 uses whichever one it is given.
 """
 import logging
+import os
 import re
 import shutil
+import signal
 import subprocess
 import threading
 import time
@@ -218,6 +220,73 @@ class VBoxController:
     def pause_vm(self, vm: str) -> None:
         """Pause a running VM without shutting it down."""
         self._run("controlvm", vm, "pause", timeout=self.action_timeout)
+
+    def _find_vm_pids(self, vm_uuid: str) -> list[int]:
+        """Locate running VBoxHeadless/VirtualBoxVM process IDs for this VM UUID."""
+        target = vm_uuid.strip().lower().strip("{}")
+        pids: list[int] = []
+        proc_dir = Path("/proc")
+        if not proc_dir.is_dir():
+            return pids
+        for entry in proc_dir.iterdir():
+            if not entry.name.isdigit():
+                continue
+            try:
+                raw = (entry / "cmdline").read_bytes()
+            except OSError:
+                continue
+            if not raw:
+                continue
+            parts = [p.decode("utf-8", errors="ignore") for p in raw.split(b"\x00") if p]
+            if not parts:
+                continue
+            exe_name = Path(parts[0]).name.lower()
+            if exe_name not in ("vboxheadless", "virtualboxvm"):
+                continue
+            for idx, arg in enumerate(parts):
+                if arg == "--startvm" and idx + 1 < len(parts):
+                    if parts[idx + 1].strip().lower().strip("{}") == target:
+                        pids.append(int(entry.name))
+                        break
+        return pids
+
+    def crash(self, vm: str) -> None:
+        """Simulate an abrupt VM crash by terminating its running VirtualBox process.
+
+        Sending SIGKILL to the VM's VBoxHeadless/VirtualBoxVM process forces
+        VirtualBox into the 'aborted' state, matching a genuine hypervisor or
+        host-process crash so the recovery worker detects and restores it.
+        """
+        state = self.wait_until_ready(vm).lower()
+        if state in CRASHED_STATES:
+            return
+        if state not in ("running", "paused"):
+            raise VBoxError(f"Cannot simulate a crash while the machine is '{state}'. Start the VM first.")
+        uuid = self.get_uuid(vm)
+        pids = self._find_vm_pids(uuid)
+        if not pids:
+            raise VBoxError("Could not locate the running VirtualBox VM process to simulate a crash.")
+        killed = False
+        last_err = None
+        for pid in pids:
+            try:
+                os.kill(pid, signal.SIGKILL)
+                killed = True
+            except OSError as exc:
+                last_err = exc
+        if not killed:
+            raise VBoxError(f"Could not terminate VirtualBox VM process: {last_err}")
+        self.wait_for_state(vm, ("aborted", "poweroff"), timeout=15.0, poll=0.5, settle=0.5)
+
+    def freeze(self, vm: str) -> None:
+        """Simulate a guest OS freeze by pausing the running VM in VirtualBox."""
+        state = self.wait_until_ready(vm).lower()
+        if state == "paused":
+            return
+        if state != "running":
+            raise VBoxError(f"Cannot simulate a freeze while the machine is '{state}'. Start the VM first.")
+        self.pause_vm(vm)
+        self.wait_for_state(vm, ("paused",), timeout=15.0, poll=0.5, settle=0.5)
 
     def save_state(self, vm: str) -> None:
         """Suspend to disk. export/clone refuse a running VM; a saved one is fine."""

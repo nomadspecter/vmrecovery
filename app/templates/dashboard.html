@@ -147,23 +147,31 @@
     </form></div>
   {% endif %}
 
-  {% if simulate and user.role == 'admin' %}
+  {% if user.role == 'admin' %}
   <div class="panel" style="background:#f8fafc;border-left:4px solid #2563eb;margin-bottom:16px">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
       <div>
-        <h4 style="margin:0 0 4px 0;color:#1e293b">💡 Autonomous Self-Healing & Fault Demonstration Panel</h4>
+        <h4 style="margin:0 0 4px 0;color:#1e293b">Autonomous Self-Healing &amp; Fault Demonstration</h4>
         <p class="muted" style="margin:0;font-size:13px">
-          <b>How to test failure recovery:</b> Click <b>Sim. crash</b> (aborted process) or <b>Sim. freeze</b> (hung OS) on any running VM below. Watch the status change, debounce counter advance (1/2 &rarr; 2/2), and the background daemon automatically restore the snapshot and boot the VM within 10–20 seconds.
+          {% if simulate %}
+          <b>How to test failure recovery:</b> Click <b>Sim. crash</b> (aborted process) or <b>Sim. freeze</b> (hung OS) on any VM below. The background worker detects the fault, restores the latest snapshot, and boots the VM automatically (~{{ check_seconds }}s).
+          {% else %}
+          <b>How to test failure recovery on VirtualBox:</b> Start a VM that has at least one snapshot, then click <b>Test crash</b> (terminates the VM process into <code>aborted</code>) or <b>Test freeze</b> (pauses the VM into <code>frozen</code>). The background worker will detect the fault, restore the latest snapshot, and boot the VM automatically (~{{ check_seconds }}s).
+          {% endif %}
         </p>
       </div>
       <div>
+        {% if simulate %}
         <span class="badge" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-weight:700;padding:4px 8px">SIMULATION ACTIVE</span>
+        {% else %}
+        <span class="badge" style="background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;font-weight:700;padding:4px 8px">LOCAL VIRTUALBOX</span>
+        {% endif %}
       </div>
     </div>
   </div>
   {% endif %}
 
-  <form method="post" action="{{ url_for('main.vms_bulk') }}">
+  <form id="bulk-form" method="post" action="{{ url_for('main.vms_bulk') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="panel bulkbar">
       <span class="muted">Bulk action for the selected machines:</span>
@@ -176,21 +184,22 @@
         <option value="resume">Resume</option>
       </select>
       <button class="btn" type="submit">Apply</button>
-      <span class="muted">A paused machine stays paused; the monitor leaves it alone until it is resumed.</span>
+      <span class="muted">Pausing a running VM places it into a frozen state monitored for automatic recovery.</span>
     </div>
-    <div class="table-wrap"><table>
+  </form>
+  <div class="table-wrap"><table>
       <tr><th style="width:28px"><input type="checkbox" onclick="document.querySelectorAll('input[name=vm_ids]').forEach(c=>c.checked=this.checked)"></th>
           <th>VM name</th><th>Class group</th><th>Status</th><th>Student</th><th>Last snapshot</th><th>Actions</th></tr>
       {% for vm in vms %}
       <tr>
-        <td><input type="checkbox" name="vm_ids" value="{{ vm.vm_id }}"></td>
+        <td><input type="checkbox" name="vm_ids" value="{{ vm.vm_id }}" form="bulk-form"></td>
         <td>
           <b>{{ vm.vm_name }}</b>
           {% if vm.is_template %}<span class="badge tmpl">Template</span>{% endif %}
         </td>
         <td>{{ vm.class_group }}</td>
         <td>
-          <span class="pill {{ pill(vm.status) }}">{{ vm.status|capitalize }}</span>
+          <span class="pill {{ pill(vm.status) }}">{{ vm.status|replace('_', ' ')|capitalize }}</span>
           {% if vm.status in ('crashed', 'frozen') %}
             <span class="badge" style="background:#fee2e2;color:#991b1b;border:1px solid #f87171;font-size:10px;font-weight:700;display:inline-block;margin-top:2px">
               FAULT DETECTED
@@ -198,7 +207,7 @@
           {% endif %}
           {% if vm.fail_count and vm.fail_count > 0 %}
             <div style="font-size:10.5px;color:#b91c1c;font-weight:600;margin-top:2px" title="Consecutive failure debounce count">
-              Debounce: {{ vm.fail_count }}/2
+              Debounce: {{ vm.fail_count }}/{{ fail_threshold }}
             </div>
           {% endif %}
           {% if vm.status == 'needs_admin' %}
@@ -213,14 +222,13 @@
           <a class="btn o" href="{{ url_for('main.snapshots', vm_id=vm.vm_id) }}">{{ 'Restore' if user.role == 'admin' else 'Snapshots' }}</a>
           <a class="btn o" href="{{ url_for('main.backups', vm_id=vm.vm_id) }}">Backups ({{ vm.backup_count or 0 }})</a>
           {% if user.role == 'trainer' %}<form class="inline" method="post" action="{{ url_for('main.request_restore', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn o" type="submit">Request restore</button></form>{% endif %}
-          {% if simulate and user.role == 'admin' %}
-            <form class="inline" method="post" action="{{ url_for('main.demo', action='crash', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn r" type="submit" title="Simulate abrupt VM crash">Sim. crash</button></form>
-            <form class="inline" method="post" action="{{ url_for('main.demo', action='freeze', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn r" type="submit" title="Simulate guest OS freeze">Sim. freeze</button></form>
+          {% if user.role == 'admin' %}
+            <form class="inline" method="post" action="{{ url_for('main.demo', action='crash', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn r" type="submit" title="Trigger abrupt VM crash (aborted state)">{{ 'Sim. crash' if simulate else 'Test crash' }}</button></form>
+            <form class="inline" method="post" action="{{ url_for('main.demo', action='freeze', vm_id=vm.vm_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn r" type="submit" title="Trigger guest OS freeze (paused state)">{{ 'Sim. freeze' if simulate else 'Test freeze' }}</button></form>
           {% endif %}
         </td></tr>
       {% else %}<tr><td colspan="7" class="muted">No virtual machines registered yet.{% if user.role == 'admin' %} <a href="{{ url_for('main.vms') }}">Register or create one</a>.{% endif %}</td></tr>{% endfor %}
     </table></div>
-  </form>
   <p class="muted">Status updates every few seconds as the background service checks each VM. Host free disk: {{ disk.free_gb }} GB.</p>
 {% endif %}
 {% endblock %}

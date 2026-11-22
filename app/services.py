@@ -1107,15 +1107,20 @@ def approve_vm_request(conn, vbox, request_id, admin_user_id, interval=30, keep=
         new_name, new_uuid = _clone_from_template(
             vbox, req["template_vbox_uuid"], req["requested_name"],
             linked=(req["clone_type"] == "linked"), snapshot=snap_name, conn=conn)
+        requester = conn.execute("SELECT username, role FROM users WHERE user_id=?",
+                                 (req["user_id"],)).fetchone()
+        assigned_student_id = req["user_id"] if (requester and requester["role"] == "student") else None
         vm_id = register_vm(conn, new_name, new_uuid, req["class_group"], interval, keep,
-                            pre_session=pre_session, user_id=req["user_id"], now=now)
+                            pre_session=pre_session, user_id=req["user_id"],
+                            assigned_student_id=assigned_student_id, now=now)
         take_snapshot(conn, vbox, get_vm(conn, vm_id), "baseline", now=now, user_id=admin_user_id)
         conn.execute("UPDATE vm_requests SET status='ready', created_vm_id=?, updated_at=?, "
                      "rejection_reason=NULL WHERE request_id=?",
                      (vm_id, ts(now), request_id))
         conn.commit()
+        who = requester["username"] if requester else "requester"
         log_event(conn, "vm_request_approved", vm_id, admin_user_id,
-                  f"Approved and created '{new_name}' for trainer", "Success", now)
+                  f"Approved and created '{new_name}' for {who}", "Success", now)
         return vm_id
     except Exception as exc:
         conn.execute("UPDATE vm_requests SET status='failed', rejection_reason=?, updated_at=? WHERE request_id=?",
@@ -1372,6 +1377,8 @@ def monitor_vm(conn, vbox, vm, settings, now) -> str:
                f"The recovery service is taking action.",
                severity="critical", vm_id=vm["vm_id"], now=now)
     if recent_auto_attempts(conn, vm["vm_id"], now) >= settings.max_restores_per_hour:
+        conn.execute("UPDATE vms SET status='needs_admin' WHERE vm_id=?", (vm["vm_id"],))
+        conn.commit()
         alert_once(conn, vm, f"Automatic recovery stopped after {settings.max_restores_per_hour} "
                              f"attempts in an hour. Manual action needed.", now)
         return "needs_admin"

@@ -195,3 +195,121 @@ def test_end_session_button_powers_off_and_closes_the_session(client, settings, 
     conn = db.connect(settings.db_path)
     assert services.active_session(conn, "Class A") is None
     conn.close()
+
+
+def test_student_vm_request_and_auto_assignment(client, settings, vbox):
+    conn = db.connect(settings.db_path)
+    student_id = services.create_user(conn, "student1", "Student1234!", "student")
+    tpl_id = services.register_vm(conn, "TPL-BASE", "uuid-1", "CS", 30, 5, is_template=True, now=T0)
+    services.take_snapshot(conn, vbox, services.get_vm(conn, tpl_id), "template", T0)
+    conn.close()
+
+    login(client, "student1", "Student1234!")
+    page = client.get("/requests")
+    assert page.status_code == 200
+    assert b"Request a new virtual machine" in page.data
+
+    t = csrf(client)
+    r = client.post("/requests/new", data={
+        "csrf_token": t,
+        "template_choice": "uuid-1|TPL-BASE",
+        "requested_name": "STU-VM-01",
+        "class_group": "CS",
+        "clone_type": "linked",
+    })
+    assert r.status_code == 302
+    assert b"STU-VM-01" in client.get("/requests").data
+
+    # Admin approves request -> VM should be auto-assigned to student1
+    client.post("/logout", data={"csrf_token": t})
+    login(client, "admin")
+    t_admin = csrf(client)
+    conn = db.connect(settings.db_path)
+    req_id = conn.execute("SELECT request_id FROM vm_requests WHERE requested_name='STU-VM-01'").fetchone()[0]
+    conn.close()
+    assert client.post(f"/requests/{req_id}/approve", data={"csrf_token": t_admin}).status_code == 302
+
+    conn = db.connect(settings.db_path)
+    vm = conn.execute("SELECT * FROM vms WHERE vm_name='STU-VM-01'").fetchone()
+    assert vm is not None
+    assert vm["assigned_student_id"] == student_id
+    conn.close()
+
+    # Student sees View on Dashboard (not 403 Manage VM) and sees the VM on dashboard
+    client.post("/logout", data={"csrf_token": t_admin})
+    login(client, "student1", "Student1234!")
+    req_page = client.get("/requests")
+    assert req_page.status_code == 200
+    assert b"View on Dashboard" in req_page.data
+    assert b"Manage VM" not in req_page.data
+    assert b"STU-VM-01" in client.get("/").data
+
+
+def test_snapshots_page_and_delete_snapshot_route(client, settings, vbox):
+    conn = db.connect(settings.db_path)
+    vm_id = services.register_vm(conn, "DEV-LAB-01", "uuid-1", "Class A", 30, 5, now=T0)
+    services.take_snapshot(conn, vbox, services.get_vm(conn, vm_id), "manual", T0)
+    snap_id = services.list_snapshots(conn, vm_id)[0]["snapshot_id"]
+    conn.close()
+
+    login(client)
+    r = client.get(f"/vms/{vm_id}/snapshots")
+    assert r.status_code == 200
+    t = csrf(client)
+    d = client.post(f"/vms/{vm_id}/snapshots/{snap_id}/delete", data={"csrf_token": t})
+    assert d.status_code == 302
+    conn = db.connect(settings.db_path)
+    assert services.list_snapshots(conn, vm_id) == []
+    conn.close()
+
+
+def test_demo_crash_and_freeze_auto_recover_in_next_cycle(client, settings, vbox):
+    conn = db.connect(settings.db_path)
+    vm_id = services.register_vm(conn, "DEV-LAB-01", "uuid-1", "Class A", 30, 5, now=T0)
+    services.take_snapshot(conn, vbox, services.get_vm(conn, vm_id), "baseline", T0)
+    conn.close()
+
+    login(client)
+    t = csrf(client)
+
+    for action in ("crash", "freeze"):
+        r = client.post(f"/demo/{action}/{vm_id}", data={"csrf_token": t})
+        assert r.status_code == 302
+        expected_vbox_state = "aborted" if action == "crash" else "paused"
+        assert vbox.get_state("uuid-1") == expected_vbox_state
+
+        conn = db.connect(settings.db_path)
+        summary = services.run_cycle(conn, vbox, settings, now=T0)
+        vm = services.get_vm(conn, vm_id)
+        conn.close()
+        assert summary["recoveries"] == 1
+        assert vbox.get_state("uuid-1") == "running"
+        assert vm["status"] == "running"
+        assert vm["fail_count"] == 0
+
+
+def test_dashboard_has_no_nested_forms(client, settings):
+    from html.parser import HTMLParser
+    conn = db.connect(settings.db_path)
+    services.register_vm(conn, "DEV-LAB-01", "uuid-1", "Class A", 30, 5, now=T0)
+    conn.close()
+    login(client)
+    html = client.get("/").data.decode("utf-8")
+
+    class _Checker(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.depth = 0
+            self.nested = 0
+        def handle_starttag(self, tag, attrs):
+            if tag == "form":
+                self.depth += 1
+                if self.depth > 1:
+                    self.nested += 1
+        def handle_endtag(self, tag):
+            if tag == "form":
+                self.depth = max(0, self.depth - 1)
+
+    c = _Checker()
+    c.feed(html)
+    assert c.nested == 0

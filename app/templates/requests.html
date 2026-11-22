@@ -4,7 +4,11 @@
 {% if user.role in ('admin', 'trainer', 'student') %}
 <div class="panel"><h4>Request a new virtual machine from a template</h4>
   {% if not templates %}
-    <p class="muted">No golden templates configured yet. An administrator can mark any registered VM as a template in <a href="{{ url_for('main.vms') }}">Virtual Machines</a>.</p>
+    {% if user.role == 'admin' %}
+      <p class="muted">No golden templates configured yet. Mark any registered VM as a template in <a href="{{ url_for('main.vms') }}">Virtual Machines</a>.</p>
+    {% else %}
+      <p class="muted">No golden templates are configured yet. Please contact your administrator to enable a VM template.</p>
+    {% endif %}
   {% else %}
   <form method="post" action="{{ url_for('main.request_new') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -62,7 +66,11 @@
         </form>
         {% endif %}
       {% elif r.status == 'ready' and r.created_vm_id %}
-        <a class="btn o" href="{{ url_for('main.snapshots', vm_id=r.created_vm_id) }}">Manage VM</a>
+        {% if user.role == 'student' %}
+          <a class="btn o" href="{{ url_for('main.dashboard') }}">View on Dashboard</a>
+        {% else %}
+          <a class="btn o" href="{{ url_for('main.vm_detail', vm_id=r.created_vm_id) }}">Manage VM</a>
+        {% endif %}
       {% else %}
         <span class="muted">-</span>
       {% endif %}

@@ -28,7 +28,7 @@
 <div class="panel">
   <h4>Power control</h4>
   <p class="muted" style="margin-bottom:12px">These act on the machine in VirtualBox immediately.
-    A machine paused here stays paused: the monitor does not treat a deliberate pause as a fault.</p>
+    Pausing a running VM places it into a frozen state monitored for automatic recovery.</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap">
     {% for action, label in (('start','Start'), ('stop','Stop'), ('restart','Restart'), ('reset','Reset'), ('pause','Pause'), ('resume','Resume')) %}
     <form class="inline" method="post" action="{{ url_for('main.vm_power', vm_id=vm.vm_id) }}">
@@ -41,6 +41,16 @@
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <button class="btn" type="submit">Take snapshot</button>
     </form>
+    {% if user.role == 'admin' %}
+    <form class="inline" method="post" action="{{ url_for('main.demo', action='crash', vm_id=vm.vm_id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn r" type="submit">{{ 'Sim. crash' if simulate else 'Test crash' }}</button>
+    </form>
+    <form class="inline" method="post" action="{{ url_for('main.demo', action='freeze', vm_id=vm.vm_id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn r" type="submit">{{ 'Sim. freeze' if simulate else 'Test freeze' }}</button>
+    </form>
+    {% endif %}
   </div>
 </div>
 
