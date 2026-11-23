@@ -68,10 +68,34 @@ def build_milestone6():
         run = p.add_run()
         run.add_break(docx.enum.text.WD_BREAK.PAGE)
 
+    def ins_section_break():
+        """Insert a Next-Page section break right before p_anchor so Cover Page,
+        Preliminary Pages (Roman i, ii, iii...), and Chapter 1+ (Arabic 1, 2, 3...)
+        have completely independent page numbering."""
+        from copy import deepcopy
+        from docx.oxml import OxmlElement
+        from docx.oxml.ns import qn
+        p = p_anchor.insert_paragraph_before()
+        p.paragraph_format.space_before = Pt(0)
+        p.paragraph_format.space_after = Pt(0)
+        pPr = p._p.get_or_add_pPr()
+        # Clone base section properties (page size/margins) without copying old header/footer refs
+        base_sect = doc.sections[-1]._sectPr
+        sectPr = OxmlElement('w:sectPr')
+        for tag in ('w:pgSz', 'w:pgMar', 'w:cols', 'w:docGrid'):
+            found = base_sect.find(qn(tag))
+            if found is not None:
+                sectPr.append(deepcopy(found))
+        s_type = OxmlElement('w:type')
+        s_type.set(qn('w:val'), 'nextPage')
+        sectPr.append(s_type)
+        pPr.append(sectPr)
+        return p
+
     print("Inserting Preliminary Pages before Chapter One...")
 
-    # --- Page Break after Cover Page ---
-    ins_page_break()
+    # --- Section Break after Cover Page (Section 0 = Cover Page, unnumbered) ---
+    ins_section_break()
 
     # --- DECLARATION AND APPROVAL ---
     ins_p("DECLARATION AND APPROVAL", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
@@ -249,7 +273,8 @@ def build_milestone6():
     for acr, full in acronyms:
         ins_p(f"{acr:<8} :  {full}", align=WD_ALIGN_PARAGRAPH.LEFT, space_after=2, line_spacing=1.0)
 
-    ins_page_break()
+    # --- Section Break before Chapter One (Section 1 = Preliminary Roman, Section 2 = Chapter 1+ Arabic) ---
+    ins_section_break()
     print("Preliminary pages inserted successfully.")
 
     # -------------------------------------------------------------
@@ -531,6 +556,67 @@ def build_milestone6():
         sec.bottom_margin = Inches(0.75)
         sec.left_margin = Inches(0.85)
         sec.right_margin = Inches(0.85)
+
+    # Configure academic 3-part page numbering:
+    #   Section 0 (Cover Page): NO page number
+    #   Section 1 (Preliminary Pages): lowercase Roman numerals starting at i (i, ii, iii...)
+    #   Section 2+ (Chapter 1 to Appendices): Arabic numerals starting at 1 (1, 2, 3...)
+    def set_section_page_number(section, fmt=None, start=None):
+        section.different_first_page_header_footer = False
+        footer = section.footer
+        footer.is_linked_to_previous = False
+        for p in list(footer.paragraphs):
+            p.clear()
+        p = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.space_before = Pt(0)
+        p.paragraph_format.space_after = Pt(0)
+
+        # Remove any existing pgNumType on this section
+        for old in section._sectPr.findall(qn('w:pgNumType')):
+            section._sectPr.remove(old)
+
+        if fmt is None:
+            # Cover page: leave footer completely blank (unnumbered)
+            return
+
+        pg_num = OxmlElement('w:pgNumType')
+        pg_num.set(qn('w:fmt'), fmt)
+        if start is not None:
+            pg_num.set(qn('w:start'), str(start))
+        section._sectPr.append(pg_num)
+
+        r_begin = p.add_run()
+        fld_b = OxmlElement('w:fldChar')
+        fld_b.set(qn('w:fldCharType'), 'begin')
+        r_begin._r.append(fld_b)
+
+        r_instr = p.add_run()
+        instr_el = OxmlElement('w:instrText')
+        instr_el.set(qn('xml:space'), 'preserve')
+        instr_el.text = ' PAGE '
+        r_instr._r.append(instr_el)
+
+        r_sep = p.add_run()
+        fld_s = OxmlElement('w:fldChar')
+        fld_s.set(qn('w:fldCharType'), 'separate')
+        r_sep._r.append(fld_s)
+
+        r_val = p.add_run('i' if fmt == 'lowerRoman' else '1')
+        r_val.font.name = 'Montserrat Medium'
+        r_val.font.size = Pt(10)
+
+        r_end = p.add_run()
+        fld_e = OxmlElement('w:fldChar')
+        fld_e.set(qn('w:fldCharType'), 'end')
+        r_end._r.append(fld_e)
+
+    if len(doc.sections) >= 3:
+        set_section_page_number(doc.sections[0], fmt=None)                       # Cover page: no number
+        set_section_page_number(doc.sections[1], fmt='lowerRoman', start=1)      # Preliminary: i, ii, iii...
+        set_section_page_number(doc.sections[2], fmt='decimal', start=1)         # Chapter 1+: 1, 2, 3...
+        for extra_sec in doc.sections[3:]:
+            extra_sec.footer.is_linked_to_previous = True
 
     # Cap any tall legacy Chapter 1/2 images (> 3.25" tall) proportionally
     max_h_emu = int(Inches(3.25))
