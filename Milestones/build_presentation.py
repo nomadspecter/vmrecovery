@@ -328,7 +328,7 @@ def build_presentation():
             ("Uninterrupted Practical Learning", "Keeps lab sessions running smoothly and lets students experiment safely with pre-session snapshot baselines."),
             ("Reduced Technician Workload", "Automates health polling, snapshot retention pruning, class session startups, and Golden Master VM cloning."),
             ("Full Accountability & Reporting", "Records every crash, restore, and action in an immutable audit log with MTTR reports and email/webhook alerts."),
-            ("Cost-Effective & Secure", "Built on an open-source stack for existing lab hosts with RBAC (Admin/Trainer/Student), CSRF protection, and Cloudflare Zero-Trust HTTPS."),
+            ("Cost-Effective & Secure", "Built on an open-source stack for existing lab hosts with RBAC (Admin/Trainer/Student), CSRF protection, and PBKDF2 hashing."),
         ],
         font_size=14.5, space_after=14
     )
@@ -425,7 +425,7 @@ def build_presentation():
         [
             ("1. Analysis & Design", "DFDs (Level 0 & 1), 10-table ERD, UML Use Case & Class Diagrams."),
             ("2. Build & Testing", "Iterative development validated by 154/154 passing automated pytest cases."),
-            ("3. On-Premise Host", "Linux systemd service (vmrecovery.service) + Cloudflare Zero-Trust HTTPS tunnel."),
+            ("3. On-Premise Host", "Linux systemd service (vmrecovery.service) + Waitress WSGI + Oracle VirtualBox 7.2."),
             ("4. Live Cloud Demo", "Render PaaS (vmrecovery-demo.onrender.com) + Supabase PostgreSQL for 24/7 live evaluation."),
         ],
         accent_color=NAVY, bg_color=SOFT_NAVY_BG

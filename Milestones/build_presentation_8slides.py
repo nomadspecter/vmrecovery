@@ -345,7 +345,7 @@ def build_8slide_presentation():
         ("Uninterrupted Learning", "Eliminates practical downtime and lets students experiment safely with pre-session snapshot baselines."),
         ("Reduced Technician Workload", "Automates 10s health polling, snapshot retention pruning, class sessions, and Golden Master VM cloning."),
         ("Full Accountability & Reporting", "Immutable audit trail, MTTR reliability reports, CSV exports, and real-time SMTP/webhook incident alerts."),
-        ("Cost-Effective & Secure", "100% open-source stack on existing lab hosts with RBAC, PBKDF2 hashing, CSRF protection, and Cloudflare Zero-Trust HTTPS."),
+        ("Cost-Effective & Secure", "100% open-source stack on existing lab hosts with RBAC, PBKDF2 hashing, CSRF protection, and HTTPS cloud hosting."),
     ])
     add_banner(s_justif, 0.85, 5.95, 11.65, 0.82, "PROVEN VALUE",
                "Verified with 154/154 automated tests passing (100% pass rate) and 8.4s measured crash-to-boot recovery.", bg_color=NAVY)
@@ -382,7 +382,7 @@ def build_8slide_presentation():
         ("Hypervisor Layer", "Oracle VirtualBox 7.2 (VBoxManage CLI) + Simulation Engine"),
         ("Dual Database", "SQLite 3 (WAL mode) locally & Supabase PostgreSQL in cloud"),
         ("Security", "PBKDF2 hashing, CSRF tokens, RBAC, HMAC-SHA256 webhooks"),
-        ("Remote & Cloud", "Cloudflare Zero-Trust Tunnel + Render PaaS Demo"),
+        ("Cloud Demo", "Render PaaS (vmrecovery-demo.onrender.com) + Supabase PostgreSQL"),
     ], accent_color=NAVY, body_size=11.5)
     set_notes(s_arch, "Point to the layered diagram: Web UI & REST API -> Services -> VBoxManage / SQLite WAL / Supabase PostgreSQL.")
 
@@ -415,7 +415,7 @@ def build_8slide_presentation():
 
     add_card(s_results, 0.75, 2.76, 5.75, 4.02, "Hybrid Edge-Cloud Deployment", [
         ("On-Premises Lab Host", "Linux systemd (vmrecovery.service) + Waitress WSGI + Oracle VirtualBox 7.2 + SQLite WAL."),
-        ("Cloudflare Zero-Trust", "Outbound encrypted tunnel for secure remote HTTPS with zero open campus firewall ports."),
+        ("Independent Backups", "Standalone .ova appliance exports & hourly online SQLite hot backups with 7-day retention."),
         ("Render Cloud PaaS", "Public live demo at https://vmrecovery-demo.onrender.com (Simulation Mode active)."),
         ("Supabase PostgreSQL", "Managed cloud database (EU Central 1) with TLS pooling & automatic schema migration."),
     ], accent_color=NAVY, body_size=11.8)
