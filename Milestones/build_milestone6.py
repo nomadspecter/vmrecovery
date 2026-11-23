@@ -617,6 +617,8 @@ def build_milestone6():
         set_section_page_number(doc.sections[2], fmt='decimal', start=1)         # Chapter 1+: 1, 2, 3...
         for extra_sec in doc.sections[3:]:
             extra_sec.footer.is_linked_to_previous = True
+            for old in extra_sec._sectPr.findall(qn('w:pgNumType')):
+                extra_sec._sectPr.remove(old)
 
     # Cap any tall legacy Chapter 1/2 images (> 3.25" tall) proportionally
     max_h_emu = int(Inches(3.25))
