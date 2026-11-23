@@ -33,7 +33,7 @@ def set_table_borders(table):
                         f'</w:tblBorders>')
     tblPr.append(borders)
 
-def add_p(doc, text, style=None, bold_prefix="", italic=False, align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=6, line_spacing=1.15):
+def add_p(doc, text, style=None, bold_prefix="", italic=False, align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=4, line_spacing=1.12):
     p = doc.add_paragraph()
     p.alignment = align
     p.paragraph_format.space_after = Pt(space_after)
@@ -42,13 +42,13 @@ def add_p(doc, text, style=None, bold_prefix="", italic=False, align=WD_ALIGN_PA
     if bold_prefix:
         r_pre = p.add_run(bold_prefix)
         r_pre.font.name = 'Montserrat Medium'
-        r_pre.font.size = Pt(12)
+        r_pre.font.size = Pt(11)
         r_pre.bold = True
         
     if text:
         r = p.add_run(text)
         r.font.name = 'Montserrat Medium'
-        r.font.size = Pt(12)
+        r.font.size = Pt(11)
         r.italic = italic
     return p
 
@@ -56,12 +56,12 @@ def add_heading_1(doc, text):
     p = doc.add_paragraph()
     p.style = 'Heading 1'
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    p.paragraph_format.space_before = Pt(12)
-    p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.space_before = Pt(10)
+    p.paragraph_format.space_after = Pt(4)
     p.paragraph_format.keep_with_next = True
     r = p.add_run(text)
     r.font.name = 'Montserrat Medium'
-    r.font.size = Pt(15)
+    r.font.size = Pt(14)
     r.bold = True
     return p
 
@@ -69,12 +69,12 @@ def add_heading_2(doc, text):
     p = doc.add_paragraph()
     p.style = 'Heading 2'
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    p.paragraph_format.space_before = Pt(10)
-    p.paragraph_format.space_after = Pt(4)
+    p.paragraph_format.space_before = Pt(8)
+    p.paragraph_format.space_after = Pt(3)
     p.paragraph_format.keep_with_next = True
     r = p.add_run(text)
     r.font.name = 'Montserrat Medium'
-    r.font.size = Pt(13)
+    r.font.size = Pt(12.5)
     r.bold = True
     return p
 
@@ -82,27 +82,41 @@ def add_heading_3(doc, text):
     p = doc.add_paragraph()
     p.style = 'Heading 3'
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    p.paragraph_format.space_before = Pt(8)
-    p.paragraph_format.space_after = Pt(3)
+    p.paragraph_format.space_before = Pt(6)
+    p.paragraph_format.space_after = Pt(2)
     p.paragraph_format.keep_with_next = True
     r = p.add_run(text)
     r.font.name = 'Montserrat Medium'
-    r.font.size = Pt(12)
+    r.font.size = Pt(11.5)
     r.bold = True
     return p
+
+def _ensure_caption_style(doc, name):
+    from docx.enum.style import WD_STYLE_TYPE
+    if name not in [s.name for s in doc.styles]:
+        st = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+        st.font.name = 'Montserrat Medium'
+        st.font.size = Pt(10)
+        st.font.bold = True
+    return doc.styles[name]
 
 def add_caption(doc, text):
     p = doc.add_paragraph()
+    t = text.strip()
+    if t.startswith(("Figure ", "Listing ")):
+        p.style = _ensure_caption_style(doc, "FigureCaption")
+    elif t.startswith("Table "):
+        p.style = _ensure_caption_style(doc, "TableCaption")
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.paragraph_format.space_before = Pt(3)
-    p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.space_before = Pt(2)
+    p.paragraph_format.space_after = Pt(5)
     r = p.add_run(text)
     r.font.name = 'Montserrat Medium'
-    r.font.size = Pt(10.5)
+    r.font.size = Pt(10)
     r.bold = True
     return p
 
-def add_image_box(doc, img_path, caption_text, width=Inches(5.6), max_height=Inches(3.85)):
+def add_image_box(doc, img_path, caption_text, width=Inches(5.2), max_height=Inches(3.05)):
     if os.path.exists(img_path):
         from PIL import Image
         with Image.open(img_path) as im:
@@ -110,8 +124,8 @@ def add_image_box(doc, img_path, caption_text, width=Inches(5.6), max_height=Inc
         ratio = iw / ih
         w_in = width.inches if hasattr(width, 'inches') else float(width)
         max_h_in = max_height.inches if hasattr(max_height, 'inches') else float(max_height)
-        if w_in > 5.8:
-            w_in = 5.8
+        if w_in > 5.3:
+            w_in = 5.3
         h_in = w_in / ratio
         if h_in > max_h_in:
             h_in = max_h_in
@@ -119,8 +133,8 @@ def add_image_box(doc, img_path, caption_text, width=Inches(5.6), max_height=Inc
 
         p_img = doc.add_paragraph()
         p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img.paragraph_format.space_before = Pt(4)
-        p_img.paragraph_format.space_after = Pt(2)
+        p_img.paragraph_format.space_before = Pt(3)
+        p_img.paragraph_format.space_after = Pt(1)
         p_img.paragraph_format.keep_with_next = True
         run = p_img.add_run()
         run.add_picture(img_path, width=Inches(w_in), height=Inches(h_in))
@@ -151,7 +165,7 @@ def add_code_snippet(doc, code_str, caption_title, img_path=None):
                 break
 
     if img_path and os.path.exists(img_path):
-        add_image_box(doc, img_path, caption_title, width=Inches(5.8), max_height=Inches(3.95))
+        add_image_box(doc, img_path, caption_title, width=Inches(5.3), max_height=Inches(3.10))
         return
 
     add_caption(doc, caption_title)

@@ -35,9 +35,9 @@ def update_chapter2_doc(doc_path):
             print(f"  -> Warning: {rid} not found in doc or {img_file} missing")
 
     # Fix inline_shape width & height to match each replacement PNG's TRUE aspect ratio
-    # (prevents Word from squishing Level 0 DFD to 6.25"x1.79" or stretching Level 1 DFD!)
-    max_w_in = 5.8
-    max_h_in = 4.2
+    # Compact max_h_in=3.15 so two figures + text fit cleanly per page without half-page blank voids
+    max_w_in = 5.3
+    max_h_in = 3.15
     for shape in doc.inline_shapes:
         blip = shape._inline.xpath('.//a:blip/@r:embed')
         rid = blip[0] if blip else None
@@ -54,10 +54,38 @@ def update_chapter2_doc(doc_path):
             new_cy = int(Inches(h_in))
             shape.width = new_cx
             shape.height = new_cy
-            # Also sync inner <a:ext> inside <pic:spPr><a:xfrm> so LibreOffice & Word both respect it
             for ext in shape._inline.xpath('.//a:ext'):
                 ext.set('cx', str(new_cx))
                 ext.set('cy', str(new_cy))
+
+    # Update Gantt Chart Table (Table 1) dates to align with Project Presentation on November 23rd, 2026
+    gantt_weeks = [
+        "31 Aug – 4 Sep 2026",
+        "7 – 11 Sep 2026",
+        "14 – 18 Sep 2026",
+        "21 – 25 Sep 2026",
+        "28 Sep – 2 Oct 2026",
+        "5 – 9 Oct 2026",
+        "12 – 16 Oct 2026",
+        "19 – 23 Oct 2026",
+        "26 – 30 Oct 2026",
+        "2 – 6 Nov 2026",
+        "9 – 13 Nov 2026",
+        "16 – 20 Nov 2026",
+        "23rd Nov 2026",
+    ]
+    for tbl in doc.tables:
+        if len(tbl.rows) >= 15 and len(tbl.columns) >= 7 and "WEEKS" in tbl.rows[1].cells[0].text.upper():
+            for offset, label in enumerate(gantt_weeks):
+                cell = tbl.rows[2 + offset].cells[0]
+                cell.paragraphs[0].text = label
+                for r in cell.paragraphs[0].runs:
+                    r.font.name = 'Montserrat Medium'
+                    r.font.size = Pt(9.5)
+                    if offset == len(gantt_weeks) - 1:
+                        r.bold = True
+            print("  -> Updated Gantt table weeks to end on 23rd Nov 2026")
+            break
 
     # Remove unnecessary mid-Chapter-2 page breaks that cause half-page blank white gaps
     for idx, p in enumerate(list(doc.paragraphs)):

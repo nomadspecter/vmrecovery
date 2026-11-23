@@ -136,143 +136,68 @@ def build_milestone6():
 
     ins_page_break()
 
-    # --- TABLE OF CONTENTS ---
-    ins_p("TABLE OF CONTENTS", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
-    toc_items = [
-        ("Declaration and Approval", "ii"),
-        ("Dedication", "iii"),
-        ("Acknowledgements", "iv"),
-        ("Abstract", "v"),
-        ("Table of Contents", "vi"),
-        ("List of Figures", "vii"),
-        ("List of Tables", "viii"),
-        ("List of Abbreviations and Acronyms", "ix"),
-        ("CHAPTER ONE: PROJECT PLANNING AND ANALYSIS", "1"),
-        ("  1.1 Statement of Problem", "1"),
-        ("  1.2 Study Justification", "2"),
-        ("  1.3 System Objectives", "2"),
-        ("    1.3.1 General Objective", "2"),
-        ("    1.3.2 Specific Objectives", "2"),
-        ("  1.4 Functional Requirements", "3"),
-        ("  1.5 Breakdown of Tools & Resources to Be Used", "4"),
-        ("  1.6 Project Schedule Breakdown (Gantt Chart)", "6"),
-        ("CHAPTER TWO: DESIGN AND MODELING", "8"),
-        ("  2.1 Introduction to Modelling", "8"),
-        ("  2.2 User Interface Models", "8"),
-        ("    2.2.1 Login Page", "8"),
-        ("    2.2.2 Dashboard", "9"),
-        ("    2.2.3 Virtual Machines Registry", "10"),
-        ("    2.2.4 Snapshots and Restore", "11"),
-        ("    2.2.5 Event Log", "12"),
-        ("    2.2.6 Reports", "13"),
-        ("    2.2.7 Virtual Machine Provisioning Requests", "14"),
-        ("    2.2.8 System Health and Notification Audit", "15"),
-        ("  2.3 Logic Models", "16"),
-        ("    2.3.1 Login Process Flowchart", "16"),
-        ("    2.3.2 System Flowchart", "17"),
-        ("    2.3.3 Data Flow Diagrams (Level 0 and Level 1)", "19"),
-        ("    2.3.4 Entity Relationship Diagram (ERD)", "22"),
-        ("    2.3.5 Use Case Diagram", "24"),
-        ("    2.3.6 Class Diagram", "26"),
-        ("CHAPTER THREE: SYSTEM METHODOLOGY AND ARCHITECTURE", "28"),
-        ("  3.1 System Architecture and Modular Organization", "28"),
-        ("  3.2 Implementation Environment and Technology Stack", "29"),
-        ("  3.3 Database Development and Schema Migrations", "30"),
-        ("  3.4 Feature-by-Feature Implementation and Debugging (Part 1 - Core Modules)", "35"),
-        ("  3.5 Feature Debugging and Problem-Solving Log (Part 1)", "38"),
-        ("  3.6 Unit and Integration Testing (Part 1)", "40"),
-        ("  3.7 Summary of Chapter Three Achievements", "42"),
-        ("CHAPTER FOUR: SYSTEM IMPLEMENTATION, TESTING AND DEPLOYMENT", "43"),
-        ("  4.1 Automated Snapshot Engine and Retention Policy Enforcement", "43"),
-        ("  4.2 Autonomous Recovery Engine and Failure Modes Handling", "44"),
-        ("  4.3 Disaster Recovery: Independent Appliance (.ova) Engine and Online Backups", "46"),
-        ("  4.4 Golden Master Template Provisioning and Student Request Workflow", "47"),
-        ("  4.5 Multi-Channel Alert and Notification Engine", "48"),
-        ("  4.6 RESTful API and Administrative Command-Line Interface (CLI)", "49"),
-        ("  4.7 Advanced Feature Debugging and Problem-Solving Log (Part 2)", "50"),
-        ("  4.8 Comprehensive System Testing Matrix (Full 154-Test Verification)", "52"),
-        ("  4.9 Summary of System Implementation and Verification", "54"),
-        ("  4.10 Deployment Strategy and Hybrid Edge-Cloud Architecture", "55"),
-        ("  4.11 Production Host Setup and Systemd Daemon Hardening", "56"),
-        ("  4.12 Cloudflare Zero-Trust Tunnel Configuration and Edge Ingress", "57"),
-        ("  4.13 Cloud Database Replication & Supabase Managed PostgreSQL Architecture", "58"),
-        ("  4.14 Cloud Demonstration Deployment (Render & Supabase PostgreSQL Integration)", "59"),
-        ("  4.15 Operational Validation and Deployment Testing Results", "60"),
-        ("  4.16 Summary of Chapter Four Achievements", "62"),
-        ("CHAPTER FIVE: CONCLUSIONS AND RECOMMENDATIONS", "63"),
-        ("  5.1 Summary of Project Achievements", "63"),
-        ("  5.2 Challenges Encountered and Technical Mitigations", "64"),
-        ("  5.3 Recommendations for Future Work", "65"),
-        ("  5.4 Concluding Remarks", "66"),
-        ("REFERENCES (APA 7th Edition)", "67"),
-        ("APPENDICES", "68"),
-        ("  Appendix A: Project Schedule and Budget", "68"),
-        ("  Appendix B: Installation and Role-Based User Manual", "69"),
-        ("  Appendix C: Administrative CLI and Configuration Reference", "70"),
-        ("  Appendix D: Laboratory Evaluation Questionnaire", "71")
-    ]
-    for item, pg in toc_items:
-        dots = ". " * int((60 - len(item)) / 2)
-        ins_p(f"{item} {dots} {pg}", align=WD_ALIGN_PARAGRAPH.LEFT, space_after=3, line_spacing=1.0)
+    def ins_auto_field(instr: str, placeholder_text: str):
+        """Insert a true Word OOXML field (TOC / List of Figures / List of Tables)
+        that auto-generates with live page numbers when Update Field is clicked."""
+        from docx.oxml import OxmlElement
+        from docx.oxml.ns import qn
+        p = p_anchor.insert_paragraph_before()
+        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        p.paragraph_format.space_before = Pt(4)
+        p.paragraph_format.space_after = Pt(8)
+
+        r_begin = p.add_run()
+        fld_begin = OxmlElement('w:fldChar')
+        fld_begin.set(qn('w:fldCharType'), 'begin')
+        fld_begin.set(qn('w:dirty'), 'true')
+        r_begin._r.append(fld_begin)
+
+        r_instr = p.add_run()
+        instr_el = OxmlElement('w:instrText')
+        instr_el.set(qn('xml:space'), 'preserve')
+        instr_el.text = f' {instr} '
+        r_instr._r.append(instr_el)
+
+        r_sep = p.add_run()
+        fld_sep = OxmlElement('w:fldChar')
+        fld_sep.set(qn('w:fldCharType'), 'separate')
+        r_sep._r.append(fld_sep)
+
+        r_txt = p.add_run(placeholder_text)
+        r_txt.font.name = 'Montserrat Medium'
+        r_txt.font.size = Pt(10.5)
+        r_txt.italic = True
+
+        r_end = p.add_run()
+        fld_end = OxmlElement('w:fldChar')
+        fld_end.set(qn('w:fldCharType'), 'end')
+        r_end._r.append(fld_end)
+        return p
+
+    # --- TABLE OF CONTENTS (Auto-Generated Word Field) ---
+    ins_p("TABLE OF CONTENTS", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=10)
+    ins_auto_field(
+        'TOC \\o "1-3" \\h \\z \\u',
+        '[Table of Contents — Right-click and select "Update Field" (or press F9 / allow automatic update on open) to populate live page numbers.]'
+    )
 
     ins_page_break()
 
-    # --- LIST OF FIGURES ---
-    ins_p("LIST OF FIGURES", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
-    figs = [
-        ("Figure 2.2.1: Login Page", "9"),
-        ("Figure 2.2.2: Dashboard Interface", "10"),
-        ("Figure 2.2.3: Virtual Machine Registration and Snapshot Policy Form", "11"),
-        ("Figure 2.2.4: Snapshot History and Restore Confirmation", "12"),
-        ("Figure 2.2.5: Event Log Page", "13"),
-        ("Figure 2.2.6: Reports Interface", "14"),
-        ("Figure 2.2.7: Virtual Machine Provisioning Requests Page", "15"),
-        ("Figure 2.2.8: System Health and Notification Audit Page", "16"),
-        ("Figure 2.3.1: Login Process Flowchart", "17"),
-        ("Figure 2.3.2a: System Flowchart (User Operations)", "18"),
-        ("Figure 2.3.2b: Automated Snapshot and Recovery Flowchart", "19"),
-        ("Figure 2.3.3a: Level 0 Data Flow Diagram (Context Diagram)", "20"),
-        ("Figure 2.3.3b: Level 1 Data Flow Diagram", "21"),
-        ("Figure 2.3.4: Complete Entity Relationship Diagram (10 Tables)", "23"),
-        ("Figure 2.3.5: Complete UML Use Case Diagram", "25"),
-        ("Figure 2.3.6: Complete UML Architectural Class Diagram", "27"),
-        ("Figure 3.1: Modular System Architecture and Process Interaction Model", "29"),
-        ("Figure 3.2: SQLite WAL Concurrency and Migration Architecture", "32"),
-        ("Figure 3.3: Authentication & Secure Role-Based Access Control Interface", "36"),
-        ("Figure 3.4: Virtual Machine Registry Management Interface", "37"),
-        ("Figure 3.5: Real-Time Laboratory VM Health Monitoring Dashboard", "38"),
-        ("Figure 3.6: Background Worker Cycle & Fault Detection Flowchart", "39"),
-        ("Figure 4.1: Automated Snapshot Engine Architecture & Retention Pruning Flow", "44"),
-        ("Figure 4.2: Autonomous Zero-Touch Rollback Sequence Diagram", "45"),
-        ("Figure 4.3: Independent Appliance (.ova) Disaster Recovery Pipeline", "46"),
-        ("Figure 4.4: Golden Master Template Provisioning & Approval State Machine", "47"),
-        ("Figure 4.5: Multi-Channel Alert Dispatcher & HMAC-SHA256 Webhook Pipeline", "48"),
-        ("Figure 4.6: Token-Authenticated RESTful API & CLI Subsystem Architecture", "49"),
-        ("Figure 4.7: Comprehensive 154-Test Automated Validation Execution Console", "53"),
-        ("Figure 4.8: Hybrid Edge-Cloud Production Deployment Architecture", "56"),
-        ("Figure 4.9: Production System Telemetry, Runtime Controls & Service Daemon Status", "61")
-    ]
-    for ftitle, fpg in figs:
-        dots = ". " * int((58 - len(ftitle)) / 2)
-        ins_p(f"{ftitle} {dots} {fpg}", align=WD_ALIGN_PARAGRAPH.LEFT, space_after=3, line_spacing=1.0)
+    # --- LIST OF FIGURES (Auto-Generated Word Field) ---
+    ins_p("LIST OF FIGURES", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=10)
+    ins_auto_field(
+        'TOC \\h \\z \\t "FigureCaption,1"',
+        '[List of Figures & Code Listings — Right-click and select "Update Field" to auto-generate all figures with live page numbers.]'
+    )
 
     ins_page_break()
 
-    # --- LIST OF TABLES ---
-    ins_p("LIST OF TABLES", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=14)
-    tbls = [
-        ("Table 1.4.1: Functional Requirements Specification", "4"),
-        ("Table 1.6.1: Project Schedule Breakdown (Gantt Chart)", "7"),
-        ("Table 3.2.1: Implementation Technology Stack", "30"),
-        ("Table 3.3.1: Complete Relational Database Data Dictionary", "33"),
-        ("Table 3.3.2: Numbered Database Migrations Record (Schema Version 8)", "34"),
-        ("Table 3.6.1: Core Module Unit and Integration Testing Execution Matrix", "41"),
-        ("Table 4.8.1: Comprehensive System Testing Execution Matrix (154 Total Tests)", "53"),
-        ("Table 4.15.1: Production Deployment Environment Verification Matrix", "60")
-    ]
-    for ttitle, tpg in tbls:
-        dots = ". " * int((58 - len(ttitle)) / 2)
-        ins_p(f"{ttitle} {dots} {tpg}", align=WD_ALIGN_PARAGRAPH.LEFT, space_after=3, line_spacing=1.0)
+    # --- LIST OF TABLES (Auto-Generated Word Field) ---
+    ins_p("LIST OF TABLES", is_heading=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=10)
+    ins_auto_field(
+        'TOC \\h \\z \\t "TableCaption,1"',
+        '[List of Tables — Right-click and select "Update Field" to auto-generate all tables with live page numbers.]'
+    )
 
     ins_page_break()
 
@@ -481,14 +406,15 @@ def build_milestone6():
     add_heading_2(doc, "Appendix A: Project Schedule and Budget")
     add_p(doc, "Table A.1 summarizes the phased execution timeline from proposal approval through final defense, and Table A.2 outlines the total project expenditure.")
     add_appendix_table(
-        ["Phase / Milestone", "Key Deliverables", "Timeline", "Status"],
+        ["Phase / Milestone", "Key Deliverables", "Dates (2026)", "Status"],
         [
-            ("Milestone 1: Proposal", "Problem statement, objectives, scope, literature review", "Weeks 1 – 2", "Completed"),
-            ("Milestone 2: Analysis & Design", "DFDs (Level 0 & 1), 10-table ERD, UML Use Case & Class Diagrams", "Weeks 3 – 4", "Completed"),
-            ("Milestone 3: Architecture & Core", "Flask backend, VBoxManage wrapper, SQLite WAL, worker daemon", "Weeks 5 – 7", "Completed"),
-            ("Milestone 4: Implementation & Testing", "Snapshots, auto-recovery, student portal, 154 automated pytest cases", "Weeks 8 – 10", "Completed"),
-            ("Milestone 5: Deployment", "Systemd service, Cloudflare Zero-Trust, Render PaaS + Supabase DB", "Weeks 11 – 12", "Completed"),
-            ("Milestone 6: Final Documentation", "Compiled documentation book, appendices & project defense deck", "Week 13", "Completed"),
+            ("Milestone 1: Planning & Analysis", "Problem statement, objectives, scope, Gantt schedule", "31 Aug – 11 Sep 2026", "Completed"),
+            ("Milestone 2: Design & Modeling", "DFDs (Level 0 & 1), 10-table ERD, UML Use Case & Class Diagrams", "14 Sep – 2 Oct 2026", "Completed"),
+            ("Milestone 3: Architecture & Core", "Flask backend, VBoxManage wrapper, SQLite WAL, worker daemon", "5 Oct – 23 Oct 2026", "Completed"),
+            ("Milestone 4: Build & Testing", "Snapshots, auto-recovery, student portal, 154 automated pytest cases", "26 Oct – 6 Nov 2026", "Completed"),
+            ("Milestone 5: Deployment", "Systemd service, Cloudflare Zero-Trust, Render PaaS + Supabase DB", "9 Nov – 13 Nov 2026", "Completed"),
+            ("Milestone 6: Final Documentation", "Compiled documentation book, appendices & slides finalization", "16 Nov – 20 Nov 2026", "Completed"),
+            ("Project Presentation & Defense", "Live demonstration & oral project defense at Zetech University", "23rd Nov 2026", "Scheduled"),
         ]
     )
     add_caption(doc, "Table A.1: Project Implementation Schedule")
@@ -582,6 +508,49 @@ def build_milestone6():
         ]
     )
     add_caption(doc, "Table D.1: Post-Deployment Laboratory Evaluation Questionnaire")
+
+    # -------------------------------------------------------------
+    # 5. POST-PASS: AUTO-GENERATE TAGS, COMPACT MARGINS & IMAGE CAP
+    # -------------------------------------------------------------
+    from docx.oxml import OxmlElement
+    from docx.oxml.ns import qn
+    from docx_helpers import _ensure_caption_style
+
+    fig_style = _ensure_caption_style(doc, "FigureCaption")
+    tbl_style = _ensure_caption_style(doc, "TableCaption")
+    for p in doc.paragraphs:
+        t = p.text.strip()
+        if t.startswith(("Figure ", "Listing ")) and len(t) < 160:
+            p.style = fig_style
+        elif t.startswith("Table ") and len(t) < 160:
+            p.style = tbl_style
+
+    # Compact margins to reduce total page count & eliminate excessive white gaps
+    for sec in doc.sections:
+        sec.top_margin = Inches(0.75)
+        sec.bottom_margin = Inches(0.75)
+        sec.left_margin = Inches(0.85)
+        sec.right_margin = Inches(0.85)
+
+    # Cap any tall legacy Chapter 1/2 images (> 3.25" tall) proportionally
+    max_h_emu = int(Inches(3.25))
+    for shape in doc.inline_shapes:
+        if shape.height > max_h_emu:
+            scale = max_h_emu / shape.height
+            new_w = int(shape.width * scale)
+            new_h = max_h_emu
+            shape.width = new_w
+            shape.height = new_h
+            for ext in shape._inline.xpath('.//a:ext'):
+                ext.set('cx', str(new_w))
+                ext.set('cy', str(new_h))
+
+    # Enable automatic field update on open in Word / LibreOffice / WPS
+    settings_el = doc.settings.element
+    if not settings_el.xpath('.//w:updateFields'):
+        upd = OxmlElement('w:updateFields')
+        upd.set(qn('w:val'), 'true')
+        settings_el.append(upd)
 
     print(f"Saving compiled final documentation book to {out_docx6}...")
     doc.save(out_docx6)
