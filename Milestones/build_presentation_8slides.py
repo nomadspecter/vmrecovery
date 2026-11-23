@@ -292,7 +292,7 @@ def build_8slide_presentation():
             tf.clear()
             p = tf.paragraphs[0]
             r = p.add_run()
-            r.text = "Automated Crash Recovery, Snapshot Orchestration & Hybrid Lab Management"
+            r.text = "Automated Crash Recovery, Snapshot Scheduling & Hybrid Lab Management"
             r.font.name = FONT_BODY
             r.font.size = Pt(12)
             r.font.color.rgb = RGBColor(0xE2, 0xE8, 0xF0)
@@ -423,10 +423,10 @@ def build_8slide_presentation():
     add_card(s_results, 6.83, 2.76, 5.75, 4.02, "Key Achievements & Future Work", [
         ("100% Objectives Met", "All 4 specific objectives implemented, tested across 7 pytest suites, and deployed live."),
         ("Solved Real Faults", "SQLite WAL concurrency, VirtualBox live-snapshot locks, systemd setuid access, and cloud DB hydration."),
-        ("Future — Multi-Hypervisor", "Extend controller layer to support Proxmox VE, KVM/QEMU, and VMware ESXi clusters."),
-        ("Future — Embedded Console", "Add HTML5 noVNC/RDP directly inside the Student Portal and university SSO login."),
+        ("Future: Multi-Hypervisor", "Extend controller layer to support Proxmox VE, KVM/QEMU, and VMware ESXi clusters."),
+        ("Future: Embedded Console", "Add HTML5 noVNC/RDP directly inside the Student Portal and university SSO login."),
     ], accent_color=MAROON, bg_color=SOFT_NAVY_BG, body_size=11.8)
-    set_notes(s_results, "Summarize your empirical validation (154/154 tests, 8.4s recovery), show the live Render URL vmrecovery-demo.onrender.com, and invite questions / begin the live demo.")
+    set_notes(s_results, "Summarize your test results (154/154 tests, 8.4s recovery), show the live Render URL vmrecovery-demo.onrender.com, and invite questions / begin the live demo.")
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     prs.save(OUTPUT_PATH)

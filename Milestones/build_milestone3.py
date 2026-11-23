@@ -88,7 +88,7 @@ def build_milestone3():
             r.bold = True
 
     stack_rows = [
-        ("Runtime Environment", "Python 3.14", "Provides robust subprocess control, built-in SQLite threading primitives, standard-library cryptography, and high performance."),
+        ("Runtime Environment", "Python 3.14", "Provides reliable subprocess control, built-in SQLite threading support, standard-library cryptography, and fast execution."),
         ("Hypervisor Engine", "Oracle VirtualBox 7.x & VBoxManage CLI", "Industry-standard Type-2 hypervisor capable of headless virtual machine execution, differencing disk snapshots, and guest property heartbeats."),
         ("Web Framework", "Flask 3.x", "Lightweight, flexible Python WSGI web microframework providing modular blueprints, template rendering via Jinja2, and session management."),
         ("Application Server", "Waitress WSGI", "Production-grade, pure-Python multi-threaded WSGI server that safely handles concurrent browser requests and API queries."),
@@ -138,7 +138,7 @@ def build_milestone3():
     )
     add_p(doc,
         "The busy_timeout handler ensures that if a momentary lock collision occurs during an intensive disk checkpoint, the requesting thread "
-        "waits up to 15 seconds rather than failing immediately. Furthermore, foreign key constraints are explicitly enforced at runtime, "
+        "waits up to 15 seconds rather than failing immediately. Foreign key constraints are also enforced at runtime, "
         "guaranteeing referential integrity across all relationships."
     )
 
@@ -220,7 +220,7 @@ def get_db(db_path=None):
     add_heading_3(doc, "3.3.3 The Numbered Schema Migration Engine (Migrations 1 to 8)")
     add_p(doc,
         "As system development progressed and additional features were introduced, preserving existing student records, "
-        "machine registrations, and historical event logs without destructive re-initialization became paramount. A custom, "
+        "machine registrations, and historical event logs without wiping existing data became essential. A custom, "
         "zero-dependency schema migration framework was built directly into app/db.py. The application splits the schema.sql file "
         "at the '-- INDEXES ---' marker, executing table creations first, then executing all unapplied numbered migrations, and finally "
         "applying indexes."
@@ -320,7 +320,7 @@ def get_db(db_path=None):
     )
     add_p(doc,
         "To protect against brute-force credential stuffing, an in-memory login rate limiter tracks failed authentication attempts per IP address. "
-        "Furthermore, Cross-Site Request Forgery (CSRF) tokens are validated on all state-changing POST requests."
+        "In addition, Cross-Site Request Forgery (CSRF) tokens are checked on all state-changing POST requests."
     )
 
     add_image_box(doc, 'Milestones/figures/screen_login.png', 
@@ -417,7 +417,7 @@ def run_worker(app, stop_event=None, poll_interval=10):
 
     add_heading_3(doc, "3.4.4 Layered Configuration Architecture")
     add_p(doc,
-        "To ensure seamless operation across development laptops, test suites, and production laboratory hypervisors, the configuration system "
+        "To work smoothly across development laptops, test suites, and production laboratory hypervisors, the configuration system "
         "(app/config.py) implements a strict six-tier precedence hierarchy:\n"
         "1. Database Overrides (app_settings): Runtime settings modified via the dashboard; highest priority.\n"
         "2. Real OS Environment Variables: Shell environment variables, Docker parameters, and systemd directives.\n"
@@ -537,7 +537,7 @@ def run_worker(app, stop_event=None, poll_interval=10):
 
     add_p(doc,
         "All 150 automated test cases across the system test suite (including test_web.py, test_services.py, test_enterprise.py, "
-        "and test_vbox_controller.py) passed with zero errors, achieving comprehensive code coverage across all core features."
+        "and test_vbox_controller.py) passed with zero errors, giving full test coverage across all core features."
     )
 
     # 3.7 Summary of Chapter Three
@@ -554,7 +554,7 @@ def run_worker(app, stop_event=None, poll_interval=10):
     )
     add_p(doc,
         "With the architectural methodology and core execution engines firmly established, Chapter Four presents the practical "
-        "feature implementation, disaster recovery algorithms, student provisioning workflows, comprehensive system verification, "
+        "feature implementation, disaster recovery routines, student provisioning workflows, full system testing, "
         "and production deployment."
     )
 

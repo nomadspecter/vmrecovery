@@ -38,7 +38,7 @@ def build_milestone5():
         "(vmrecovery.service), executing Waitress WSGI on http://127.0.0.1:5000 with direct access to local VirtualBox VMs via the VBoxManage CLI.\n"
         "• Pillar 2: Cloudflare Zero-Trust Ingress Tunnel (cloudflared): Creates an encrypted, outbound-only tunnel to Cloudflare's global edge network. "
         "This exposes the application securely over public HTTPS (e.g., https://vmrecovery.lab.com) with automatic SSL/TLS termination, zero router "
-        "port-forwarding, and full DDoS mitigation.\n"
+        "port-forwarding, and built-in DDoS protection.\n"
         "• Pillar 3: Managed Cloud Database & High-Availability Persistence (Supabase PostgreSQL): Implements managed cloud database persistence "
         "(app/pg_db.py) connecting to a dedicated Supabase PostgreSQL instance in EU Central 1 with TLS encryption, automated pooler failover, "
         "and self-migrating schema provisioning.\n"
@@ -123,8 +123,8 @@ WantedBy=multi-user.target'''
     add_heading_2(doc, "4.13 Cloud Database Replication and Supabase Managed PostgreSQL Architecture")
     add_p(doc,
         "To ensure high availability and enterprise persistence across distributed environments, the VM Recovery System implements a "
-        "dual-engine database architecture. On bare-metal laboratory hosts, the system leverages local SQLite with Write-Ahead Logging (WAL) "
-        "for microsecond execution times. In cloud environments where local container storage is ephemeral, the system seamlessly interfaces "
+        "dual-engine database setup. On local laboratory hosts, the system uses SQLite with Write-Ahead Logging (WAL) "
+        "for fast local reads and writes. In cloud environments where local container storage is temporary, the system connects cleanly "
         "with a cloud-managed PostgreSQL database provisioned on Supabase (Frankfurt, EU-Central-1)."
     )
     add_p(doc,
@@ -180,21 +180,21 @@ def init_pg_db(url: str) -> None:
     add_heading_2(doc, "4.14 Cloud Demonstration Deployment (Render & Supabase PostgreSQL Integration)")
     add_p(doc,
         "In addition to on-premises hypervisor operations, the system was packaged and deployed to a publicly accessible cloud environment "
-        "to facilitate remote academic evaluation and live demonstration without requiring physical presence in the university computer lab. "
+        "to support remote academic evaluation and live demonstration without requiring physical presence in the university computer lab. "
         "The cloud demonstration platform is hosted on Render at https://vmrecovery-demo.onrender.com and is backed by a dedicated, managed "
         "PostgreSQL database provisioned on Supabase (Frankfurt, EU-Central-1)."
     )
     add_p(doc,
         "The cloud deployment incorporates automated database schema migration, multi-user role-based authentication, student self-registration, "
         "and hypervisor simulation mode. In simulation mode (VMRECOVERY_SIMULATED=true), the system emulates Oracle VirtualBox VBoxManage execution "
-        "traces—including guest heartbeat degradation, freeze timeouts, autonomous debounce recovery cycles, and crash state transitions—ensuring "
+        "traces (including guest heartbeat drops, freeze timeouts, automatic debounce recovery cycles, and crash state transitions), allowing "
         "that evaluators can observe the entire recovery lifecycle in real time through an interactive public dashboard."
     )
 
     # 4.15 Operational Validation and Deployment Testing Results
     add_heading_2(doc, "4.15 Operational Validation and Deployment Testing Results")
     add_p(doc,
-        "To empirically confirm that the system functions correctly in its live deployment environment, an automated verification suite "
+        "To confirm directly that the system works properly in its live deployment environment, an automated verification script "
         "(deploy/verify_deployment.py) was executed directly against the running production service. Table 4.15.1 details the operational "
         "verification results across all deployment subsystems:"
     )
@@ -263,7 +263,7 @@ def init_pg_db(url: str) -> None:
     add_p(doc,
         "Chapter Four successfully demonstrated the complete implementation, rigorous validation, and production deployment of the Automated "
         "Virtual Machine Recovery System across both physical laboratory hypervisors and public cloud infrastructure, achieving all operational objectives:\n"
-        "1. Realized the full system architecture including core hypervisor management, automated heartbeat monitoring, autonomous debounce recovery, "
+        "1. Built the full system architecture including core hypervisor management, automated heartbeat monitoring, debounced auto-recovery, "
         "and multi-user role-based access control.\n"
         "2. Achieved 100% test pass rate across 154 unit, integration, recovery, and security tests, proving sub-10-second crash restoration.\n"
         "3. Transitioned the software to a hardened production systemd service running Waitress WSGI on the physical laboratory host with Cloudflare Zero-Trust ingress.\n"

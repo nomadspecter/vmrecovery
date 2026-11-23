@@ -144,8 +144,8 @@ def build_milestone6():
     ins_p("Virtual machines (VMs) form the educational backbone of modern technical training institutions, allowing learners to experiment "
           "with operating systems, networking, and security in isolated environments. However, student experimentation frequently triggers "
           "catastrophic operating system crashes, frozen kernels, and misconfigurations that disrupt instructional continuity, waste valuable lab time, "
-          "and place immense operational burdens on technical staff. Traditional laboratory solutions—relying on manual hypervisor snapshots or complete "
-          "operating system reinstalls—are slow, uncoordinated, and reactive.")
+          "and create heavy workloads for technical staff. Traditional laboratory methods, which rely on manual hypervisor snapshots or complete "
+          "operating system reinstalls, are slow, uncoordinated, and reactive.")
     ins_p("This project details the design, implementation, and deployment of the Automated Virtual Machine Instability Management System "
           "(VMRecovery) for IT training laboratories. Developed using Python 3.14, Flask, SQLite with Write-Ahead Logging (WAL) concurrency, and "
           "Oracle VirtualBox VBoxManage CLI integration, the system delivers unattended, zero-touch self-healing for lab virtual machines. The system "
@@ -155,7 +155,7 @@ def build_milestone6():
           "multi-channel alerting via SMTP and HMAC-SHA256 signed webhooks, and a token-authenticated RESTful API.")
     ins_p("The system was deployed and validated within a hybrid edge-cloud architecture utilizing Linux systemd service hardening on the physical lab "
           "hypervisor host, Cloudflare Zero-Trust ingress tunneling for firewall-free remote HTTPS access, an offsite 3-2-1 disaster recovery pipeline "
-          "managed cloud database persistence on Supabase PostgreSQL, and a live public demonstration platform deployed on Render PaaS. Empirical validation across an automated suite of 154 test cases achieved a 100% pass rate with zero defects. The resulting system "
+          "managed cloud database storage on Supabase PostgreSQL, and a live public demonstration platform hosted on Render PaaS. Automated testing across a suite of 154 test cases achieved a 100% pass rate with zero defects. The resulting system "
           "guarantees instructional continuity, protects learning progress, and automates laboratory administration.")
 
     ins_page_break()
@@ -292,7 +292,7 @@ def build_milestone6():
         "(VMRecovery), this research successfully achieved every general and specific objective established in Chapter One:"
     )
     add_p(doc,
-        "1. Realization of the Virtual Machine Registry Module: Successfully established a centralized repository linking Oracle VirtualBox "
+        "1. Virtual Machine Registry Module: Built a central registry linking Oracle VirtualBox "
         "hardware UUIDs to academic class groups, custom snapshot cadences, and student ownership, verified by direct CLI hardware discovery.\n"
         "2. Implementation of Automated Snapshot Scheduling: Engineered an automated snapshot engine executing both interval-based snapshots "
         "and pre-session baseline captures, protected by automated retention pruning and disk space thresholds.\n"
@@ -309,14 +309,14 @@ def build_milestone6():
         align=WD_ALIGN_PARAGRAPH.LEFT
     )
 
-    add_heading_2(doc, "5.2 Challenges Encountered and Technical Mitigations")
+    add_heading_2(doc, "5.2 Challenges Encountered and Technical Solutions")
     add_p(doc,
-        "Throughout the practical implementation and deployment of this system, several significant technical and architectural hurdles were "
-        "encountered. The engineering mitigations devised during this project provide valuable insights for systems engineering:"
+        "Throughout the practical implementation and deployment of this system, several technical and architectural hurdles were "
+        "encountered. The practical fixes developed during this project provide useful lessons for systems engineering:"
     )
     add_p(doc,
         "• Public Cloud Virtualization Limitations: Standard cloud container and shared virtual server environments do not permit direct bare-metal "
-        "hardware virtualization (VT-x/AMD-V) access. This was mitigated by architecting a 4-Pillar Hybrid Edge-Cloud Deployment: running bare-metal "
+        "hardware virtualization (VT-x/AMD-V) access. This was solved by designing a 4-Pillar Hybrid Edge-Cloud Deployment: running bare-metal "
         "hypervisor execution and sub-second rollbacks on the physical laboratory host, using Cloudflare Zero-Trust edge tunnels for secure off-campus "
         "administrative ingress, utilizing Supabase managed cloud PostgreSQL for persistent database replication, and deploying a public demonstration "
         "platform on Render with simulated hypervisor telemetry.\n"
@@ -356,7 +356,7 @@ def build_milestone6():
     add_p(doc,
         "The Automated Virtual Machine Recovery System establishes a resilient, scalable, and autonomous platform for managing virtualized technical "
         "training environments. By eliminating reliance on manual hypervisor interventions, the software guarantees that student technical progress "
-        "is continuously protected and that laboratory classes proceed without interruption. The empirical testing and real-world deployment results "
+        "is continuously protected and that laboratory classes proceed without interruption. The automated testing and real-world deployment results "
         "validate that hybrid edge-cloud architectures combine the performance of local hardware virtualization with the resilience and accessibility "
         "of enterprise cloud computing. This system delivers a cost-effective, dependable solution for educational institutions striving to provide "
         "world-class, uninterrupted hands-on technical training."

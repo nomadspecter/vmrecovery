@@ -27,9 +27,9 @@ def build_milestone4():
     add_p(doc,
         "This chapter details the concrete implementation, verification, and deployment of the Automated Virtual Machine "
         "Recovery System (VMRecovery). Building directly upon the design models of Chapter Two and the architectural "
-        "framework established in Chapter Three, this chapter presents the practical realization of the automated snapshot "
-        "and retention engine, autonomous self-healing recovery algorithms, independent appliance disaster recovery, "
-        "student self-service provisioning workflows, multi-channel alerting infrastructure, empirical testing results, "
+        "framework established in Chapter Three, this chapter presents the practical implementation of the automated snapshot "
+        "and retention engine, automatic self-healing recovery routines, independent appliance disaster recovery, "
+        "student self-service provisioning workflows, multi-channel alerting, automated testing results, "
         "and production deployment configurations."
     )
 
@@ -342,11 +342,11 @@ def require_token(f):
     for title, desc in adv_bugs:
         add_p(doc, desc, bold_prefix=title + "\n")
 
-    # 4.8 Comprehensive System Testing Matrix (Full Test Suite Verification)
-    add_heading_2(doc, "4.8 Comprehensive System Testing Matrix (Full Test Suite Verification)")
+    # 4.8 Full System Testing Matrix (154-Test Verification)
+    add_heading_2(doc, "4.8 Full System Testing Matrix (154-Test Verification)")
     add_p(doc,
-        "To rigorously validate that every functional requirement, edge case, and failure mode is properly handled across the entire codebase, "
-        "a comprehensive automated test suite consisting of 154 test cases was executed using Pytest 9.x. Table 4.8.1 provides the complete test "
+        "To confirm that every functional requirement, edge case, and failure mode is properly handled across the codebase, "
+        "an automated test suite of 154 test cases was executed using Pytest 9.x. Table 4.8.1 provides the full test "
         "execution matrix categorized by functional module:"
     )
 
@@ -406,11 +406,11 @@ def require_token(f):
                 if i in [0, 2, 4]:
                     r.bold = True
 
-    add_caption(doc, "Table 4.8.1: Comprehensive System Testing Execution Matrix (154 Total Tests)")
+    add_caption(doc, "Table 4.8.1: Full System Testing Execution Matrix (154 Total Tests)")
 
     add_p(doc,
-        "As reflected in Table 4.8.1, all 154 automated test cases executed across the seven test suites passed with a 100% success rate "
-        "in 16.79 seconds. This empirical testing proves that the software reliably handles both normal operations and severe fault conditions "
+        "As shown in Table 4.8.1, all 154 automated test cases across the seven test suites passed with a 100% success rate "
+        "in 16.79 seconds. These test results confirm that the software reliably handles both normal operations and severe fault conditions "
         "without crashing, data loss, or hypervisor corruption."
     )
 
@@ -423,14 +423,14 @@ def require_token(f):
     # 4.9 Summary of Core Implementation and Testing
     add_heading_2(doc, "4.9 Summary of Core Implementation and Testing")
     add_p(doc,
-        "Sections 4.1 through 4.8 successfully realized the practical implementation, debugging, and comprehensive testing of all core and advanced "
+        "Sections 4.1 through 4.8 completed the practical implementation, debugging, and full testing of all core and advanced "
         "modules for the Automated Virtual Machine Recovery System, achieving the following key milestones:\n"
-        "1. Realization of autonomous snapshot scheduling, session baselines, and automatic retention pruning.\n"
-        "2. Implementation of zero-touch automated recovery for both crashed VM processes and silent guest OS hangs via debounced heartbeats.\n"
-        "3. Development of independent .ova appliance disaster recovery and non-blocking database backups.\n"
-        "4. Deployment of the student self-service provisioning portal supporting linked and full clone generation from Golden Master templates.\n"
-        "5. Construction of the multi-channel notification engine (SMTP and signed webhooks) and token-authenticated RESTful API.\n"
-        "6. Complete empirical verification through 154 passing automated test cases with zero defects."
+        "1. Built autonomous snapshot scheduling, session baselines, and automatic retention pruning.\n"
+        "2. Implemented zero-touch automatic recovery for both crashed VM processes and silent guest OS hangs via debounced heartbeats.\n"
+        "3. Developed independent .ova appliance disaster recovery and non-blocking database backups.\n"
+        "4. Built the student self-service provisioning portal supporting linked and full clone generation from Golden Master templates.\n"
+        "5. Built the multi-channel notification engine (SMTP and signed webhooks) and token-authenticated REST API.\n"
+        "6. Completed full test verification with 154 passing automated test cases and zero defects."
     )
     add_p(doc,
         "With full software construction and validation achieved, the subsequent sections present the operational deployment into a simulated "
