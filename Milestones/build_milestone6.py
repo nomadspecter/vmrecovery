@@ -18,6 +18,12 @@ def build_milestone6():
     print(f"Loading {base_docx}...")
     doc = docx.Document(base_docx)
 
+    # Remove any legacy internal section breaks inherited from Milestone 1/2
+    # so we have EXACTLY 3 clean sections: Cover (0), Preliminary (1), Chapter 1+ (2).
+    for p in doc.paragraphs:
+        for old_sp in p._p.xpath('./w:pPr/w:sectPr'):
+            old_sp.getparent().remove(old_sp)
+
     # -------------------------------------------------------------
     # 1. PRELIMINARY PAGES (Inserted before Chapter One)
     # -------------------------------------------------------------
@@ -615,10 +621,6 @@ def build_milestone6():
         set_section_page_number(doc.sections[0], fmt=None)                       # Cover page: no number
         set_section_page_number(doc.sections[1], fmt='lowerRoman', start=1)      # Preliminary: i, ii, iii...
         set_section_page_number(doc.sections[2], fmt='decimal', start=1)         # Chapter 1+: 1, 2, 3...
-        for extra_sec in doc.sections[3:]:
-            extra_sec.footer.is_linked_to_previous = True
-            for old in extra_sec._sectPr.findall(qn('w:pgNumType')):
-                extra_sec._sectPr.remove(old)
 
     # Cap any tall legacy Chapter 1/2 images (> 3.25" tall) proportionally
     max_h_emu = int(Inches(3.25))
