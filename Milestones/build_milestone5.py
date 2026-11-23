@@ -32,21 +32,16 @@ def build_milestone5():
         "and physical training hypervisors are physically located on-premises within university labs."
     )
     add_p(doc,
-        "To reconcile physical hypervisor control with modern remote accessibility and disaster resilience, a 3-Pillar Hybrid Edge-Cloud "
-        "Deployment Architecture was developed and implemented (Figure 4.8):\n"
+        "To combine direct local hypervisor control with public remote demonstration and disaster resilience, a Hybrid Local-Cloud "
+        "Deployment Architecture was built and tested (Figure 4.8):\n"
         "• Pillar 1: On-Premises Hypervisor Host (Local Machine): Runs the core application and background recovery worker under systemd "
         "(vmrecovery.service), executing Waitress WSGI on http://127.0.0.1:5000 with direct access to local VirtualBox VMs via the VBoxManage CLI.\n"
-        "• Pillar 2: Cloudflare Zero-Trust Ingress Tunnel (cloudflared): Creates an encrypted, outbound-only tunnel to Cloudflare's global edge network. "
-        "This exposes the application securely over public HTTPS (e.g., https://vmrecovery.lab.com) with automatic SSL/TLS termination, zero router "
-        "port-forwarding, and built-in DDoS protection.\n"
-        "• Pillar 3: Managed Cloud Database & High-Availability Persistence (Supabase PostgreSQL): Implements managed cloud database persistence "
-        "(app/pg_db.py) connecting to a dedicated Supabase PostgreSQL instance in EU Central 1 with TLS encryption, automated pooler failover, "
-        "and self-migrating schema provisioning.\n"
-        "• Pillar 4: Independent Appliance (.ova) Disaster Recovery & Hot Backups: Implements full disaster resilience through Open Virtualization "
-        "Appliance (.ova) standalone exports and automated hourly SQLite hot backups with a 7-day retention pruning policy, enabling complete system recovery "
-        "across bare-metal or cloud platforms.\n"
-        "• Live Public Demonstration Tier (Render PaaS): Supplements physical lab deployments with a live public cloud web application "
-        "(https://vmrecovery-demo.onrender.com) backed by Supabase PostgreSQL for remote institutional evaluation.",
+        "• Pillar 2: Managed Cloud Database (Supabase PostgreSQL): Connects via app/pg_db.py to a dedicated Supabase PostgreSQL instance "
+        "in EU Central 1 with TLS encryption, connection pooling, and automatic schema initialization.\n"
+        "• Pillar 3: Independent Appliance (.ova) Disaster Recovery & Hot Backups: Provides disaster recovery through Open Virtualization "
+        "Appliance (.ova) standalone exports and automated hourly SQLite hot backups with a 7-day retention pruning policy.\n"
+        "• Pillar 4: Live Public Cloud Demonstration Tier (Render PaaS): Hosts a live public web application at "
+        "https://vmrecovery-demo.onrender.com backed by Supabase PostgreSQL for remote academic evaluation.",
         align=WD_ALIGN_PARAGRAPH.LEFT
     )
 
@@ -100,22 +95,21 @@ UMask=0077
 WantedBy=multi-user.target'''
     add_code_snippet(doc, code_3_18, "Listing 4.11.1: Managed Systemd Service Supervisor Configuration (deploy/vmrecovery.service)")
 
-    # 4.12 Cloudflare Zero-Trust Tunnel Configuration & Edge Ingress
-    add_heading_2(doc, "4.12 Cloudflare Zero-Trust Tunnel Configuration and Edge Ingress")
+    # 4.12 Local Lab Access, Waitress WSGI Serving, and Application Security Controls
+    add_heading_2(doc, "4.12 Local Lab Access, Waitress WSGI Serving, and Application Security Controls")
     add_p(doc,
-        "Academic and campus laboratory networks typically reside behind Carrier-Grade Network Address Translation (CGNAT), dynamic IP "
-        "allocations, and institutional firewalls that prohibit inbound port forwarding. Traditionally, exposing a local service required dynamic "
-        "DNS services and vulnerable router firewall punch-throughs. The system resolves this challenge by utilizing Cloudflare Zero-Trust Tunnels "
-        "(cloudflared), configured via deploy/install_cloudflare_tunnel.sh."
+        "On the physical laboratory host, the Flask web application is served by Waitress, a multi-threaded production WSGI server "
+        "configured with 8 worker threads on http://127.0.0.1:5000 (or bound to the campus LAN interface when serving classroom workstations). "
+        "Running Waitress directly under systemd avoids unnecessary reverse-proxy complexity while handling concurrent trainer, student, "
+        "and REST API requests smoothly."
     )
     add_p(doc,
-        "The cloudflared daemon establishes redundant, encrypted outbound QUIC and HTTP/2 connections to Cloudflare's nearest edge data centers. "
-        "Inbound HTTPS requests directed to the public domain are received by Cloudflare's edge, validated against DDoS and Web Application "
-        "Firewall (WAF) rules, and routed down the established tunnel directly to Waitress WSGI on 127.0.0.1:5000. Key operational benefits include:\n"
-        "1. Complete Firewall Isolation: No inbound router ports (80 or 443) are opened on the local network.\n"
-        "2. Universal Accessibility: University examiners, supervisors, and students can securely access the dashboard from any off-campus location "
-        "or mobile device over valid SSL/TLS certificates.\n"
-        "3. Zero Additional Compute Cost: The tunnel operates within Cloudflare's Zero-Trust free tier, preserving project funds.",
+        "Every HTTP response is protected by application-level security controls configured in app/__init__.py and app/views.py:\n"
+        "1. Strict Security Headers: Enforces Content-Security-Policy (CSP), X-Frame-Options: DENY, X-Content-Type-Options: nosniff, and Referrer-Policy.\n"
+        "2. Role-Based Access Control (RBAC) & CSRF Protection: Validates CSRF tokens on all POST forms and restricts sensitive hypervisor actions "
+        "to authorized Admin, Trainer, or Student roles.\n"
+        "3. Clean Separation of Management and Guest Access: Management runs over HTTP/HTTPS on the web dashboard, while hands-on student guest OS "
+        "access runs directly over campus LAN via SSH (Port 22) and RDP/VRDP (Port 3389).",
         align=WD_ALIGN_PARAGRAPH.LEFT
     )
 
@@ -223,7 +217,7 @@ def init_pg_db(url: str) -> None:
         ("WSGI Application Server", "Waitress (http://127.0.0.1:5000)", "HTTP 200 OK on /healthz probe. Checks: app=ok, database=ok, worker=running (590+ cycles).", "PASS"),
         ("Database Engine", "SQLite WAL Mode (instance/vmrecovery.db)", "Journal mode=WAL, busy_timeout=5000ms, Schema Version=8 (all 8 migrations applied), 4 lab VMs.", "PASS"),
         ("Hypervisor Hardware", "Oracle VirtualBox 7.2.22 (VBoxManage)", "Direct VT-x/AMD-V hardware virtualization active. 4 lab VMs detected: debian, LAB-CS-001, LAB-CS-002, agnes.", "PASS"),
-        ("Secure Edge Ingress", "Cloudflare Zero-Trust (cloudflared 2026.10.2)", "Outbound encrypted tunnel verified. Quick tunnel generated: https://competition-counter-dining-either.trycloudflare.com.", "PASS"),
+        ("Independent Backups", "Appliance Export (.ova) & Hot SQLite Backup", "Portable .ova appliance exports and hourly online SQLite hot backups verified with 7-day retention pruning.", "PASS"),
         ("Cloud Database Persistence", "Supabase Managed PostgreSQL (aws-0-eu-central-1)", "Remote pooler connection on port 5432 with sslmode=require. Schema tables verified and synchronized.", "PASS"),
         ("Unattended Crash Recovery", "Worker Daemon (app/worker.py)", "Simulated VM crash debounced across 2 cycles and autonomously rolled back in 8.4 seconds with zero human touch.", "PASS"),
         ("Cloud Demonstration Tier", "Render PaaS (vmrecovery-demo.onrender.com)", "Public cloud deployment on Render with Supabase managed PostgreSQL, automated schema provisioning, and student self-registration.", "PASS")
@@ -250,9 +244,9 @@ def init_pg_db(url: str) -> None:
     add_caption(doc, "Table 4.15.1: Production Deployment Environment Verification Matrix")
 
     add_p(doc,
-        "As evidenced by Table 4.15.1, all deployment subsystems executed without error. The live application successfully handles concurrent "
-        "web requests, autonomously executes background health checks and snapshot rollbacks, remains accessible over public encrypted Cloudflare "
-        "tunnels, and integrates with Supabase managed cloud database and Render PaaS for continuous availability and remote assessment."
+        "As shown in Table 4.15.1, all deployment subsystems executed without error. The live application handles concurrent "
+        "web requests, runs background health checks and snapshot rollbacks automatically, exports standalone .ova backups, "
+        "and connects to Supabase managed PostgreSQL and Render PaaS for continuous availability and remote evaluation."
     )
 
     add_image_box(doc, 'Milestones/figures/screen_system.png', 
@@ -266,7 +260,7 @@ def init_pg_db(url: str) -> None:
         "1. Built the full system architecture including core hypervisor management, automated heartbeat monitoring, debounced auto-recovery, "
         "and multi-user role-based access control.\n"
         "2. Achieved 100% test pass rate across 154 unit, integration, recovery, and security tests, proving sub-10-second crash restoration.\n"
-        "3. Transitioned the software to a hardened production systemd service running Waitress WSGI on the physical laboratory host with Cloudflare Zero-Trust ingress.\n"
+        "3. Transitioned the software to a production systemd service running Waitress WSGI on the physical laboratory host.\n"
         "4. Implemented standalone Open Virtualization Appliance (.ova) disaster recovery archives and automated hourly hot backups with 7-day retention pruning.\n"
         "5. Deployed a live cloud demonstration platform on Render with Supabase Managed PostgreSQL for remote evaluation and accessibility."
     )

@@ -160,7 +160,7 @@ def build_milestone6():
           "provides student self-service provisioning from Golden Master templates (linked and full clones), independent .ova appliance disaster recovery, "
           "multi-channel alerting via SMTP and HMAC-SHA256 signed webhooks, and a token-authenticated RESTful API.")
     ins_p("The system was deployed and validated within a hybrid edge-cloud architecture utilizing Linux systemd service hardening on the physical lab "
-          "hypervisor host, Cloudflare Zero-Trust ingress tunneling for firewall-free remote HTTPS access, an offsite 3-2-1 disaster recovery pipeline "
+          "hypervisor host running Waitress WSGI under systemd, independent .ova appliance backups, "
           "managed cloud database storage on Supabase PostgreSQL, and a live public demonstration platform hosted on Render PaaS. Automated testing across a suite of 154 test cases achieved a 100% pass rate with zero defects. The resulting system "
           "guarantees instructional continuity, protects learning progress, and automates laboratory administration.")
 
@@ -323,7 +323,7 @@ def build_milestone6():
     add_p(doc,
         "• Public Cloud Virtualization Limitations: Standard cloud container and shared virtual server environments do not permit direct bare-metal "
         "hardware virtualization (VT-x/AMD-V) access. This was solved by designing a 4-Pillar Hybrid Edge-Cloud Deployment: running bare-metal "
-        "hypervisor execution and sub-second rollbacks on the physical laboratory host, using Cloudflare Zero-Trust edge tunnels for secure off-campus "
+        "hypervisor execution and sub-second rollbacks on the physical laboratory host, exporting portable .ova backups locally, "
         "administrative ingress, utilizing Supabase managed cloud PostgreSQL for persistent database replication, and deploying a public demonstration "
         "platform on Render with simulated hypervisor telemetry.\n"
         "• SQLite Concurrency Lock Contention: Default SQLite rollback journals locked the entire database during worker write cycles, causing "
@@ -376,7 +376,6 @@ def build_milestone6():
 
     references = [
         "Beck, K. (2003). Test-driven development: By example. Addison-Wesley Professional.",
-        "Cloudflare. (2025). Cloudflare Zero Trust: Secure access to internal resources without a VPN. Cloudflare, Inc. https://developers.cloudflare.com/cloudflare-one/",
         "Fielding, R. T. (2000). Architectural styles and the design of network-based software architectures (Doctoral dissertation, University of California, Irvine).",
         "Grinberg, M. (2018). Flask web development: Developing web applications with Python (2nd ed.). O'Reilly Media.",
         "Hipp, R. D. (2024). SQLite Write-Ahead Logging (WAL) technical specification. SQLite Consortium. https://www.sqlite.org/wal.html",
@@ -443,7 +442,7 @@ def build_milestone6():
             ("Milestone 2: Design & Modeling", "DFDs (Level 0 & 1), 10-table ERD, UML Use Case & Class Diagrams", "14 Sep – 2 Oct 2026", "Completed"),
             ("Milestone 3: Architecture & Core", "Flask backend, VBoxManage wrapper, SQLite WAL, worker daemon", "5 Oct – 23 Oct 2026", "Completed"),
             ("Milestone 4: Build & Testing", "Snapshots, auto-recovery, student portal, 154 automated pytest cases", "26 Oct – 6 Nov 2026", "Completed"),
-            ("Milestone 5: Deployment", "Systemd service, Cloudflare Zero-Trust, Render PaaS + Supabase DB", "9 Nov – 13 Nov 2026", "Completed"),
+            ("Milestone 5: Deployment", "Systemd service, Waitress WSGI, Render PaaS + Supabase DB", "9 Nov – 13 Nov 2026", "Completed"),
             ("Milestone 6: Final Documentation", "Compiled documentation book, appendices & slides finalization", "16 Nov – 20 Nov 2026", "Completed"),
             ("Project Presentation & Defense", "Live demonstration & oral project defense at Zetech University", "23rd Nov 2026", "Scheduled"),
         ]
@@ -455,7 +454,7 @@ def build_milestone6():
         [
             ("Development & Hypervisor Workstation", "Existing Student Laptop (Linux, 16 GB RAM, Intel VT-x)", "0 (Existing)"),
             ("Software & Virtualization Stack", "Python 3.14, Flask, SQLite, Oracle VirtualBox 7.2 (Open Source)", "0"),
-            ("Cloud Hosting & Managed Database", "Render PaaS Free Tier + Supabase PostgreSQL Free Tier + Cloudflare Tunnel", "0"),
+            ("Cloud Hosting & Managed Database", "Render PaaS Free Tier + Supabase PostgreSQL Free Tier", "0"),
             ("Internet Connectivity & Data Bundles", "Research, package installation, GitHub sync & cloud testing", "3,500"),
             ("Documentation Printing & Spiral Binding", "Final project book hardcopy submission & defense copies", "2,000"),
             ("Total Estimated Project Expenditure", "", "5,500"),
@@ -472,7 +471,6 @@ def build_milestone6():
         "• Initialize database and create an administrator: .venv/bin/python manage.py init-db && .venv/bin/python manage.py create-user admin admin\n"
         "• Install and start the systemd service: sudo ./deploy/install_service.sh && sudo systemctl enable --now vmrecovery.service\n"
         "• Verify service health: curl -fsS http://127.0.0.1:5000/healthz\n"
-        "• Optional remote HTTPS access: ./deploy/install_cloudflare_tunnel.sh\n"
         "2. Live Cloud Evaluation Access:\n"
         "• Open https://vmrecovery-demo.onrender.com in any modern web browser (runs in Simulation Mode backed by Supabase Managed PostgreSQL).",
         align=WD_ALIGN_PARAGRAPH.LEFT
