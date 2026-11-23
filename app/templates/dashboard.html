@@ -92,6 +92,14 @@
   </div>
   {% endif %}
 
+  {% set active_faults = student_vms | selectattr('status', 'in', ['crashed', 'frozen', 'restoring', 'busy', 'suspect']) | list %}
+  {% if active_faults %}
+  <div class="banner amber">
+    <b>Auto-recovery in progress:</b> {{ active_faults[0].vm_name }} is being restored automatically. This page refreshes every 4 seconds.
+  </div>
+  <script>setTimeout(function(){ window.location.reload(); }, 4000);</script>
+  {% endif %}
+
 {% else %}
   <div class="cards">
     <div class="card">Registered VMs<b>{{ counts.total }}</b></div>
@@ -154,9 +162,9 @@
         <h4 style="margin:0 0 4px 0;color:#1e293b">Autonomous Self-Healing &amp; Fault Demonstration</h4>
         <p class="muted" style="margin:0;font-size:13px">
           {% if simulate %}
-          <b>How to test failure recovery:</b> Click <b>Sim. crash</b> (aborted process) or <b>Sim. freeze</b> (hung OS) on any VM below. The background worker detects the fault, restores the latest snapshot, and boots the VM automatically (~{{ check_seconds }}s).
+          <b>How to test failure recovery:</b> Click <b>Sim. crash</b> (aborted process) or <b>Sim. freeze</b> (hung OS) on any VM below. The background worker detects the fault, restores the latest snapshot, and boots the VM automatically (~5s).
           {% else %}
-          <b>How to test failure recovery on VirtualBox:</b> Start a VM that has at least one snapshot, then click <b>Test crash</b> (terminates the VM process into <code>aborted</code>) or <b>Test freeze</b> (pauses the VM into <code>frozen</code>). The background worker will detect the fault, restore the latest snapshot, and boot the VM automatically (~{{ check_seconds }}s).
+          <b>How to test failure recovery on VirtualBox:</b> Start a VM that has at least one snapshot, then click <b>Test crash</b> (terminates the VM process into <code>aborted</code>) or <b>Test freeze</b> (pauses the VM into <code>frozen</code>). The background worker will detect the fault, restore the latest snapshot, and boot the VM automatically (~5s).
           {% endif %}
         </p>
       </div>
@@ -229,6 +237,25 @@
         </td></tr>
       {% else %}<tr><td colspan="7" class="muted">No virtual machines registered yet.{% if user.role == 'admin' %} <a href="{{ url_for('main.vms') }}">Register or create one</a>.{% endif %}</td></tr>{% endfor %}
     </table></div>
+  {% set active_faults = vms | selectattr('status', 'in', ['crashed', 'frozen', 'restoring', 'busy', 'suspect']) | list %}
+  {% if active_faults %}
+  <div class="banner amber">
+    <b>Auto-recovery active:</b> {{ active_faults|length }} VM(s) currently in fault/recovery state
+    ({{ active_faults[0].vm_name }}: {{ active_faults[0].status }}). This page refreshes automatically every 4 seconds.
+  </div>
+  <script>setTimeout(function(){ window.location.reload(); }, 4000);</script>
+  {% endif %}
+
+  {% set tripped_vms = vms | selectattr('status', 'equalto', 'needs_admin') | list %}
+  {% if tripped_vms %}
+  <div class="banner red">
+    <b>Circuit breaker tripped:</b> {{ tripped_vms[0].vm_name }} reached the hourly automatic restore limit.
+    {% if user.role == 'admin' %}
+    Use <a href="{{ url_for('main.vm_detail', vm_id=tripped_vms[0].vm_id) }}">Manage</a> to restore manually or increase the hourly limit in <a href="{{ url_for('main.settings_page') }}">Settings</a>.
+    {% endif %}
+  </div>
+  {% endif %}
+
   <p class="muted">Status updates every few seconds as the background service checks each VM. Host free disk: {{ disk.free_gb }} GB.</p>
 {% endif %}
 {% endblock %}

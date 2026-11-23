@@ -313,3 +313,58 @@ def test_dashboard_has_no_nested_forms(client, settings):
     c = _Checker()
     c.feed(html)
     assert c.nested == 0
+
+
+def test_demo_blocks_when_circuit_breaker_limit_reached(client, settings, vbox):
+    conn = db.connect(settings.db_path)
+    vm_id = services.register_vm(conn, "DEV-LAB-01", "uuid-1", "Class A", 30, 5, now=T0)
+    services.take_snapshot(conn, vbox, services.get_vm(conn, vm_id), "baseline", T0)
+    now = services.now_local()
+    for _ in range(settings.max_restores_per_hour):
+        services.log_event(conn, "restore_success", vm_id, None, "Auto restore", "Success", now)
+    conn.close()
+
+    login(client)
+    t = csrf(client)
+    r = client.post(f"/demo/crash/{vm_id}", data={"csrf_token": t}, follow_redirects=True)
+    assert r.status_code == 200
+    assert b"Circuit breaker limit reached" in r.data
+    assert vbox.get_state("uuid-1") == "running"
+
+
+def test_apply_retention_cleans_orphaned_snapshots(settings, vbox):
+    db.init_db(settings.db_path)
+    conn = db.connect(settings.db_path)
+    vm_id = services.register_vm(conn, "DEV-LAB-01", "uuid-1", "Class A", 30, 2, now=T0)
+    # Insert stale DB snapshots that do not exist in vbox
+    for i in range(3):
+        conn.execute(
+            "INSERT INTO snapshots (vm_id, snapshot_name, snapshot_type, created_at) VALUES (?, ?, 'auto', ?)",
+            (vm_id, f"ghost-{i}", f"2026-01-01 00:0{i}:00"),
+        )
+    conn.commit()
+    services.take_snapshot(conn, vbox, services.get_vm(conn, vm_id), "manual", now=T0)
+    snaps = services.list_snapshots(conn, vm_id)
+    failed = conn.execute("SELECT * FROM events WHERE event_type='snapshot_failed'").fetchall()
+    conn.close()
+    assert len(snaps) == 2
+    assert failed == []
+
+
+def test_backup_restore_creates_baseline_for_auto_recovery(settings, vbox, tmp_path):
+    db.init_db(settings.db_path)
+    conn = db.connect(settings.db_path)
+    vm_id = services.register_vm(conn, "DEV-LAB-01", "uuid-1", "Class A", 30, 5, now=T0)
+    services.take_snapshot(conn, vbox, services.get_vm(conn, vm_id), "manual", now=T0)
+    bid = services.create_backup(conn, vbox, services.get_vm(conn, vm_id), str(tmp_path), now=T0)
+    ok = services.restore_backup(conn, vbox, services.get_vm(conn, vm_id), bid, now=T0)
+    assert ok is True
+    vm = services.get_vm(conn, vm_id)
+    snaps = services.list_snapshots(conn, vm_id)
+    assert len(snaps) == 1
+    assert snaps[0]["snapshot_type"] == "baseline"
+    # Crashing immediately after a backup restore must now auto-recover cleanly
+    vbox.crash(vm["vbox_uuid"])
+    assert services.recover(conn, vbox, vm, now=T0) is True
+    assert vbox.get_state(vm["vbox_uuid"]) == "running"
+    conn.close()

@@ -179,8 +179,12 @@ def _hydrate_simulated_vbox(app: Flask) -> None:
         }
         for vm in conn.execute("SELECT vm_id, vm_name, vbox_uuid, status FROM vms").fetchall():
             uuid = vm["vbox_uuid"]
+            desired_state = state_map.get(vm["status"], "running")
             if uuid not in vbox.vms:
-                vbox.add_vm(vm["vm_name"], uuid, state=state_map.get(vm["status"], "running"))
+                vbox.add_vm(vm["vm_name"], uuid, state=desired_state)
+            else:
+                vbox.vms[uuid]["name"] = vm["vm_name"]
+                vbox.vms[uuid]["state"] = desired_state
             snaps = conn.execute(
                 "SELECT snapshot_name FROM snapshots WHERE vm_id=? ORDER BY snapshot_id ASC",
                 (vm["vm_id"],),

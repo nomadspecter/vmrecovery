@@ -10,6 +10,10 @@ services:
         value: "true"
       - key: VMR_WORKER
         value: "true"
+      - key: VMR_CHECK_SECONDS
+        value: "10"
+      - key: VMR_MAX_RESTORES_PER_HOUR
+        value: "20"
       - key: PYTHON_VERSION
         value: "3.11.9"
       - key: DATABASE_URL

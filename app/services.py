@@ -348,8 +348,8 @@ def power_action(conn, vbox, vm_id, action, user_id=None, now=None):
             return f"{name} is already running."
         if state == "paused":
             vbox.resume_vm(uuid)
-            return f"{name} was resumed."
-        vbox.start_vm(uuid)
+        else:
+            vbox.start_vm(uuid)
     elif action == "stop":
         if state in ("poweroff", "aborted"):
             return f"{name} is already powered off."
@@ -501,6 +501,13 @@ def apply_retention(conn, vbox, vm, now):
         try:
             vbox.delete_snapshot(vm["vbox_uuid"], old["snapshot_name"])
         except VBoxError as exc:
+            msg = str(exc).lower()
+            if "not found" in msg or "could not find a snapshot" in msg:
+                # Already absent in VirtualBox; remove the stale DB record so
+                # retention does not log repeated failures on every future cycle.
+                conn.execute("DELETE FROM snapshots WHERE snapshot_id=?", (old["snapshot_id"],))
+                conn.commit()
+                continue
             log_event(conn, "snapshot_failed", vm["vm_id"], None,
                       f"Could not delete old snapshot {old['snapshot_name']}", str(exc), now)
             continue
@@ -848,6 +855,9 @@ def restore_backup(conn, vbox, vm, backup_id, user_id=None, now=None):
 
     conn.execute("UPDATE vms SET vbox_uuid=?, vm_name=?, status='running', fail_count=0 WHERE vm_id=?",
                  (new_uuid, new_name, vm["vm_id"]))
+    # Old snapshot records belonged to the deleted VM and do not exist on the
+    # freshly imported appliance.
+    conn.execute("DELETE FROM snapshots WHERE vm_id=?", (vm["vm_id"],))
     conn.commit()
     try:
         # The import registers the machine while its disk is still being
@@ -862,6 +872,9 @@ def restore_backup(conn, vbox, vm, backup_id, user_id=None, now=None):
                   f"Imported {new_name} from {b['backup_name']} but it would not start after {dur}s",
                   str(exc), now)
         return False
+
+    # Take a fresh baseline snapshot so automated recovery immediately has a valid restore point.
+    take_snapshot(conn, vbox, get_vm(conn, vm["vm_id"]), "baseline", now=now, user_id=user_id)
 
     dur = round(time.monotonic() - t0, 2)
     log_event(conn, "backup_restore_success", vm["vm_id"], user_id,

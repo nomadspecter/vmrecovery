@@ -363,6 +363,8 @@ def vms_add():
                              request.form.get("pre_session") == "on", g.user["user_id"],
                              request.form.get("heartbeat_property"), is_template=is_template,
                              assigned_student_id=student_id)
+        if settings().simulate and hasattr(vbox(), "vms") and uuid.strip() not in vbox().vms:
+            vbox().add_vm(name.strip(), uuid.strip(), state="running")
         flash(f"{name} registered.", "ok")
     except ValueError as exc:
         flash_error(str(exc))
@@ -484,6 +486,10 @@ def vm_power(vm_id):
     try:
         with vbox_lock():
             message = services.power_action(get_db(), vbox(), vm_id, action, g.user["user_id"])
+        if action == "pause":
+            worker = current_app.extensions.get("worker")
+            if worker is not None:
+                worker.wake(delay=3.0)
         flash(message, "ok")
     except ValueError as exc:
         flash_error(str(exc))
@@ -834,6 +840,11 @@ def healthz():
     return jsonify(status="ok" if status == 200 else "degraded", checks=checks), status
 
 
+@bp.route("/favicon.ico")
+def favicon():
+    return "", 204
+
+
 # ------------------------------------------------------------------ fault demonstration (simulated & local VirtualBox)
 @bp.route("/demo/<action>/<int:vm_id>", methods=["POST"])
 @role_required("admin")
@@ -842,6 +853,17 @@ def demo(action, vm_id):
         abort(404)
     vm = vm_or_404(vm_id)
     conn = get_db()
+    now = services.now_local()
+    # Re-apply any runtime Settings overrides so max_restores_per_hour is current.
+    services.apply_overrides(conn, settings())
+    attempts = services.recent_auto_attempts(conn, vm_id, now)
+    limit = settings().max_restores_per_hour
+    if attempts >= limit:
+        flash_error(
+            f"Circuit breaker limit reached for {vm['vm_name']} ({attempts}/{limit} auto-restores "
+            f"in the last hour). Increase 'Maximum automatic restores per hour' in Settings or test another VM."
+        )
+        return redirect(request.referrer or url_for("main.dashboard"))
     has_snap = False
     try:
         with vbox_lock():
@@ -851,7 +873,7 @@ def demo(action, vm_id):
             # worker cycle triggers auto-recovery without extra delay.
             status = "crashed" if action == "crash" else "frozen"
             initial_fails = max(1, settings().fail_threshold - 1)
-            now_str = services.ts(services.now_local())
+            now_str = services.ts(now)
             conn.execute(
                 "UPDATE vms SET status=?, fail_count=?, admin_paused=0, last_checked=?, status_since=? WHERE vm_id=?",
                 (status, initial_fails, now_str, now_str, vm_id),
@@ -860,10 +882,14 @@ def demo(action, vm_id):
     except VBoxError as exc:
         flash_error(f"Could not trigger {action} on {vm['vm_name']}: {exc}")
         return redirect(request.referrer or url_for("main.dashboard"))
+    worker = current_app.extensions.get("worker")
+    if worker is not None:
+        worker.wake(delay=3.0)
     if has_snap:
+        eta = "~5s" if worker is not None else f"~{settings().check_seconds}s"
         flash(
             f"Triggered {action} on {vm['vm_name']}. Auto-recovery will restore it to its latest snapshot "
-            f"on the next monitor cycle (~{settings().check_seconds}s).",
+            f"automatically ({eta}).",
             "ok",
         )
     else:

@@ -17,6 +17,7 @@ class Worker(threading.Thread):
         super().__init__(name="vm-recovery-worker", daemon=True)
         self.settings, self.vbox, self.lock = settings, vbox, lock
         self._stop_event = threading.Event()
+        self._wake_event = threading.Event()
         self.started_at = None
         self.last_cycle = None
         self.last_summary = None
@@ -27,6 +28,16 @@ class Worker(threading.Thread):
 
     def stop(self):
         self._stop_event.set()
+        self._wake_event.set()
+
+    def wake(self, delay: float = 0.0):
+        """Trigger the next monitoring cycle early (e.g. right after a fault test)."""
+        if delay <= 0:
+            self._wake_event.set()
+        else:
+            t = threading.Timer(delay, self._wake_event.set)
+            t.daemon = True
+            t.start()
 
     def status(self) -> dict:
         """A small snapshot for the System Health page and /healthz."""
@@ -61,7 +72,8 @@ class Worker(threading.Thread):
             except Exception as exc:
                 self.last_error = str(exc) or exc.__class__.__name__
                 log.exception("Worker cycle failed")
-            self._stop_event.wait(self.settings.check_seconds)
+            self._wake_event.clear()
+            self._wake_event.wait(self.settings.check_seconds)
 
     # ------------------------------------------------------------------ housekeeping
     def _housekeeping(self, conn) -> None:
